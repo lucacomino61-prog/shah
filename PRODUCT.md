@@ -30,8 +30,8 @@ on the first try.
 ## Positioning
 
 The coach speaks Albanian and explains moves in words rather than numbers. It runs fully in the browser on a free
-engine: no account, no server, no cost per question. The board is a polished marble set in 3D, not a flat web
-widget.
+engine: no account, no server, no cost per question. The board is a classic wooden set in 3D under one lamp, and the
+coach speaks as a TV broadcast, not as a flat web widget.
 
 ## Operating Context
 

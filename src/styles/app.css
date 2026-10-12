@@ -46,7 +46,6 @@ a { color: inherit; }
   --step-0: 1rem;
   --step-small: 0.8125rem;
   --step-title: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);
-  --step-poster: clamp(3.5rem, 1.6rem + 11vw, 9rem);
   --step-giant: clamp(5.5rem, 2rem + 26vw, 24rem);
 
   --space-2xs: 0.375rem;

@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-12T00:00:00Z",
+  "title": "Design System: Shah",
+  "extensions": {
+    "colorMeta": {
+      "stone": { "role": "neutral", "displayName": "Stone", "canonical": "#e6e5e1", "tonalRamp": ["#2a2927", "#43423f", "#5e5d59", "#7a7974", "#97968f", "#b4b3ad", "#cfcec9", "#e6e5e1"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#111214", "tonalRamp": ["#111214", "#1c1d20", "#2a2b2f", "#3c3d42", "#55565b", "#727378", "#95969a", "#bfc0c3"] },
+      "text-2": { "role": "neutral", "displayName": "Second Text", "canonical": "color-mix(in srgb, var(--ink) 66%, var(--stone))" },
+      "rule": { "role": "neutral", "displayName": "Rule", "canonical": "color-mix(in srgb, var(--ink) 16%, var(--stone))" },
+      "rule-strong": { "role": "neutral", "displayName": "Strong Rule", "canonical": "color-mix(in srgb, var(--ink) 40%, var(--stone))" },
+      "well": { "role": "neutral", "displayName": "Well", "canonical": "color-mix(in srgb, var(--ink) 6%, var(--stone))" },
+      "pointer": { "role": "primary", "displayName": "Lacquer Pointer", "canonical": "#e65719", "tonalRamp": ["#3a1304", "#5e1f06", "#852d09", "#a83707", "#c8460f", "#e65719", "#f27636", "#f7904b"] },
+      "pointer-ink": { "role": "primary", "displayName": "Pointer Ink", "canonical": "#a83707" },
+      "pointer-dark": { "role": "primary", "displayName": "Lacquer Pointer (dark theme)", "canonical": "#f27636" },
+      "pointer-ink-dark": { "role": "primary", "displayName": "Pointer Ink (dark grounds)", "canonical": "#f7904b" },
+      "pointer-stage": { "role": "primary", "displayName": "Lacquer Pointer (lit table)", "canonical": "#f06a2c" },
+      "verdict-on-stone": { "role": "primary", "displayName": "Verdict on Stone", "canonical": "#c8460f" },
+      "stage-ground": { "role": "neutral", "displayName": "Studio Dark", "canonical": "#070908" },
+      "room-black": { "role": "neutral", "displayName": "Room Black", "canonical": "#0b0907" },
+      "bar-umber": { "role": "neutral", "displayName": "Bar Umber", "canonical": "rgb(17 14 11 / 0.94)" },
+      "bar-umber-raised": { "role": "neutral", "displayName": "Bar Umber Raised", "canonical": "rgb(20 17 14 / 0.86)" },
+      "sheet-umber": { "role": "neutral", "displayName": "Sheet Umber", "canonical": "#15120f" },
+      "felt-pool": { "role": "tertiary", "displayName": "Felt under the Lamp", "canonical": "#3d5444", "tonalRamp": ["#090d0a", "#111a14", "#1a271f", "#24342a", "#2f4436", "#3d5444", "#506a58", "#68836f"] },
+      "felt-mid": { "role": "tertiary", "displayName": "Felt", "canonical": "#24342a" },
+      "felt-edge": { "role": "tertiary", "displayName": "Felt Edge", "canonical": "#111a14" },
+      "felt-dark": { "role": "tertiary", "displayName": "Felt in Shadow", "canonical": "#090d0a" },
+      "sq-light": { "role": "tertiary", "displayName": "Maple", "canonical": "#e4c99a", "tonalRamp": ["#4a3a20", "#6b5631", "#8d7345", "#ae905b", "#c8ab78", "#e4c99a", "#ecd6b0", "#f4e6cc"] },
+      "sq-dark": { "role": "tertiary", "displayName": "Walnut", "canonical": "#84532f", "tonalRamp": ["#24150b", "#3b2313", "#53321c", "#6b4225", "#84532f", "#9d6a45", "#b78760", "#d1a882"] },
+      "mahogany": { "role": "tertiary", "displayName": "Mahogany", "canonical": "#4b2213", "tonalRamp": ["#160601", "#2a1006", "#3a190c", "#4b2213", "#62301d", "#7b4229", "#965a3d", "#b47757"] },
+      "mahogany-edge": { "role": "tertiary", "displayName": "Mahogany Edge", "canonical": "#2a1006" },
+      "boxwood-stringing": { "role": "tertiary", "displayName": "Boxwood Stringing", "canonical": "#e9d3a4" },
+      "coord-inlay": { "role": "tertiary", "displayName": "Coordinate Inlay", "canonical": "#ecd6aa" },
+      "boxwood": { "role": "tertiary", "displayName": "Boxwood", "canonical": "#ecd8ae" },
+      "ebony": { "role": "tertiary", "displayName": "Ebony", "canonical": "#1a1a1d" },
+      "piece-fill-w": { "role": "tertiary", "displayName": "Flat White Piece", "canonical": "#f6f4ee" },
+      "piece-fill-b": { "role": "tertiary", "displayName": "Flat Black Piece", "canonical": "#17181b" },
+      "piece-edge-b": { "role": "tertiary", "displayName": "Flat Black Piece Edge", "canonical": "#f1efe9" }
+    },
+    "themes": {
+      "dark": { "ground": "#111214", "text": "#e6e5e1", "text-2": "color-mix(in srgb, var(--stone) 70%, var(--ink))", "rule": "color-mix(in srgb, var(--stone) 15%, var(--ink))", "rule-strong": "color-mix(in srgb, var(--stone) 38%, var(--ink))", "well": "color-mix(in srgb, var(--stone) 6%, var(--ink))", "pointer": "#f27636", "pointer-ink": "#f7904b" },
+      "stage": { "selector": "html[data-stage]", "ground": "#070908", "text": "#e6e5e1", "text-2": "color-mix(in srgb, var(--stone) 70%, #0b0907)", "rule": "color-mix(in srgb, var(--stone) 16%, #0b0907)", "rule-strong": "color-mix(in srgb, var(--stone) 38%, #0b0907)", "well": "color-mix(in srgb, var(--stone) 7%, #0b0907)", "pointer": "#f06a2c", "pointer-ink": "#f7904b" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Reading-page titles sized from their letter count (min(step-giant, 100cqi / (chars * 0.74))); the home wordmark and intro mark run the same voice larger." },
+      "verdict": { "displayName": "Verdict", "purpose": "The move in figurine notation plus its informant symbol, in the lower-third head." },
+      "headline": { "displayName": "Headline", "purpose": "The new-game sheet title, uppercase." },
+      "title": { "displayName": "Title", "purpose": "Lesson rows, scoresheet and progress section heads." },
+      "caps": { "displayName": "Broadcast Caps", "purpose": "Live bug, lower-third tag and title, cues, guide labels, ticker; uppercase, width 112-125, weight 700-900." },
+      "body": { "displayName": "Body", "purpose": "Reading pages; ledes at 42ch." },
+      "body-broadcast": { "displayName": "Broadcast Body", "purpose": "Coach reasons in the lower third, 56ch; 1rem on wide screens." },
+      "label": { "displayName": "Label", "purpose": "Tab labels, meta, move numbers, motion switch." }
+    },
+    "shadows": [
+      { "name": "over-table-mark", "value": "text-shadow: 0 0.03em 0.12em rgb(0 0 0 / 0.45)", "purpose": "Stone wordmark set directly on the lit board." },
+      { "name": "over-table-line", "value": "text-shadow: 0 1px 8px rgb(0 0 0 / 0.6)", "purpose": "Stone reading line set directly on the lit board." },
+      { "name": "piece-in-hand", "value": "filter: drop-shadow(0 8px 6px rgb(0 0 0 / 0.28))", "purpose": "A flat piece being dragged." },
+      { "name": "focus-halo", "value": "outline: 2px solid var(--pointer); outline-offset: 3px; box-shadow: 0 0 0 6px var(--ground)", "purpose": "Every focus-visible element." },
+      { "name": "selection-underline", "value": "box-shadow: inset 0 -2px 0 currentColor", "purpose": "Current nav item (ink), current move and chosen theme (pointer)." },
+      { "name": "stage-vignette", "value": "radial-gradient(ellipse 85% 70% at 50% 40%, transparent 55%, rgb(0 0 0 / 0.45) 100%)", "purpose": "Darkens the room toward the corners over the felt pool." }
+    ],
+    "motion": [
+      { "name": "dur-press", "value": "110ms", "purpose": "Press scale (0.97 buttons and cues, 0.95 tools)." },
+      { "name": "dur-ui", "value": "200ms", "purpose": "Background and colour state changes." },
+      { "name": "ease-out", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Default easing for presses, piece slides, menu and sheet entrances, 2D arrows." },
+      { "name": "ease-in-out", "value": "cubic-bezier(0.65, 0, 0.35, 1)", "purpose": "Symmetric moves." },
+      { "name": "piece-slide-2d", "value": "transform 210ms ease-out", "purpose": "Flat pieces moving between squares." },
+      { "name": "verdict-ink", "value": "color 320ms ease-out", "purpose": "The outlined move fills in when the verdict lands." },
+      { "name": "menu-in", "value": "160ms ease-out, opacity 0 and scale 0.96 from top right", "purpose": "Phone tool list opening." },
+      { "name": "sheet-in", "value": "240ms ease-out, translateY 1.5rem and opacity 0", "purpose": "New-game sheet opening." },
+      { "name": "graphic-wipe", "value": "clip-path inset(0 100% 0 0) to inset(0 0% 0 0), 0.32-0.34s, stagger 0.06-0.07s, power3.out", "purpose": "Lower-third parts arriving left to right." },
+      { "name": "intro-wipe", "value": "clip-path inset(0 0 100% 0), 0.5s power3.inOut, delay 0.15s", "purpose": "The intro card lifting off the table." },
+      { "name": "arrow-draw-3d", "value": "0.32s cubic out, each arrow offset by 0.35 of the line, numbers after", "purpose": "Demonstrated lines drawing on from the tail." },
+      { "name": "arrow-draw-2d", "value": "stroke-dashoffset 260ms ease-out; head opacity 120ms at +200ms", "purpose": "Same on the flat board (WAAPI)." },
+      { "name": "study-step", "value": "0.55s first step, 1.05s between steps", "purpose": "Shiko pse replay pacing." },
+      { "name": "live-blink", "value": "1.6s steps(2, jump-none) infinite, opacity 0.25 at 50%", "purpose": "The live bug's square; off in study mode." },
+      { "name": "ticker-crawl", "value": "translateX(-50%) var(--crawl, 40s) linear infinite", "purpose": "Ticker band; pauses on hover, stops with motion off or reduced motion." },
+      { "name": "spring-rest", "value": "k 170, c 19", "purpose": "3D piece set down with the faintest overshoot." },
+      { "name": "spring-carry", "value": "k 560, c 42", "purpose": "3D piece following the hand." },
+      { "name": "spring-tilt", "value": "k 210, c 17", "purpose": "3D piece tilt while carried." },
+      { "name": "lift", "value": "hover 0.05, chosen 0.24, carry 0.6 (board units)", "purpose": "How high a 3D piece rides." },
+      { "name": "engine", "value": "GSAP ticker is the only loop (lagSmoothing 0); motion off sets globalTimeline.timeScale 1000; reduced motion and data-motion=off zero transitions (0s) and animations", "purpose": "One animation engine." }
+    ],
+    "breakpoints": [
+      { "name": "sheet", "value": "640px" },
+      { "name": "desktop", "value": "1024px" },
+      { "name": "wide", "value": "1400px" }
+    ],
+    "studio3d": {
+      "renderer": { "clearColor": "#070908", "toneMapping": "NeutralToneMapping", "exposure": 1.04, "shadowMap": "VSM (PCF fallback)" },
+      "lights": [
+        { "name": "lamp", "type": "SpotLight", "color": "#fff0dc", "intensity": 3.6, "angle": 0.5, "penumbra": 0.62, "position": "(-7, 15, 6) mirrored for black: over the player's left shoulder", "shadow": "1024 map, radius 5 VSM, bias -0.0006" },
+        { "name": "fill", "type": "HemisphereLight", "sky": "#8fa596", "ground": "#0c140f", "intensity": 0.34 },
+        { "name": "room", "type": "RoomEnvironment envMap per material", "intensity": 0.45 }
+      ],
+      "materials": [
+        { "name": "felt", "type": "MeshStandard", "map": "noise around rgb(52 82 62), repeat 36", "roughness": 1, "envMapIntensity": 0.05 },
+        { "name": "mahogany-frame", "type": "MeshPhysical", "map": "grain on #4b2213", "roughness": 0.36, "clearcoat": 0.9, "clearcoatRoughness": 0.12, "envMapIntensity": 0.7, "geometry": "RoundedBox radius 0.06" },
+        { "name": "boxwood-stringing", "type": "MeshStandard", "color": "#e9d3a4", "roughness": 0.45, "envMapIntensity": 0.5, "note": "two lines: round the squares (0.032) and near the outer edge (0.022)" },
+        { "name": "veneer-squares", "type": "MeshPhysical", "map": "per-leaf maple hsl(36 52% 76%) and walnut hsl(22 47% 27%), grain along the file on maple, across on walnut", "roughness": 0.48, "clearcoat": 0.55, "clearcoatRoughness": 0.2, "envMapIntensity": 0.55 },
+        { "name": "coordinate-inlay", "type": "MeshBasic, not tone mapped", "color": "rgba(236, 214, 170, 0.9)", "font": "600 Mona Sans" },
+        { "name": "boxwood-pieces", "type": "MeshPhysical", "map": "grain on #ecd8ae", "roughness": 0.42, "clearcoat": 0.45, "clearcoatRoughness": 0.2, "envMapIntensity": 0.7 },
+        { "name": "ebony-pieces", "type": "MeshPhysical", "color": "#1a1a1d", "roughness": 0.28, "clearcoat": 1, "clearcoatRoughness": 0.06, "envMapIntensity": 1 },
+        { "name": "arrows", "type": "Shader, flat outline drawn on by share of length", "color": "var(--pointer)", "opacity": "0.92 (quiet 0.74)", "badge": "pointer disc with ink number, 800 Mona Sans" }
+      ],
+      "cameraAngles": [
+        { "name": "Kënd klasik", "upright": { "el": 0.9, "az": -0.26 }, "wide": { "el": 0.74, "az": -0.32 }, "default": true },
+        { "name": "Nga lart", "upright": { "el": 1.18, "az": 0 }, "wide": { "el": 1.05, "az": 0 } },
+        { "name": "Afër tabelës", "upright": { "el": 0.72, "az": -0.42 }, "wide": { "el": 0.56, "az": -0.5 } }
+      ],
+      "boardMarks2d": { "last": "pointer 0.2", "check": "pointer 0.42", "chosen": "pointer 0.26", "focus": "pointer stroke 7", "dot": "pointer 0.85", "take": "pointer ring 7 at 0.85", "cursor": "ink dashed 10 8, stroke 5", "arrowShaft": "pointer stroke 17 mitre at 0.88" }
+    }
+  },
+  "components": [
+    {
+      "name": "Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Outlined ink box for reading pages and the scoresheet.",
+      "html": "<button class=\"ds-btn\">Dorëzohu</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 48px; padding: 0 1.125rem; font-family: 'Mona Sans Variable', system-ui, sans-serif; font-weight: 680; font-variation-settings: 'wdth' 108; line-height: 1.1; border: 1.5px solid #111214; color: #111214; background: transparent; border-radius: 0; cursor: pointer; transition: transform 110ms cubic-bezier(0.22,1,0.36,1), background-color 200ms ease; } .ds-btn:hover { background: #d9d8d5; } .ds-btn:active { transform: scale(0.97); } .ds-btn:focus-visible { outline: 2px solid #e65719; outline-offset: 3px; box-shadow: 0 0 0 6px #e6e5e1; }"
+    },
+    {
+      "name": "Solid Button",
+      "kind": "button",
+      "refersTo": "button-solid",
+      "description": "The primary action on reading pages.",
+      "html": "<button class=\"ds-btn-solid\">Kthehu në fillim</button>",
+      "css": ".ds-btn-solid { display: inline-flex; align-items: center; min-height: 48px; padding: 0 1.125rem; font-family: 'Mona Sans Variable', system-ui, sans-serif; font-weight: 680; font-variation-settings: 'wdth' 108; border: 1.5px solid #111214; background: #111214; color: #e6e5e1; border-radius: 0; cursor: pointer; transition: transform 110ms cubic-bezier(0.22,1,0.36,1), background-color 200ms ease; } .ds-btn-solid:hover { background: color-mix(in srgb, #111214 86%, #e6e5e1); } .ds-btn-solid:active { transform: scale(0.97); } .ds-btn-solid:focus-visible { outline: 2px solid #e65719; outline-offset: 3px; box-shadow: 0 0 0 6px #e6e5e1; }"
+    },
+    {
+      "name": "Cue",
+      "kind": "button",
+      "refersTo": "cue-on",
+      "description": "Broadcast caps actions in the lower third; the on cue is the primary (Shiko pse).",
+      "html": "<div class=\"ds-cue-row\"><button class=\"ds-cue ds-cue--on\">Shiko pse</button><button class=\"ds-cue\">Provo përsëri</button></div>",
+      "css": ".ds-cue-row { display: flex; gap: 0.4rem; padding: 0.75rem; background: rgb(17 14 11 / 0.94); } .ds-cue { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.8rem; border: 1px solid rgb(230 229 225 / 0.42); background: transparent; color: #e6e5e1; font-family: 'Mona Sans Variable', system-ui, sans-serif; font-variation-settings: 'wdth' 115; font-weight: 780; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.04em; border-radius: 0; cursor: pointer; transition: transform 110ms cubic-bezier(0.22,1,0.36,1), background-color 200ms ease; } .ds-cue:hover { background: rgb(230 229 225 / 0.1); } .ds-cue:active { transform: scale(0.97); } .ds-cue:focus-visible { outline: 2px solid #f06a2c; outline-offset: 3px; } .ds-cue--on { background: #e6e5e1; color: #111214; border-color: #e6e5e1; } .ds-cue--on:hover { background: #fff; }"
+    },
+    {
+      "name": "Live and Score Bugs",
+      "kind": "custom",
+      "refersTo": "live-bug",
+      "description": "Top-left broadcast bugs: what is happening now, and who plays whom.",
+      "html": "<div class=\"ds-bugs\"><div class=\"ds-live\"><span class=\"ds-live__tag\">Drejtpërdrejt</span><span class=\"ds-live__status\">Radha jote.</span></div><div class=\"ds-score\"><div class=\"ds-score__row\"><span class=\"ds-score__name\">Motori · Niveli 2</span></div><div class=\"ds-score__row ds-score__row--turn\"><span class=\"ds-score__name\">Ti</span></div></div></div>",
+      "css": ".ds-bugs { display: grid; gap: 0.25rem; padding: 1rem; background: #24342a; font-family: 'Mona Sans Variable', system-ui, sans-serif; } .ds-live { display: flex; } .ds-live__tag { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.55rem 0.4rem; background: #f06a2c; color: #111214; font-variation-settings: 'wdth' 125; font-weight: 880; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.07em; line-height: 1; } .ds-live__tag::before { content: ''; width: 0.45rem; height: 0.45rem; background: #111214; animation: ds-live 1.6s steps(2, jump-none) infinite; } @keyframes ds-live { 50% { opacity: 0.25; } } .ds-live__status { padding: 0.35rem 0.6rem 0.4rem; background: #e6e5e1; color: #111214; font-weight: 720; font-size: 0.8125rem; } .ds-score { display: grid; min-width: 11.5rem; justify-self: start; } .ds-score__row { display: flex; align-items: center; min-height: 1.6rem; padding: 0.1rem 0.55rem; background: rgb(20 17 14 / 0.9); color: #e6e5e1; font-size: 0.75rem; font-weight: 640; } .ds-score__row + .ds-score__row { border-top: 1px solid rgb(230 229 225 / 0.14); } .ds-score__name { position: relative; padding-left: 0.7rem; } .ds-score__name::before { content: ''; position: absolute; left: 0; top: 50%; width: 0.35rem; height: 0.35rem; translate: 0 -50%; border: 1px solid currentColor; } .ds-score__row--turn .ds-score__name { font-weight: 820; } .ds-score__row--turn .ds-score__name::before { background: #f06a2c; border-color: #f06a2c; }"
+    },
+    {
+      "name": "Lower Third",
+      "kind": "custom",
+      "refersTo": "lower-head",
+      "description": "The coach's verdict: pointer tag, stone head with move and informant symbol at poster size, umber body with reasons.",
+      "html": "<div class=\"ds-lower\"><div class=\"ds-lower__head\"><span class=\"ds-lower__tag\">Trajneri</span><div class=\"ds-lower__headline\"><span class=\"ds-lower__glyph\">a6<span class=\"ds-lower__ann\">??</span></span><span class=\"ds-lower__title\">Gabim i rëndë</span></div></div><div class=\"ds-lower__body\"><p>Oficeri yt në a6 mbeti pa mbrojtje.</p><p class=\"ds-lower__warn\">Kujdes: oficeri yt në a6 është nën sulm.</p></div></div>",
+      "css": ".ds-lower { display: grid; max-width: 26rem; font-family: 'Mona Sans Variable', system-ui, sans-serif; } .ds-lower__head { display: grid; grid-template-columns: auto minmax(0,1fr); background: #e6e5e1; color: #111214; } .ds-lower__tag { display: grid; place-items: center; padding: 0.32rem 0.6rem 0.36rem; background: #f06a2c; color: #111214; font-variation-settings: 'wdth' 125; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1; } .ds-lower__headline { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.75rem; padding: 0.3rem 0.75rem 0.4rem; } .ds-lower__glyph { font-size: clamp(2.25rem, 1.6rem + 3.2vw, 4rem); font-variation-settings: 'wdth' 125; font-weight: 880; letter-spacing: -0.045em; line-height: 0.86; } .ds-lower__ann { color: #c8460f; } .ds-lower__title { font-variation-settings: 'wdth' 125; font-weight: 860; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.03em; line-height: 1.05; } .ds-lower__body { padding: 0.6rem 0.75rem 0.75rem; background: rgb(17 14 11 / 0.94); color: #e6e5e1; font-size: 0.9375rem; line-height: 1.42; } .ds-lower__warn { margin-top: 0.45rem; color: #f7904b; font-weight: 680; }"
+    },
+    {
+      "name": "Ticker",
+      "kind": "custom",
+      "refersTo": "ticker-band",
+      "description": "Rail of verdict ticks over a stone band crawling caps items separated by pointer squares.",
+      "html": "<div class=\"ds-ticker\"><div class=\"ds-ticker__rail\"><i></i><i class=\"g\"></i><i class=\"m\"></i><i class=\"g\"></i><i class=\"b\"></i><i class=\"now\"></i></div><div class=\"ds-ticker__band\"><div class=\"ds-ticker__track\"><span>Niveli 2: i lehtë</span><span>Lëvizja 2</span><span>Kujdes: oficeri</span><span>Niveli 2: i lehtë</span><span>Lëvizja 2</span><span>Kujdes: oficeri</span></div></div></div>",
+      "css": ".ds-ticker { display: grid; grid-template-rows: 1.25rem 2.5rem; font-family: 'Mona Sans Variable', system-ui, sans-serif; } .ds-ticker__rail { display: flex; align-items: end; gap: 2px; padding: 3px 0.75rem; background: rgb(17 14 11 / 0.92); } .ds-ticker__rail i { width: 4px; height: 3px; background: rgb(230 229 225 / 0.32); } .ds-ticker__rail i.g { height: 6px; background: rgb(230 229 225 / 0.78); } .ds-ticker__rail i.m { height: 11px; background: #e6e5e1; } .ds-ticker__rail i.b { height: 13px; background: #f06a2c; } .ds-ticker__rail i.now { height: 5px; background: rgb(230 229 225 / 0.6); box-shadow: 0 -3px 0 #e6e5e1; } .ds-ticker__band { display: flex; align-items: center; overflow: hidden; background: #e6e5e1; color: #111214; } .ds-ticker__track { display: flex; flex: none; white-space: nowrap; font-weight: 700; font-size: 0.8125rem; font-variation-settings: 'wdth' 112; text-transform: uppercase; letter-spacing: 0.03em; animation: ds-crawl 40s linear infinite; } .ds-ticker__track span { display: inline-flex; align-items: center; } .ds-ticker__track span::after { content: ''; width: 0.4rem; height: 0.4rem; margin-inline: 1.1rem; background: #f06a2c; } .ds-ticker__band:hover .ds-ticker__track { animation-play-state: paused; } @keyframes ds-crawl { to { transform: translateX(-50%); } } @media (prefers-reduced-motion: reduce) { .ds-ticker__track { animation: none; } }"
+    },
+    {
+      "name": "Tool",
+      "kind": "button",
+      "refersTo": "tool",
+      "description": "44px umber square with a Phosphor icon, top right of the stage; pressed turns stone.",
+      "html": "<div class=\"ds-tools\"><button class=\"ds-tool\" aria-label=\"Ushtrimi tjetër\"><svg viewBox=\"0 0 256 256\" width=\"20\" height=\"20\" fill=\"currentColor\"><path d=\"M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z\"/></svg></button><button class=\"ds-tool\" aria-pressed=\"true\" aria-label=\"Pamje 3D\"><svg viewBox=\"0 0 256 256\" width=\"20\" height=\"20\" fill=\"currentColor\"><path d=\"M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z\"/></svg></button></div>",
+      "css": ".ds-tools { display: flex; gap: 0.25rem; padding: 0.75rem; background: #24342a; } .ds-tool { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 0; background: rgb(20 17 14 / 0.86); color: #e6e5e1; cursor: pointer; transition: transform 110ms cubic-bezier(0.22,1,0.36,1), background-color 200ms ease; } .ds-tool:hover { background: rgb(40 34 28 / 0.95); } .ds-tool:active { transform: scale(0.95); } .ds-tool:focus-visible { outline: 2px solid #f06a2c; outline-offset: 3px; } .ds-tool[aria-pressed='true'] { background: #e6e5e1; color: #111214; }"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-bar",
+      "description": "Phone navigation: four tabs, icon over label, current tab inked with a 2px top bar.",
+      "html": "<nav class=\"ds-tabs\"><a href=\"#\" aria-current=\"page\">Luaj</a><a href=\"#\">Ushtrime</a><a href=\"#\">Mësime</a><a href=\"#\">Progresi</a></nav>",
+      "css": ".ds-tabs { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); height: 4rem; background: #e6e5e1; border-top: 1px solid #c4c3c0; font-family: 'Mona Sans Variable', system-ui, sans-serif; } .ds-tabs a { position: relative; display: grid; place-items: center; font-size: 0.8125rem; font-weight: 560; color: #595a5a; text-decoration: none; } .ds-tabs a:hover { color: #111214; } .ds-tabs a:focus-visible { outline: 2px solid #e65719; outline-offset: -3px; } .ds-tabs a[aria-current='page'] { color: #111214; font-weight: 760; } .ds-tabs a[aria-current='page']::before { content: ''; position: absolute; top: -1px; left: 22%; right: 22%; height: 2px; background: #111214; }"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "input",
+      "refersTo": "setup-sheet",
+      "description": "Side choice on the new-game sheet: stone-ruled cells, checked cell filled stone.",
+      "html": "<div class=\"ds-seg\"><label><input type=\"radio\" name=\"s\" checked>Të bardhat</label><label><input type=\"radio\" name=\"s\">Rastësisht</label><label><input type=\"radio\" name=\"s\">Të zezat</label></div>",
+      "css": ".ds-seg { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); border: 1.5px solid #e6e5e1; background: #15120f; color: #e6e5e1; font-family: 'Mona Sans Variable', system-ui, sans-serif; } .ds-seg label { position: relative; display: grid; place-items: center; min-height: 48px; font-weight: 660; cursor: pointer; } .ds-seg label + label { border-left: 1.5px solid #e6e5e1; } .ds-seg input { position: absolute; inset: 0; opacity: 0; cursor: pointer; } .ds-seg label:has(input:checked) { background: #e6e5e1; color: #111214; } .ds-seg label:has(input:focus-visible) { outline: 2px solid #f06a2c; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Commentary Room",
+    "overview": "A dark studio round one lamp, a classic wooden board on green felt, and over it a commentator who speaks in television graphics. The table is a place, not a page colour: every play, puzzle and home screen fills the viewport with the lit board, and the interface arrives as broadcast furniture laid on top of it (a live bug and score bug top left, a tool column top right, a lower third, a crawling ticker). Reading pages (lessons list, progress, 404) step out of the studio onto plain stone paper with the same type and the same pointer.\n\nThe graphics commit to two colours, stone and ink, square-cornered, with one lacquer orange as the commentator's pointer: the tag, the arrows, the chosen square, the live verdict. One family, Mona Sans, carries every voice; rank comes from the width axis and weight, not from a second face. The verdict is the interface: the move and its informant symbol (!! ! !? ?! ? ??) are set as type at poster size in the lower third, never as a badge.\n\nBuilt divergence from the direction contract, recorded because the build wins: the contract asks for every neutral to be stone or ink at an alpha; the shipped broadcast bars use a warm umber-black family (bar-umber, bar-umber-raised, sheet-umber, room-black) rather than ink, and the stage reading text runs at 0.9375rem beside the 1rem page body rather than a single body size.",
+    "keyCharacteristics": [
+      "The lit table fills the screen; graphics sit on it, never beside it in a sidebar.",
+      "Two colours plus one pointer; no third hue in the interface.",
+      "Square corners everywhere in 2D; the only rounding is the 3D frame's turned edge.",
+      "One family, ranked by width (100 / 108 / 112 / 118 / 125) and weight (430 to 900).",
+      "Expanded black caps for broadcast type; normal width for reading.",
+      "Motion is broadcast motion: wipes, crawls, draw-on arrows, pieces that fly and settle on springs."
+    ],
+    "rules": [
+      { "name": "The One Pointer Rule", "body": "Orange means \"the commentator is pointing here\". It never decorates, never marks the current move on the rail (that cap is stone), and never appears as a second accent hue.", "section": "colors" },
+      { "name": "The Table Is A Place Rule", "body": "The felt, wood and set keep their own tones in both system themes; only the paper pages follow light and dark.", "section": "colors" },
+      { "name": "The Width Carries Rank Rule", "body": "Hierarchy is width and weight inside one family. No second typeface, no italics for emphasis.", "section": "typography" },
+      { "name": "The Figurine Rule", "body": "Moves are written as figurine plus square (piece silhouette inline at 0.95em, then the square in 700 tabular figures), never as letter notation.", "section": "typography" },
+      { "name": "The Flat Graphics Rule", "body": "Broadcast bars never cast shadows; only the table has light.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do put play, puzzle and home screens on the lit table and lay the interface over it as broadcast graphics.",
+      "Do keep graphics to stone, ink and the umber bar family, with the pointer as the only hue; fill the pointer with ink text.",
+      "Do rank type by width (125 for broadcast caps and posters, 100 for reading) and weight within Mona Sans.",
+      "Do write moves in figurine notation and grade them with informant symbols set as type.",
+      "Do keep every corner square and every tap target at least 44px (48px for primary buttons).",
+      "Do route every animation through the GSAP ticker or CSS, and make the Stop-animations switch and reduced motion place pieces and arrows at once (transition-duration 0s, not 0.01ms)."
+    ],
+    "donts": [
+      "Don't build the flat green-and-cream board widget with a grey eval bar and a sidebar of tabs.",
+      "Don't add badges or pills for verdicts; the verdict word and symbol are the interface.",
+      "Don't use orange to mark the current move on the rail or as decoration.",
+      "Don't add drop shadows or rounded corners to broadcast bars.",
+      "Don't add a second typeface or set text as an icon glyph; icons are Phosphor regular SVG, one family, one weight.",
+      "Don't give the table a light theme: felt, wood and pieces keep their tones in both system themes."
+    ]
+  }
+}
