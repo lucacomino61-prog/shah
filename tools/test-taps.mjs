@@ -52,6 +52,42 @@ await page.waitForFunction(() => window.__play.state().verdicts[2], { timeout: 3
 const v = await page.evaluate(() => window.__play.state().verdicts);
 ok(!!v[0] && !!v[2], 'both moves graded', JSON.stringify([v[0]?.grade, v[2]?.grade]));
 
+// a fresh game against a level that answers properly: the replay returns every piece, and a take-back restores
+// the position exactly (a taken piece flies back from the felt)
+await page.evaluate(() => localStorage.clear());
+await page.goto(base + '/luaj/', { waitUntil: 'networkidle0' });
+await page.waitForFunction(() => window.__play && window.__play.engine() === 'ready' && window.__board, { timeout: 30000 });
+await page.evaluate(() => window.__play.setLevel(5));
+await sleep(800);
+await page.evaluate(() => window.__play.move('e2', 'e4'));
+await page.waitForFunction(() => window.__play.state().sans.length === 2 && window.__play.state().phase === 'user', { timeout: 30000 });
+await sleep(1500);
+const settled = () => page.waitForFunction(() => !window.__board.state().busy, { timeout: 8000 }).catch(() => {});
+await settled();
+const before = await page.evaluate(() => window.__board.state().pieces.join(','));
+await page.evaluate(() => window.__play.move('d1', 'h5'));
+await page.waitForFunction(() => window.__play.state().sans.length === 4 && window.__play.state().phase === 'user', { timeout: 30000 });
+await sleep(1500);
+await settled();
+const game = await page.evaluate(() => window.__board.state().pieces.join(','));
+await page.click('[data-why]');
+await sleep(2500);
+await page.click('[data-back]');
+await sleep(300);
+await settled();
+ok((await page.evaluate(() => window.__board.state().pieces.join(','))) === game, 'after "Shiko pse" every piece is back where the game stands');
+await page.evaluate(() => document.querySelector('[data-undo]').click());
+await page.waitForFunction(() => window.__play.state().sans.length === 2, { timeout: 8000 }).catch(() => {});
+await sleep(300);
+await settled();
+ok((await page.evaluate(() => window.__board.state().pieces.join(','))) === before, 'a take-back restores the position exactly');
+
+// the intro hides once the board is ready, and its skip works at once
+await page.goto(base + '/luaj/', { waitUntil: 'domcontentloaded' });
+await page.click('[data-intro-skip]').catch(() => {});
+await sleep(800);
+ok(await page.evaluate(() => document.querySelector('[data-intro]').hidden), 'the intro closes on "Kalo"');
+
 // 2D: the puzzle board answers taps
 await page.goto(base + '/ushtrime/', { waitUntil: 'networkidle0' });
 await page.waitForFunction(() => window.__puzzle && window.__puzzle.state().next && !document.querySelector('[data-status]').textContent.includes('lëviz…'), { timeout: 20000 });
