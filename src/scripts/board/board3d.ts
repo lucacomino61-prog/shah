@@ -627,16 +627,24 @@ export function createBoard3d(o: BoardOptions): BoardView {
 
   /** A body that is off the board, ready to come back as this piece. */
   function spare(side: Side, kind: Kind): Body {
-    const b = bodies.find((x) => x.mode === 'off' && x.side === side && !x.flight) ?? makeBody(side, kind);
+    // the same piece lying beside the board comes back first, then any spare body of that colour
+    const free = (x: Body) => x.mode === 'off' && x.side === side && !x.flight;
+    const b = bodies.find((x) => free(x) && x.kind === kind && x.group.visible) ?? bodies.find(free) ?? makeBody(side, kind);
     if (b.kind !== kind) setShape(b, kind);
     return b;
   }
 
   /** Where taken pieces leave the board: beside it, on the taker's right. */
-  const outside = (side: Side, i: number) => {
-    const s = side === 'w' ? 1 : -1;
-    return new Vector3((F + 0.9) * -s * (orientation === 'w' ? 1 : -1), GIRTH.q, (i % 6) * 0.8 - 2);
+  /** Where taken pieces leave the board: onto the open felt on the player's right (the broadcast graphics hold the
+   *  left on a wide screen), white's nearer the player, black's further away. */
+  const outside = (side: Side, i: number, kind: Kind = 'q') => {
+    const toward = orientation === 'w' ? 1 : -1;
+    const near = side === 'w' ? 1 : -1;
+    const row = Math.floor(i / 4);
+    return new Vector3((F + 1.05 + row * 0.95) * toward, GIRTH[kind], toward * near * (0.9 + (i % 4) * 0.85));
   };
+  /** taken pieces already lying beside the board, per side */
+  const lyingCount = (side: Side) => bodies.filter((x) => x.mode === 'off' && x.group.visible && x.side === side && !x.flight).length;
 
   // ---------------------------------------------------------------- marks
   const accent = new Color();
@@ -871,6 +879,19 @@ export function createBoard3d(o: BoardOptions): BoardView {
     b.group.visible = false;
   }
 
+  /** A taken piece rests on its side on the felt beside the board, as at a real table. */
+  function lie(b: Body, slot: Vector3) {
+    b.sq = null;
+    b.mode = 'off';
+    b.flight = null;
+    b.group.visible = true;
+    b.pos.copy(slot);
+    b.target.copy(slot);
+    b.group.position.copy(slot);
+    b.group.quaternion.copy(lying);
+    shadowsStale = true;
+  }
+
   let current = new Map<Sq, Placed>();
   let takenCount = 0;
 
@@ -898,7 +919,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
         if (t.becomes) setShape(b, t.becomes);
         place(b, t.to);
       }
-      for (const b of taken) retire(b);
+      for (const b of taken) lie(b, outside(b.side, lyingCount(b.side), b.kind));
       for (const a of plan.arrive) {
         const b = spare(a.side, a.kind);
         place(b, a.to);
@@ -933,16 +954,18 @@ export function createBoard3d(o: BoardOptions): BoardView {
       longest = Math.max(longest, b.flight!.dur + b.flight!.delay);
     });
     taken.forEach((b) => {
-      const slot = outside(b.side, takenCount++);
+      const slot = outside(b.side, lyingCount(b.side) + takenCount++, b.kind);
       b.sq = null;
-      fly(b, slot, lying, { arc: 0.9, dur: 0.7, delay: longest * 0.8, spin: Math.PI * 2, end: () => retire(b) });
+      fly(b, slot, lying, { arc: 0.9, dur: 0.7, delay: longest * 0.8, spin: Math.PI * 2, end: () => ((takenCount = Math.max(0, takenCount - 1)), lie(b, slot)) });
     });
     plan.arrive.forEach((a, i) => {
       const b = spare(a.side, a.kind);
+      if (!b.group.visible) {
+        b.pos.copy(outside(a.side, i, a.kind));
+        b.group.position.copy(b.pos);
+        b.group.quaternion.copy(lying);
+      }
       b.group.visible = true;
-      b.pos.copy(outside(a.side, i));
-      b.group.position.copy(b.pos);
-      b.group.quaternion.copy(lying);
       b.sq = a.to;
       bySq.set(a.to, b);
       fly(b, square(a.to), upright, { arc: 0.8, delay: 0.05 * i, end: () => ((b.mode = 'rest'), b.target.copy(square(a.to))) });
@@ -1399,7 +1422,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
         }
       }
       for (const b of bodies) if (b.sq && b.mode !== 'off') place(b, b.sq);
-      for (const b of bodies) if (!b.sq && b.mode !== 'off') retire(b);
+      for (const b of bodies) if (!b.sq && b.mode !== 'off') lie(b, outside(b.side, lyingCount(b.side), b.kind));
       arrowClock = 1;
       arrows.forEach((a) => {
         a.mat.uniforms.uProgress.value = 1;
