@@ -20,7 +20,9 @@ if (saved && saved.ucis.length) {
   const lv = levelOf(prefs.level);
   $('[data-game-line]').textContent = `Niveli ${lv.n}, ${lv.name.toLowerCase()}. Ti me ${prefs.side === 'b' ? 'të zezat' : 'të bardhat'}.`;
 }
-$('[data-puzzle-line]').textContent = `Vlerësimi yt: ${prefs.puzzleRating}. Të zgjidhura: ${prefs.puzzlesSolved}.`;
+$('[data-puzzle-line]').textContent = prefs.puzzlesTried
+  ? `Vlerësimi yt: ${prefs.puzzleRating}. Të zgjidhura: ${prefs.puzzlesSolved}.`
+  : 'Fillo me ushtrimet e para: pirun, lidhje, mat.';
 const nextLesson = LESSONS.find((l) => !prefs.lessons.includes(l.slug)) ?? LESSONS[0];
 $<HTMLAnchorElement>('[data-lesson-link]').href = `/mesime/${nextLesson.slug}/`;
 $('[data-lesson-line]').textContent = nextLesson.title;

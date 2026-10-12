@@ -261,10 +261,10 @@ export function judge(ctx: MoveContext): Verdict {
         if (victim && victim !== 'p') {
           const undefended = new Chess(fenAfter).attackers(first.to, me).length === 0;
           if (undefended) {
-            reasons.push(`${PIECE[victim].yours} në ${first.to} mbeti pa mbrojtje: kundërshtari e merr me [[${first.san}]].`);
+            reasons.push(`${PIECE[victim].yours} në ${first.to} mbeti pa mbrojtje: kundërshtari mund ta marrë me [[${first.san}]].`);
             tags.push('hanging');
           } else {
-            reasons.push(`Pas [[${first.san}]] humbet ${PIECE[victim].yoursAcc}.`);
+            reasons.push(`Nëse kundërshtari luan [[${first.san}]], humbet ${PIECE[victim].yoursAcc}.`);
             tags.push('lost-material');
           }
         } else {
@@ -274,10 +274,10 @@ export function judge(ctx: MoveContext): Verdict {
           const targets = r ? forkTargets(pos, r.to, me) : [];
           if (r && targets.length >= 2) {
             const [a, b] = targets.sort((x, y) => (y.kind === 'k' ? 99 : VALUE[y.kind]) - (x.kind === 'k' ? 99 : VALUE[x.kind]));
-            reasons.push(`Kundërshtari ka sulm të dyfishtë (pirun): [[${r.san}]] sulmon ${both(PIECE[a.kind].yoursAcc, PIECE[b.kind].yoursAcc)}.`);
+            reasons.push(`Kundërshtari mund të bëjë sulm të dyfishtë (pirun): [[${r.san}]] sulmon ${both(PIECE[a.kind].yoursAcc, PIECE[b.kind].yoursAcc)}.`);
             tags.push('allowed-fork');
           } else {
-            reasons.push(`Pas [[${replySan}]] humbet material.`);
+            reasons.push(`Nëse kundërshtari luan [[${replySan}]], humbet material.`);
             tags.push('lost-material');
           }
         }

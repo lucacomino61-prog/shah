@@ -26,7 +26,7 @@ const next = LESSONS[index + 1];
     </div>
 
     <div class="bug bug--live" data-board-ui>
-      <span class="bug__live">Mësimi</span>
+      <span class="bug__live">{lesson.title}</span>
       <span class="bug__status" data-status>Hapi 1</span>
     </div>
 
@@ -41,9 +41,11 @@ const next = LESSONS[index + 1];
     </div>
 
     <section class="lower" data-coach data-state="note" aria-labelledby="lesson-step" data-board-ui>
-      <p class="lower__tag">{lesson.title}</p>
       <div class="lower__head">
-        <h2 class="lower__glyph poster" id="lesson-step" data-glyph></h2>
+        <p class="lower__tag">Mësimi</p>
+        <div class="lower__headline">
+          <h2 class="lower__glyph poster" id="lesson-step" data-glyph></h2>
+        </div>
       </div>
       <div class="lower__body">
         <ul class="lower__reasons" data-reasons></ul>

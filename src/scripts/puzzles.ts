@@ -123,6 +123,7 @@ async function deal(p: Puzzle = pick()) {
   ui.themeName.textContent = t.name;
   ui.puzzleRating.textContent = String(p.rating);
   ui.myRating.textContent = String(prefs.puzzleRating);
+  ratingLabel();
   setCoach('intro', side === 'w' ? 'Të bardhat lëvizin' : 'Të zezat lëvizin', t.name, [t.task]);
   showButtons();
   ui.status.textContent = 'Kundërshtari lëviz…';
@@ -219,6 +220,7 @@ function solved(lastSan: string) {
   });
   const diff = prefs.puzzleRating - before;
   ui.myRating.textContent = String(prefs.puzzleRating);
+  ratingLabel();
   const t = themeOf(puzzle.theme);
   setCoach(
     'solved',
@@ -300,10 +302,14 @@ function say(t: string) {
   ui.live.textContent = sentenceText(t);
 }
 
+function ratingLabel() {
+  document.querySelector('[data-my-label]')!.textContent = prefs.puzzlesTried ? 'Vlerësimi yt' : 'Vlerësimi fillestar';
+}
+
 function ticker() {
   const solvedCount = prefs.puzzlesSolved;
   const items = [
-    `Vlerësimi yt: ${prefs.puzzleRating}`,
+    prefs.puzzlesTried ? `Vlerësimi yt: ${prefs.puzzleRating}` : `Vlerësimi fillestar: ${prefs.puzzleRating}. Ndryshon me çdo ushtrim.`,
     `Të zgjidhura pa ndihmë: ${solvedCount}`,
     puzzle ? `Ushtrimi ${puzzle.id} nga Lichess, vlerësimi ${puzzle.rating}` : '',
     ...THEMES.slice(0, 4).map((t) => `${t.name}: ${t.idea}`),

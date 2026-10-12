@@ -65,11 +65,12 @@ const rect = async (sq) =>
     const f = 'abcdefgh'.indexOf(sq[0]);
     const rk = Number(sq[1]) - 1;
     const size = Math.min(r.width, r.height);
-    const x0 = r.left + (r.width - size) / 2;
-    const y0 = r.top + (r.height - size) / 2;
+    const k = size / 888;
+    const x0 = r.left + (r.width - size) / 2 + 44 * k;
+    const y0 = r.top + (r.height - size) / 2 + 44 * k;
     const cx = side === 'w' ? f : 7 - f;
     const cy = side === 'w' ? 7 - rk : rk;
-    return { x: x0 + (cx + 0.5) * (size / 8), y: y0 + (cy + 0.5) * (size / 8) };
+    return { x: x0 + (cx + 0.5) * 100 * k, y: y0 + (cy + 0.5) * 100 * k };
   }, sq);
 const a = await rect(next.slice(0, 2));
 await page.touchscreen.tap(a.x, a.y);

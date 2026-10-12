@@ -597,6 +597,9 @@ function enterStudy(from: string, line: string[], title: string) {
   board.setPlate('ANALIZË');
   ui.coach.dataset.mode = 'study';
   document.documentElement.dataset.mode = 'study';
+  // offer the other view only: the heading already names this one
+  ui.studyWhy.hidden = title === 'Pse ishte gabim' || !lastVerdict || !BAD.includes(lastVerdict.grade);
+  ui.studyBest.hidden = title === 'Lëvizja më e mirë' || !lastVerdict || !BAD.includes(lastVerdict.grade);
   ui.tag.textContent = 'Analizë';
   ui.liveTag.textContent = 'Analizë';
   ui.title.textContent = title;
@@ -694,6 +697,21 @@ function renderSheet() {
     })
     .join('');
   ui.rail.innerHTML = rail;
+  const bad = verdicts.filter((v) => v && BAD.includes(v.grade)).length;
+  ui.rail.setAttribute('aria-label', `Rrjedha e lojës: ${sans.length} lëvizje, ${bad} gabime`);
+  // the last moves as a scoresheet graphic beside the board (wide screens)
+  const mini = document.querySelector('[data-mini-sheet]');
+  if (mini) {
+    const lis: string[] = [];
+    for (let i = 0; i < sans.length; i++) {
+      const ply = i + offset;
+      const v = verdicts[i];
+      const cell = `<span>${sanHtml(sans[i])}${v && v.symbol ? `<span class="ann">${v.symbol}</span>` : ''}</span>`;
+      if (ply % 2 === 0 || i === 0) lis.push(`<li><span class="n">${Math.floor(ply / 2) + 1}</span>${ply % 2 === 1 ? '<span>…</span>' : ''}${cell}`);
+      else lis[lis.length - 1] += cell;
+    }
+    mini.innerHTML = lis.slice(-6).map((l) => l + '</li>').join('');
+  }
   status();
 }
 

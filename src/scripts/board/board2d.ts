@@ -24,7 +24,7 @@ export function createBoard2d(o: BoardOptions): BoardView {
   let motionOn = o.motion();
   let interactive = true;
 
-  const svg = el('svg', { viewBox: '0 0 800 800', class: 'board-svg', 'aria-hidden': 'true' });
+  const svg = el('svg', { viewBox: '-44 -44 888 888', class: 'board-svg', 'aria-hidden': 'true' });
   const squaresG = el('g');
   const coordsG = el('g', { class: 'board-coords' });
   const marksG = el('g');
@@ -43,6 +43,11 @@ export function createBoard2d(o: BoardOptions): BoardView {
   function drawSquares() {
     squaresG.replaceChildren();
     coordsG.replaceChildren();
+    // the frame: mahogany, a boxwood line let in round the squares
+    squaresG.append(
+      el('rect', { x: -44, y: -44, width: 888, height: 888, class: 'frame-wood' }),
+      el('rect', { x: -15, y: -15, width: 830, height: 830, class: 'frame-string' }),
+    );
     for (let r = 0; r < 8; r++) {
       for (let f = 0; f < 8; f++) {
         const s = FILES[f] + (r + 1);
@@ -51,16 +56,13 @@ export function createBoard2d(o: BoardOptions): BoardView {
         squaresG.append(el('rect', { x, y, width: 100, height: 100, class: light ? 'sq-l' : 'sq-d' }));
       }
     }
-    // file letters along the bottom edge, rank numbers along the left, in the opposite square tone
+    // file letters under the squares and rank numbers beside them, inlaid in the frame
     for (let i = 0; i < 8; i++) {
-      const file = orientation === 'w' ? FILES[i] : FILES[7 - i];
-      const t = el('text', { x: i * 100 + 92, y: 792, 'text-anchor': 'end', class: (FILES.indexOf(file) + (orientation === 'w' ? 0 : 7)) % 2 === 1 ? 'on-l' : 'on-d' });
-      t.textContent = file;
+      const t = el('text', { x: i * 100 + 50, y: 834, 'text-anchor': 'middle' });
+      t.textContent = orientation === 'w' ? FILES[i] : FILES[7 - i];
       coordsG.append(t);
-      const rank = orientation === 'w' ? 8 - i : i + 1;
-      const firstFile = orientation === 'w' ? 0 : 7;
-      const n = el('text', { x: 7, y: i * 100 + 22, class: (firstFile + rank - 1) % 2 === 1 ? 'on-l' : 'on-d' });
-      n.textContent = String(rank);
+      const n = el('text', { x: -30, y: i * 100 + 58, 'text-anchor': 'middle' });
+      n.textContent = String(orientation === 'w' ? 8 - i : i + 1);
       coordsG.append(n);
     }
   }

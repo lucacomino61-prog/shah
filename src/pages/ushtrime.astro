@@ -25,7 +25,7 @@ import '../styles/play.css';
 
     <div class="bug bug--score" data-board-ui>
       <div class="score__row"><span class="score__name" data-theme-name>Tema</span><span class="tabular" data-puzzle-rating></span></div>
-      <div class="score__row"><span class="score__name">Vlerësimi yt</span><b class="tabular" data-my-rating></b></div>
+      <div class="score__row"><span class="score__name" data-my-label>Vlerësimi yt</span><b class="tabular" data-my-rating></b></div>
     </div>
 
     <div class="tools" data-board-ui>
@@ -39,10 +39,12 @@ import '../styles/play.css';
     </div>
 
     <section class="lower" data-coach data-state="intro" aria-labelledby="coach-title" data-board-ui>
-      <h2 class="lower__tag" id="coach-title">Trajneri</h2>
       <div class="lower__head">
-        <p class="lower__glyph poster" data-glyph>Gjej lëvizjen</p>
-        <p class="lower__title" data-title></p>
+        <h2 class="lower__tag" id="coach-title">Trajneri</h2>
+        <div class="lower__headline">
+          <p class="lower__glyph poster" data-glyph>Gjej lëvizjen</p>
+          <p class="lower__title" data-title></p>
+        </div>
       </div>
       <div class="lower__body">
         <ul class="lower__reasons" data-reasons></ul>

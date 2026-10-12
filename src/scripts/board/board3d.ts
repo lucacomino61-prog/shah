@@ -55,7 +55,7 @@ const token = (name: string) => getComputedStyle(document.documentElement).getPr
 
 /** The studio: one lamp over the board, the room dark around it. The same in day and night themes: the table is
  *  a place, not a page colour. */
-const STUDIO = { room: 0.45, hemi: 0.2, lamp: 3.3, exposure: 1.02 };
+const STUDIO = { room: 0.45, hemi: 0.34, lamp: 3.6, exposure: 1.04 };
 
 /** Where the broadcast camera stands: a three-quarter view from the player's left, straight overhead, or low
  *  across the table. Each has a steeper version for an upright phone, so the far ranks keep their size. */
@@ -252,10 +252,10 @@ function felt(size: number): CanvasTexture {
   let seed = 5;
   const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
   for (let i = 0; i < size * size; i++) {
-    const n = (rnd() - 0.5) * 16;
-    img.data[i * 4] = 30 + n;
-    img.data[i * 4 + 1] = 40 + n;
-    img.data[i * 4 + 2] = 35 + n;
+    const n = (rnd() - 0.5) * 22;
+    img.data[i * 4] = 52 + n;
+    img.data[i * 4 + 1] = 82 + n;
+    img.data[i * 4 + 2] = 62 + n;
     img.data[i * 4 + 3] = 255;
   }
   g.putImageData(img, 0, 0);
@@ -463,10 +463,10 @@ export function createBoard3d(o: BoardOptions): BoardView {
   const azimuthFor = () => (orientation === 'w' ? 0 : Math.PI) + preset().az;
   az = azimuthFor();
 
-  const hemi = new HemisphereLight(0xfff4e6, 0x2a1a10, STUDIO.hemi);
+  const hemi = new HemisphereLight(0x8fa596, 0x0c140f, STUDIO.hemi);
   scene.add(hemi);
   // one lamp over the board: a pool of warm light on the marble, the table falling into the dark around it
-  const key = new SpotLight(0xfff0dc, STUDIO.lamp, 0, 0.52, 0.85, 0);
+  const key = new SpotLight(0xfff0dc, STUDIO.lamp, 0, 0.5, 0.62, 0);
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
   key.shadow.camera.near = 8;
@@ -479,7 +479,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
   const placeKey = () => {
     // the lamp hangs over the player's left shoulder, whichever side they play
     const s = orientation === 'w' ? 1 : -1;
-    key.position.set(-5 * s, 17, 5 * s);
+    key.position.set(-7 * s, 15, 6 * s);
   };
   placeKey();
 
@@ -492,7 +492,8 @@ export function createBoard3d(o: BoardOptions): BoardView {
   // reflections come from a studio map set on each material (scene.environment would light the table evenly)
   const room = studioFor(STUDIO.room);
   const cloth = felt(256);
-  cloth.repeat.set(24, 24);
+  cloth.repeat.set(36, 36);
+  cloth.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   textures.push(cloth);
   const table = new Mesh(keep(new PlaneGeometry(64, 64).rotateX(-Math.PI / 2)), own(new MeshStandardMaterial({ map: cloth, roughness: 1, envMap: room, envMapIntensity: 0.05 })));
   table.receiveShadow = true;
@@ -568,7 +569,12 @@ export function createBoard3d(o: BoardOptions): BoardView {
     if (!g) shapes.set(k, (g = keep(turned(k))));
     return g;
   };
-  const ivory = own(new MeshPhysicalMaterial({ color: 0xecd9b2, roughness: 0.38, clearcoat: 0.5, clearcoatRoughness: 0.16, envMap: room, envMapIntensity: 0.75 }));
+  // boxwood: a fine pale grain under a thin lacquer (the lathe's UVs run the grain up the piece)
+  const boxwood = grainTexture(256, '#ecd8ae', 'rgba(150,104,56,A)', 'rgba(255,240,205,A)', 41, 90);
+  boxwood.rotation = Math.PI / 2;
+  boxwood.repeat.set(3, 1);
+  textures.push(boxwood);
+  const ivory = own(new MeshPhysicalMaterial({ map: boxwood, roughness: 0.42, clearcoat: 0.45, clearcoatRoughness: 0.2, envMap: room, envMapIntensity: 0.7 }));
   const ebony = own(new MeshPhysicalMaterial({ color: 0x1a1a1d, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.06, envMap: room, envMapIntensity: 1 }));
   const hitMat = own(new MeshBasicMaterial({ visible: false }));
   const hitGeo = new Map<Kind, BufferGeometry>();
@@ -726,34 +732,33 @@ export function createBoard3d(o: BoardOptions): BoardView {
         fragmentShader: arrowFrag,
         transparent: true,
         depthWrite: false,
+        depthTest: false,
         side: DoubleSide,
-        polygonOffset: true,
-        polygonOffsetFactor: -4,
       });
       mat.toneMapped = false;
       const mesh = new Mesh(geo, mat);
       mesh.position.y = BOARD.top + 0.004 + i * 0.0005;
-      mesh.renderOrder = 5 + i;
+      mesh.renderOrder = 50 + i;
       board.add(mesh);
       let badge: Group | null = null;
       if (a.label) {
         let tex = numbers.get(a.label);
         if (!tex) numbers.set(a.label, (tex = numberTexture(a.label)));
-        const discMat = new MeshBasicMaterial({ color: accent.clone(), transparent: true, depthWrite: false });
+        const discMat = new MeshBasicMaterial({ color: accent.clone(), transparent: true, depthWrite: false, depthTest: false });
         discMat.toneMapped = false;
-        const textMat = new MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false });
+        const textMat = new MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false });
         textMat.toneMapped = false;
         badge = new Group();
         const disc = new Mesh(badgeGeo, discMat);
-        disc.renderOrder = 20 + i;
+        disc.renderOrder = 70 + i;
         const text = new Mesh(labelGeo, textMat);
         text.position.y = 0.001;
-        text.renderOrder = 21 + i;
+        text.renderOrder = 80 + i;
         badge.add(disc, text);
         const tail = path[0];
         badge.position.set(tail.x, BOARD.top + 0.006, tail.y);
         if (orientation === 'b') badge.rotation.y = Math.PI;
-        badge.visible = !motionOn;
+        badge.visible = true;
         board.add(badge);
       }
       arrows.push({ mesh, mat, badge, key: keyOf(a) });
@@ -1331,7 +1336,6 @@ export function createBoard3d(o: BoardOptions): BoardView {
       arrows.forEach((a, i) => {
         const local = Math.max(0, Math.min(1, e * arrows.length - i * 0.35));
         a.mat.uniforms.uProgress.value = arrows.length === 1 ? e : Math.min(1, local * 1.2);
-        if (a.badge) a.badge.visible = a.mat.uniforms.uProgress.value > 0.05;
       });
       moving = true;
     }
