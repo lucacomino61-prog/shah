@@ -60,6 +60,15 @@ for (const v of views) {
   await page.click('[data-why]');
   await sleep(6200);
   await shot('luaj-analysis');
+  // the same blunder against a level that takes: the coach must tell it in the past tense
+  await page.click('[data-back]');
+  await page.evaluate(() => window.__play.setLevel(5));
+  await page.evaluate(() => document.querySelector('[data-undo]').click());
+  await page.waitForFunction(() => window.__play.state().phase === 'user' && window.__play.state().sans.length === 2, { timeout: 30000 });
+  await page.evaluate(() => window.__play.move('f1', 'a6'));
+  await page.waitForFunction(() => window.__play.state().sans.length === 4 && window.__play.state().phase === 'user', { timeout: 30000 });
+  await sleep(900);
+  await shot('luaj-punished');
   await ctx.close();
 }
 await browser.close();

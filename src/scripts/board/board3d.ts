@@ -727,7 +727,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
       geo.rotateX(Math.PI / 2);
       const quiet = a.tone === 'quiet';
       const mat = new ShaderMaterial({
-        uniforms: { uColor: { value: accent.clone() }, uOpacity: { value: quiet ? 0.5 : 0.86 }, uProgress: { value: motionOn ? 0 : 1 } },
+        uniforms: { uColor: { value: accent.clone() }, uOpacity: { value: quiet ? 0.74 : 0.92 }, uProgress: { value: motionOn ? 0 : 1 } },
         vertexShader: arrowVert,
         fragmentShader: arrowFrag,
         transparent: true,

@@ -276,7 +276,7 @@ html[data-motion="off"] .motion-switch [data-when="off"] { display: inline-flex;
 .board-arrows { pointer-events: none; }
 .ar-shaft { fill: none; stroke: var(--pointer); stroke-width: 17; stroke-linejoin: miter; opacity: 0.88; }
 .ar-head { fill: var(--pointer); opacity: 0.88; }
-.ar-quiet .ar-shaft, .ar-quiet .ar-head { opacity: 0.45; }
+.ar-quiet .ar-shaft, .ar-quiet .ar-head { opacity: 0.68; }
 .ar-badge { fill: var(--pointer); }
 .ar-num { fill: var(--ink); font: 820 22px var(--font); }
 

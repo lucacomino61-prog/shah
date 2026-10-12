@@ -875,5 +875,7 @@ if (import.meta.env.DEV) {
     state: () => ({ phase, fen: fen(), sans: [...sans], side, level: level.n, verdicts: verdicts.map((v) => v && { grade: v.grade, reasons: v.reasons }) }),
     engine: () => engine.state,
     move: (from: Sq, to: Sq) => userMove(from, to),
+    // tests: play the engine at another strength without touching the saved preference
+    setLevel: (n: number) => (level = levelOf(n)),
   };
 }
