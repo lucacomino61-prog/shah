@@ -3,7 +3,7 @@
 // engine now threatens. "Shiko pse" leaves the game and plays the line on the board, then the pieces fly back.
 
 import { Chess, type Square } from 'chess.js';
-import { GRADES, TAG_NAMES, gameAccuracy, judge, passTurn, threatWarning, uciSan, type Grade, type Verdict } from '../lib/coach.ts';
+import { GRADES, TAG_NAMES, afterReply, gameAccuracy, judge, passTurn, threatWarning, uciSan, type Grade, type Verdict } from '../lib/coach.ts';
 import { Engine, type Analysis } from '../lib/engine.ts';
 import { LEVELS, levelOf, pickMove, type Level } from '../lib/levels.ts';
 import { icon } from '../lib/icons.ts';
@@ -339,6 +339,11 @@ async function engineMove(given?: Analysis) {
     board.setPosition(fen(), true);
     marks();
   }
+  // the punishment came: the coach says so in the past tense
+  const mine = verdicts[verdicts.length - 2];
+  if (mine && mine === lastVerdict && BAD.includes(mine.grade) && mine.refutation[1] === uci && !study && phase !== 'over') {
+    ui.reasons.innerHTML = afterReply(mine, uci).map((r) => `<li>${sentenceHtml(r)}</li>`).join('');
+  }
   renderSheet();
   say(`Kundërshtari: ${sentenceText(`[[${m.san}]]`)}${chess.inCheck() ? ', shah' : ''}.`);
   persist();
@@ -495,7 +500,10 @@ function renderVerdict(v: Verdict, fresh: boolean) {
   ui.coach.dataset.grade = v.grade;
   ui.glyph.innerHTML = `${sanHtml(v.san)}<span class="ann">${v.symbol}</span>`;
   ui.title.textContent = v.title;
-  ui.reasons.innerHTML = v.reasons.map((r) => `<li>${sentenceHtml(r)}</li>`).join('');
+  // a verdict shown again after the answer was played tells it in the past
+  const i = verdicts.indexOf(v);
+  const answer = i >= 0 ? ucis[i + 1] : undefined;
+  ui.reasons.innerHTML = (answer ? afterReply(v, answer) : v.reasons).map((r) => `<li>${sentenceHtml(r)}</li>`).join('');
   say(`${v.title}. ${v.reasons.map(sentenceText).join(' ')}`);
   if (fresh) wipeIn();
   showWarning();
@@ -613,7 +621,8 @@ function enterStudy(from: string, line: string[], title: string) {
 function studyMarks() {
   if (!study) return;
   const arrows: Arrow[] = study.line.slice(0, study.step + 1).map((u, i) => ({ from: u.slice(0, 2), to: u.slice(2, 4), label: String(i + 1), tone: i === study!.step ? 'pointer' : 'quiet' }));
-  board.setMarks({ arrows: study.step < study.line.length ? arrows.slice(-2) : [] });
+  const all: Arrow[] = study.line.map((u, i) => ({ from: u.slice(0, 2), to: u.slice(2, 4), label: String(i + 1), tone: i === study!.line.length - 1 ? 'pointer' : 'quiet' }));
+  board.setMarks({ arrows: study.step < study.line.length ? arrows.slice(-2) : all, last: null });
   ui.study.querySelectorAll('[data-i]').forEach((li) => li.toggleAttribute('data-done', Number((li as HTMLElement).dataset.i) < study!.step));
   ui.prev.disabled = study.step === 0;
   ui.next.disabled = study.step >= study.line.length;
@@ -697,6 +706,7 @@ function renderSheet() {
     })
     .join('');
   ui.rail.innerHTML = rail;
+  ui.rail.style.setProperty('--slots', String(Math.max(80, verdicts.length)));
   const bad = verdicts.filter((v) => v && BAD.includes(v.grade)).length;
   ui.rail.setAttribute('aria-label', `Rrjedha e lojës: ${sans.length} lëvizje, ${bad} gabime`);
   // the last moves as a scoresheet graphic beside the board (wide screens)

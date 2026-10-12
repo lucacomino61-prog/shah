@@ -32,7 +32,7 @@ const avg = acc.length ? Math.round(acc.reduce((s, g) => s + (g.accuracy ?? 0), 
 const rows: [string, string][] = [
   ['Lojëra', p.games.length ? `${p.games.length} (${wins} fitore, ${draws} barazime, ${losses} humbje)` : '0'],
   ['Saktësia mesatare', avg === null ? 'Ende pa lojëra' : `${avg}%`],
-  ['Vlerësimi në ushtrime', String(p.puzzleRating)],
+  [p.puzzlesTried ? 'Vlerësimi në ushtrime' : 'Vlerësimi fillestar në ushtrime', String(p.puzzleRating)],
   ['Ushtrime të zgjidhura pa ndihmë', `${p.puzzlesSolved} nga ${p.puzzlesTried}`],
   ['Mësime të kryera', `${p.lessons.length} nga ${LESSONS.length}`],
 ];

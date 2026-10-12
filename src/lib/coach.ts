@@ -430,6 +430,20 @@ export function passTurn(fen: string): string | null {
   }
 }
 
+/**
+ * The reasons once the opponent has answered: when the answer was the punishing move, say what happened rather
+ * than what could happen.
+ */
+export function afterReply(v: Verdict, playedUci: string): string[] {
+  if (v.refutation[1] !== playedUci) return v.reasons;
+  return v.reasons.map((r) =>
+    r
+      .replace('kundërshtari mund ta marrë me', 'kundërshtari e mori me')
+      .replace(/^Nëse kundërshtari luan (\[\[[^\]]+\]\]), humbet/, 'Pas $1 humbe')
+      .replace('Kundërshtari mund të bëjë sulm të dyfishtë (pirun):', 'Kundërshtari bëri sulm të dyfishtë (pirun):'),
+  );
+}
+
 /** Average accuracy of a list of verdicts. */
 export function gameAccuracy(vs: Verdict[]): number | null {
   if (!vs.length) return null;

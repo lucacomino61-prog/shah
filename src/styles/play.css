@@ -29,10 +29,10 @@ html[data-motion="off"] .tool--motion .tool__label::after { content: " (ndalur)"
   --inset-right: 0.5rem;
 }
 .stage::after {
-  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
   background: radial-gradient(ellipse 85% 70% at 50% 40%, transparent 55%, rgb(0 0 0 / 0.45) 100%);
 }
-.stage .board { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; }
+.stage .board { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; aspect-ratio: auto; }
 .stage .board[data-kind="2d"] .board-svg {
   left: var(--inset-left); top: var(--inset-top);
   width: calc(100% - var(--inset-left) - var(--inset-right));
@@ -143,7 +143,12 @@ a.tool, a.cue { text-decoration: none; }
 }
 .lower__title:empty { display: none; }
 .lower[data-state="intro"] .lower__glyph,
-.lower[data-state="note"] .lower__glyph { font-size: clamp(1.75rem, 1.3rem + 2.4vw, 3rem); }
+.lower[data-state="note"] .lower__glyph,
+.lower[data-state="end"] .lower__glyph,
+.lower[data-state="solved"] .lower__glyph,
+.lower[data-state="wrong"] .lower__glyph,
+.lower[data-state="good"] .lower__glyph { font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.5rem); white-space: normal; text-wrap: balance; line-height: 0.95; }
+.lower__headline { overflow: hidden; }
 /* while the coach looks, the move stands in outline; the verdict inks it */
 .lower[data-state="thinking"] .lower__glyph { color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
 .lower[data-state="thinking"] .lower__glyph .fig { color: transparent; stroke: var(--ink); stroke-width: 5; }
@@ -201,17 +206,18 @@ a.tool, a.cue { text-decoration: none; }
 .ticker { left: 0; right: 0; bottom: 0; height: var(--ticker-h); display: grid; grid-template-rows: 1.25rem 1fr; --ticker-h: 3.75rem; }
 /* the game's extent: one tick per move, taller and louder the worse the move */
 .ticker__rail {
-  display: flex; align-items: flex-end; gap: 3px; padding: 0 0.75rem 3px; overflow: hidden;
-  background: rgb(17 14 11 / 0.92); border-top: 1px solid rgb(230 229 225 / 0.14);
+  display: grid; grid-template-columns: repeat(var(--slots, 80), minmax(0, 1fr)); align-items: end; column-gap: 2px;
+  padding: 3px 0.75rem 3px; overflow: hidden;
+  background: rgb(17 14 11 / 0.92) linear-gradient(rgb(230 229 225 / 0.16), rgb(230 229 225 / 0.16)) 0.75rem calc(100% - 3px) / calc(100% - 1.5rem) 1px no-repeat;
 }
-.ticker__rail:empty::before { content: ""; align-self: center; width: 100%; height: 1px; background: rgb(230 229 225 / 0.18); }
-.ticker__rail i { flex: none; width: 6px; height: 4px; background: rgb(230 229 225 / 0.32); }
-.ticker__rail i[data-g="pending"] { height: 6px; background: rgb(230 229 225 / 0.6); }
-.ticker__rail i[data-g="best"], .ticker__rail i[data-g="good"], .ticker__rail i[data-g="book"], .ticker__rail i[data-g="forced"], .ticker__rail i[data-g="brilliant"] { height: 8px; background: rgb(230 229 225 / 0.78); }
-.ticker__rail i[data-g="inaccuracy"] { height: 11px; background: var(--stone); }
-.ticker__rail i[data-g="mistake"] { height: 14px; background: var(--stone); }
-.ticker__rail i[data-g="blunder"] { height: 16px; background: var(--pointer); }
-.ticker__rail i[data-now] { outline: 1px solid var(--pointer); outline-offset: 2px; }
+.ticker__rail:empty { visibility: hidden; }
+.ticker__rail i { height: 3px; background: rgb(230 229 225 / 0.32); }
+.ticker__rail i[data-g="pending"] { height: 5px; background: rgb(230 229 225 / 0.6); }
+.ticker__rail i[data-g="best"], .ticker__rail i[data-g="good"], .ticker__rail i[data-g="book"], .ticker__rail i[data-g="forced"], .ticker__rail i[data-g="brilliant"] { height: 6px; background: rgb(230 229 225 / 0.78); }
+.ticker__rail i[data-g="inaccuracy"] { height: 9px; background: var(--stone); }
+.ticker__rail i[data-g="mistake"] { height: 11px; background: var(--stone); }
+.ticker__rail i[data-g="blunder"] { height: 13px; background: var(--pointer); }
+.ticker__rail i[data-now] { box-shadow: inset 0 2px 0 var(--pointer); }
 .ticker__band { display: flex; align-items: center; overflow: hidden; background: var(--stone); color: var(--ink); }
 .ticker__track {
   display: flex; flex: none; gap: 0; white-space: nowrap;

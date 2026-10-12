@@ -58,7 +58,7 @@ for (const v of views) {
   await sleep(900);
   await shot('luaj-verdict');
   await page.click('[data-why]');
-  await sleep(2600);
+  await sleep(6200);
   await shot('luaj-analysis');
   await ctx.close();
 }
