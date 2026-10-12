@@ -9,7 +9,7 @@ web
 ## Stack
 
 Astro, chosen by Luca on 2026-10-12 (offered against Vite + TypeScript and plain HTML). Pages are static; the
-board, the engine and the coach are client scripts. three.js for the marble board, GSAP for motion (its ticker is
+board, the engine and the coach are client scripts. three.js for the wooden board, GSAP for motion (its ticker is
 the only animation loop), chess.js for the rules, Stockfish compiled to WebAssembly for the engine. Runs on
 localhost; no deploy target is chosen yet, and nothing ships until Luca says "deploy".
 
