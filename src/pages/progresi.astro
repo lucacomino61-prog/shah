@@ -1,0 +1,59 @@
+---
+import App from '../layouts/App.astro';
+import { icon } from '../lib/icons';
+---
+
+<App title="Progresi · Shah" description="Lojërat, ushtrimet dhe gabimet e tua më të shpeshta, të ruajtura vetëm në këtë pajisje." tab="progresi">
+  <div class="page progress">
+    <h1 class="page-title poster">Progresi</h1>
+    <p class="lede">Gjithçka ruhet vetëm në këtë shfletues. Askush tjetër nuk e sheh.</p>
+
+    <section class="progress__block" aria-labelledby="sum-title">
+      <h2 class="progress__h wide" id="sum-title">Përmbledhja</h2>
+      <dl class="sheet-rows" data-summary>
+        {['Lojëra', 'Saktësia mesatare', 'Vlerësimi në ushtrime', 'Ushtrime të zgjidhura pa ndihmë', 'Mësime të kryera'].map((k) => <div><dt>{k}</dt><dd>&nbsp;</dd></div>)}
+      </dl>
+    </section>
+
+    <section class="progress__block" aria-labelledby="err-title">
+      <h2 class="progress__h wide" id="err-title">Gabimet që përsërit</h2>
+      <p class="progress__note">Trajneri i numëron sipas llojit. Mësimi në të djathtë e trajton atë gabim.</p>
+      <ol class="mistakes" data-mistakes><li class="empty">&nbsp;</li></ol>
+    </section>
+
+    <section class="progress__block" aria-labelledby="games-title">
+      <h2 class="progress__h wide" id="games-title">Lojërat e fundit</h2>
+      <ol class="games" data-games><li class="empty">&nbsp;</li></ol>
+    </section>
+
+    <section class="progress__block">
+      <button type="button" class="btn" data-reset><Fragment set:html={icon('x')} /><span data-label>Fshi progresin</span></button>
+    </section>
+  </div>
+  <script>
+    import '../scripts/progress';
+  </script>
+</App>
+
+<style>
+  .progress { max-width: 56rem; margin-inline: auto; }
+  .progress__block { margin-top: var(--space-xl); }
+  .progress__h { font-size: var(--step-title); font-weight: 820; padding-bottom: 0.5rem; border-bottom: 2px solid var(--text); }
+  .progress__note { margin-top: 0.5rem; color: var(--text-2); max-width: 52ch; }
+  .progress :global(.sheet-rows) { display: grid; }
+  .progress :global(.sheet-rows > div) { display: flex; justify-content: space-between; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--rule); }
+  .progress :global(.sheet-rows dt) { color: var(--text-2); }
+  .progress :global(.sheet-rows dd) { font-weight: 760; font-variant-numeric: tabular-nums; text-align: end; }
+  .progress :global(.mistakes li), .progress :global(.games li) {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.25rem 1rem; align-items: center;
+    padding: 0.85rem 0; border-bottom: 1px solid var(--rule);
+  }
+  .progress :global(.mistakes b) { font-variation-settings: 'wdth' 112; font-weight: 780; }
+  .progress :global(.mistakes .n) { font-variation-settings: 'wdth' 125; font-weight: 880; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+  .progress :global(.mistakes a) { grid-column: 1 / -1; justify-self: start; color: var(--pointer-ink); font-weight: 680; text-underline-offset: 0.2em; }
+  .progress :global(.games .res) { font-variation-settings: 'wdth' 118; font-weight: 820; text-transform: uppercase; font-size: 0.875rem; letter-spacing: 0.03em; }
+  .progress :global(.games .res[data-r="win"]) { color: var(--pointer-ink); }
+  .progress :global(.games .meta) { grid-column: 1 / -1; }
+  .progress :global(.empty a) { display: inline-flex; align-items: center; min-height: 44px; color: var(--pointer-ink); font-weight: 700; }
+  .progress :global(.mistakes a) { min-height: 44px; display: inline-flex; align-items: center; }
+</style>

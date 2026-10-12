@@ -1,0 +1,69 @@
+---
+import App from '../../layouts/App.astro';
+import { LESSONS } from '../../data/lessons';
+import { icon } from '../../lib/icons';
+import '../../styles/play.css';
+
+export function getStaticPaths() {
+  return LESSONS.map((l, i) => ({ params: { slug: l.slug }, props: { index: i } }));
+}
+const { index } = Astro.props;
+const lesson = LESSONS[index];
+const next = LESSONS[index + 1];
+---
+
+<App title={`${lesson.title} · Mësime · Shah`} description={lesson.lede} tab="mesime" stage>
+  <h1 class="visually-hidden">{lesson.title}</h1>
+  <div class="stage" data-stage-box data-lesson={lesson.slug} data-next-href={next ? `/mesime/${next.slug}/` : '/mesime/'}>
+    <div class="board" data-board tabindex="0" role="application" aria-label="Tabela e mësimit. Shigjetat lëvizin kursorin, Enter zgjedh figurën dhe e lëviz.">
+      <div class="promo" data-promo data-board-ui hidden role="group" aria-label="Ushtari bëhet">
+        <button type="button" data-piece="q"><svg aria-hidden="true"><use href="#pc-w-q"></use></svg><span>Mbretëreshë</span></button>
+        <button type="button" data-piece="r"><svg aria-hidden="true"><use href="#pc-w-r"></use></svg><span>Torrë</span></button>
+        <button type="button" data-piece="b"><svg aria-hidden="true"><use href="#pc-w-b"></use></svg><span>Oficer</span></button>
+        <button type="button" data-piece="n"><svg aria-hidden="true"><use href="#pc-w-n"></use></svg><span>Kalë</span></button>
+        <button type="button" data-piece="x" class="promo__cancel" aria-label="Anulo"><Fragment set:html={icon('x')} /></button>
+      </div>
+    </div>
+
+    <div class="bug bug--live" data-board-ui>
+      <span class="bug__live">Mësimi</span>
+      <span class="bug__status" data-status>Hapi 1</span>
+    </div>
+
+    <div class="tools" data-board-ui>
+      <button type="button" class="tool tool--menu" data-tools-toggle aria-expanded="false" aria-controls="tools-list" aria-label="Mjetet"><Fragment set:html={icon('dotsThreeVertical')} /></button>
+      <div class="tools__list" id="tools-list">
+        <a class="tool" href="/mesime/"><span class="tool__icon"><Fragment set:html={icon('bookOpenText')} /></span><span class="tool__label">Të gjitha mësimet</span></a>
+        <button type="button" class="tool" data-angle><span class="tool__icon"><Fragment set:html={icon('videoCamera')} /></span><span class="tool__label" data-label>Këndi i kamerës</span></button>
+        <button type="button" class="tool" data-view aria-pressed="false"><span class="tool__icon"><Fragment set:html={icon('cube')} /></span><span class="tool__label" data-label>Pamje 3D</span></button>
+        <button type="button" class="tool tool--motion" data-motion-switch aria-pressed="false"><span class="tool__icon" data-when="on"><Fragment set:html={icon('pause')} /></span><span class="tool__icon" data-when="off"><Fragment set:html={icon('play')} /></span><span class="tool__label">Ndal lëvizjet</span></button>
+      </div>
+    </div>
+
+    <section class="lower" data-coach data-state="note" aria-labelledby="lesson-step" data-board-ui>
+      <p class="lower__tag">{lesson.title}</p>
+      <div class="lower__head">
+        <h2 class="lower__glyph poster" id="lesson-step" data-glyph></h2>
+      </div>
+      <div class="lower__body">
+        <ul class="lower__reasons" data-reasons></ul>
+        <p class="lower__warning" data-task hidden></p>
+        <div class="lower__actions">
+          <button type="button" class="cue" data-prev><Fragment set:html={icon('caretLeft')} />Mbrapa</button>
+          <button type="button" class="cue" data-hint hidden><Fragment set:html={icon('lightbulb')} />Ndihmë</button>
+          <button type="button" class="cue" data-again hidden><Fragment set:html={icon('arrowCounterClockwise')} />Përsërit</button>
+          <button type="button" class="cue cue--on" data-next><Fragment set:html={icon('caretRight')} /><span data-next-label>Para</span></button>
+        </div>
+      </div>
+      <p class="visually-hidden" aria-live="polite" data-live></p>
+    </section>
+
+    <div class="ticker" data-board-ui aria-hidden="true">
+      <div class="ticker__rail" data-rail></div>
+      <div class="ticker__band"><div class="ticker__track" data-ticker></div></div>
+    </div>
+  </div>
+  <script>
+    import '../../scripts/lesson';
+  </script>
+</App>

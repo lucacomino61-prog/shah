@@ -1,0 +1,87 @@
+---
+import App from '../layouts/App.astro';
+import { icon } from '../lib/icons';
+import { THEMES } from '../lib/themes';
+import '../styles/play.css';
+---
+
+<App title="Ushtrime · Shah" description="Ushtrime taktike nga baza e Lichess: pirun, lidhje, mat në një dhe në dy lëvizje." tab="ushtrime" stage>
+  <h1 class="visually-hidden">Ushtrime</h1>
+  <div class="stage" data-stage-box>
+    <div class="board" data-board tabindex="0" role="application" aria-label="Tabela e ushtrimit. Shigjetat lëvizin kursorin, Enter zgjedh figurën dhe e lëviz.">
+      <div class="promo" data-promo data-board-ui hidden role="group" aria-label="Ushtari bëhet">
+        <button type="button" data-piece="q"><svg aria-hidden="true"><use href="#pc-w-q"></use></svg><span>Mbretëreshë</span></button>
+        <button type="button" data-piece="r"><svg aria-hidden="true"><use href="#pc-w-r"></use></svg><span>Torrë</span></button>
+        <button type="button" data-piece="b"><svg aria-hidden="true"><use href="#pc-w-b"></use></svg><span>Oficer</span></button>
+        <button type="button" data-piece="n"><svg aria-hidden="true"><use href="#pc-w-n"></use></svg><span>Kalë</span></button>
+        <button type="button" data-piece="x" class="promo__cancel" aria-label="Anulo"><Fragment set:html={icon('x')} /></button>
+      </div>
+    </div>
+
+    <div class="bug bug--live" data-board-ui>
+      <span class="bug__live">Ushtrim</span>
+      <span class="bug__status" data-status>Po përgatitet…</span>
+    </div>
+
+    <div class="bug bug--score" data-board-ui>
+      <div class="score__row"><span class="score__name" data-theme-name>Tema</span><span class="tabular" data-puzzle-rating></span></div>
+      <div class="score__row"><span class="score__name">Vlerësimi yt</span><b class="tabular" data-my-rating></b></div>
+    </div>
+
+    <div class="tools" data-board-ui>
+      <button type="button" class="tool tool--menu" data-tools-toggle aria-expanded="false" aria-controls="tools-list" aria-label="Mjetet"><Fragment set:html={icon('dotsThreeVertical')} /></button>
+      <div class="tools__list" id="tools-list">
+        <button type="button" class="tool" data-next-puzzle><span class="tool__icon"><Fragment set:html={icon('arrowRight')} /></span><span class="tool__label" data-label>Ushtrimi tjetër</span></button>
+        <button type="button" class="tool" data-angle><span class="tool__icon"><Fragment set:html={icon('videoCamera')} /></span><span class="tool__label" data-label>Këndi i kamerës</span></button>
+        <button type="button" class="tool" data-view aria-pressed="false"><span class="tool__icon"><Fragment set:html={icon('cube')} /></span><span class="tool__label" data-label>Pamje 3D</span></button>
+        <button type="button" class="tool tool--motion" data-motion-switch aria-pressed="false"><span class="tool__icon" data-when="on"><Fragment set:html={icon('pause')} /></span><span class="tool__icon" data-when="off"><Fragment set:html={icon('play')} /></span><span class="tool__label">Ndal lëvizjet</span></button>
+      </div>
+    </div>
+
+    <section class="lower" data-coach data-state="intro" aria-labelledby="coach-title" data-board-ui>
+      <h2 class="lower__tag" id="coach-title">Trajneri</h2>
+      <div class="lower__head">
+        <p class="lower__glyph poster" data-glyph>Gjej lëvizjen</p>
+        <p class="lower__title" data-title></p>
+      </div>
+      <div class="lower__body">
+        <ul class="lower__reasons" data-reasons></ul>
+        <div class="lower__actions">
+          <button type="button" class="cue" data-hint><Fragment set:html={icon('lightbulb')} />Ndihmë</button>
+          <button type="button" class="cue" data-solution><Fragment set:html={icon('eye')} />Zgjidhja</button>
+          <button type="button" class="cue cue--on" data-next hidden><Fragment set:html={icon('arrowRight')} />Tjetri</button>
+          <button type="button" class="cue" data-again hidden><Fragment set:html={icon('arrowCounterClockwise')} />Provo përsëri</button>
+        </div>
+      </div>
+      <p class="visually-hidden" aria-live="polite" data-live></p>
+    </section>
+
+    <div class="ticker" data-board-ui aria-hidden="true">
+      <div class="ticker__rail"></div>
+      <div class="ticker__band"><div class="ticker__track" data-ticker></div></div>
+    </div>
+  </div>
+
+  <section class="record" aria-labelledby="themes-title">
+    <h2 class="record__title wide" id="themes-title">Zgjidh temën</h2>
+    <p class="record__opening">Ushtrimet vijnë nga baza e hapur e Lichess (CC0), me vlerësime nga lojtarë të vërtetë. Zgjidhja e çdonjërit është kontrolluar me motorin.</p>
+    <div class="themes" data-themes role="radiogroup" aria-label="Tema">
+      <label class="theme"><input type="radio" name="theme" value="all" checked /><span><b>Të gjitha</b><span data-count="all"></span></span></label>
+      {THEMES.map((t) => (
+        <label class="theme"><input type="radio" name="theme" value={t.id} /><span><b>{t.name}</b><span data-count={t.id}></span></span></label>
+      ))}
+    </div>
+  </section>
+  <script>
+    import '../scripts/puzzles';
+  </script>
+</App>
+
+<style>
+  .themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(14rem, 100%), 1fr)); margin-top: var(--space-s); border-top: 1px solid var(--rule); }
+  .theme { display: flex; gap: 0.75rem; align-items: center; padding: 0.75rem 0.25rem; border-bottom: 1px solid var(--rule); cursor: pointer; }
+  .theme input { width: 1.25rem; height: 1.25rem; accent-color: var(--pointer); flex: none; }
+  .theme > span { display: grid; }
+  .theme > span > span { font-size: var(--step-small); color: var(--text-2); }
+  .theme:has(input:checked) b { box-shadow: inset 0 -2px 0 var(--pointer); }
+</style>

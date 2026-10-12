@@ -1,0 +1,95 @@
+---
+import App from '../layouts/App.astro';
+import { icon } from '../lib/icons';
+import { LESSONS } from '../data/lessons';
+import '../styles/play.css';
+---
+
+<App title="Shah · Mëso shah duke luajtur" description="Trajner shahu në shqip: luaj kundër motorit, dëgjo pse ishte gabim, zgjidh ushtrime." tab={null} stage>
+  <div class="stage home" data-stage-box>
+    <div class="board" data-board aria-hidden="true"></div>
+
+    <div class="home__title" data-board-ui>
+      <h1 class="home__mark poster">Shah</h1>
+      <p class="home__line">Luaj kundër motorit. Pas çdo lëvizjeje, trajneri të thotë pse.</p>
+      <a class="cue cue--on home__go" href="/luaj/" data-go><Fragment set:html={icon('horse')} /><span data-go-label>Luaj</span></a>
+    </div>
+
+    <section class="lower home__guide" aria-labelledby="guide-title" data-board-ui>
+      <h2 class="lower__tag" id="guide-title">Sot në program</h2>
+      <ol class="guide">
+        <li>
+          <a href="/luaj/" class="guide__row">
+            <span class="guide__time tabular">Tani</span>
+            <span class="guide__what"><b data-game-title>Lojë me trajner</b><span data-game-line>Niveli 2, i lehtë. Ti me të bardhat.</span></span>
+            <Fragment set:html={icon('arrowRight')} />
+          </a>
+        </li>
+        <li>
+          <a href="/ushtrime/" class="guide__row">
+            <span class="guide__time tabular">+5 min</span>
+            <span class="guide__what"><b>Ushtrime</b><span data-puzzle-line>Vlerësimi yt: 900</span></span>
+            <Fragment set:html={icon('arrowRight')} />
+          </a>
+        </li>
+        <li>
+          <a href={`/mesime/${LESSONS[0].slug}/`} class="guide__row" data-lesson-link>
+            <span class="guide__time tabular">+10 min</span>
+            <span class="guide__what"><b>Mësimi</b><span data-lesson-line>{LESSONS[0].title}</span></span>
+            <Fragment set:html={icon('arrowRight')} />
+          </a>
+        </li>
+      </ol>
+    </section>
+
+    <div class="ticker" data-board-ui aria-hidden="true">
+      <div class="ticker__rail"></div>
+      <div class="ticker__band">
+        <div class="ticker__track">
+          {[0, 1].map(() => (
+            <Fragment>
+              <span>Trajneri flet shqip</span><span>Motori Stockfish punon në shfletuesin tënd</span><span>Ushtrime nga Lichess</span><span>Shtatë mësime për lojtarin që di rregullat</span><span>Pa llogari, pa pagesë</span>
+            </Fragment>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    import '../scripts/home';
+  </script>
+</App>
+
+<style>
+  .home { --inset-top: 14rem; --inset-bottom: 15.5rem; }
+  .home .board { pointer-events: none; }
+  .home__title {
+    position: absolute; z-index: 2; left: var(--gutter); right: var(--gutter); top: 1rem;
+    display: grid; justify-items: start; gap: 0.75rem;
+  }
+  .home__mark {
+    font-size: clamp(6rem, 1rem + 30vw, 22rem); color: var(--stone); margin-inline-start: -0.05em;
+    text-shadow: 0 0.03em 0.12em rgb(0 0 0 / 0.45);
+  }
+  .home__line { max-width: 30ch; color: var(--stone); font-weight: 600; font-size: 1.0625rem; line-height: 1.35; text-shadow: 0 1px 8px rgb(0 0 0 / 0.6); }
+  .home__go { min-height: 52px; padding-inline: 1.25rem; font-size: 0.9375rem; }
+  .home__guide { width: auto; }
+  .guide { display: grid; width: 100%; background: rgb(17 14 11 / 0.94); }
+  .guide li + li { border-top: 1px solid rgb(230 229 225 / 0.12); }
+  .guide__row {
+    display: grid; grid-template-columns: 4.25rem minmax(0, 1fr) auto; align-items: center; gap: 0.75rem;
+    min-height: 56px; padding: 0.5rem 0.75rem; color: var(--stone); text-decoration: none;
+    transition: background-color var(--dur-ui) ease;
+  }
+  .guide__time { font-variation-settings: 'wdth' 118; font-weight: 820; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--pointer-ink); }
+  .guide__what { display: grid; }
+  .guide__what b { font-variation-settings: 'wdth' 118; font-weight: 820; text-transform: uppercase; letter-spacing: 0.02em; font-size: 0.9375rem; }
+  .guide__what span { font-size: 0.875rem; color: rgb(230 229 225 / 0.72); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .guide__row:active { background: rgb(230 229 225 / 0.08); }
+  @media (hover: hover) and (pointer: fine) { .guide__row:hover { background: rgb(230 229 225 / 0.08); } }
+  @media (min-width: 1024px) {
+    .home { --inset-top: 6rem; --inset-bottom: 4rem; --inset-left: 22rem; --inset-right: 28rem; }
+    .home__title { left: 2rem; top: 1.5rem; }
+    .home__guide { left: auto; right: 1.5rem; width: 26rem; top: auto; }
+  }
+</style>

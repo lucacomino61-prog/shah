@@ -1,0 +1,29 @@
+{
+  "name": "chess-coach",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev --port 3770 --host 127.0.0.1",
+    "build": "astro build",
+    "preview": "astro preview --port 3771 --host 127.0.0.1",
+    "engine": "node tools/copy-engine.mjs",
+    "test": "node --experimental-strip-types tools/test-coach.ts"
+  },
+  "dependencies": {
+    "@fontsource-variable/mona-sans": "^5.2.8",
+    "@phosphor-icons/core": "^2.1.1",
+    "astro": "7.3.5",
+    "chess.js": "1.4.0",
+    "gsap": "3.15.0",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@types/node": "^24.3.0",
+    "@types/three": "0.186.0",
+    "puppeteer-core": "25.12.0",
+    "stockfish": "19.0.0",
+    "typescript": "^5.9.3"
+  }
+}

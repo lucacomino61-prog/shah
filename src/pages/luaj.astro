@@ -1,0 +1,142 @@
+---
+import App from '../layouts/App.astro';
+import { icon } from '../lib/icons';
+import '../styles/play.css';
+---
+
+<App title="Luaj · Shah" description="Luaj kundër motorit dhe dëgjo trajnerin pas çdo lëvizjeje." tab="luaj" stage>
+  <h1 class="visually-hidden">Luaj me trajner</h1>
+  <div class="stage" data-stage-box>
+    <div
+      class="board"
+      data-board
+      tabindex="0"
+      role="application"
+      aria-label="Tabela e shahut. Shigjetat lëvizin kursorin, Enter zgjedh figurën dhe e lëviz, Escape e lëshon."
+    >
+      <div class="promo" data-promo data-board-ui hidden role="group" aria-label="Ushtari bëhet">
+        <button type="button" data-piece="q"><svg aria-hidden="true"><use href="#pc-w-q"></use></svg><span>Mbretëreshë</span></button>
+        <button type="button" data-piece="r"><svg aria-hidden="true"><use href="#pc-w-r"></use></svg><span>Torrë</span></button>
+        <button type="button" data-piece="b"><svg aria-hidden="true"><use href="#pc-w-b"></use></svg><span>Oficer</span></button>
+        <button type="button" data-piece="n"><svg aria-hidden="true"><use href="#pc-w-n"></use></svg><span>Kalë</span></button>
+        <button type="button" data-piece="x" class="promo__cancel" aria-label="Anulo"><Fragment set:html={icon('x')} /></button>
+      </div>
+    </div>
+
+    <div class="intro" data-intro data-board-ui>
+      <p class="intro__mark poster" aria-hidden="true">Shah</p>
+      <p class="intro__line" role="status"><span>Transmetimi fillon</span><b class="tabular" data-intro-pct>0%</b></p>
+      <button type="button" class="cue" data-intro-skip>Kalo</button>
+    </div>
+
+    <div class="bug bug--live" data-board-ui>
+      <span class="bug__live" data-live-tag>Drejtpërdrejt</span>
+      <span class="bug__status" data-status>Motori po ngarkohet…</span>
+    </div>
+
+    <div class="bug bug--score" data-board-ui aria-label="Lojtarët">
+      <div class="score__row" data-them>
+        <span class="score__name" data-name>Motori</span>
+        <span class="score__taken" data-taken></span>
+      </div>
+      <div class="score__row" data-you>
+        <span class="score__name">Ti</span>
+        <span class="score__taken" data-taken></span>
+      </div>
+    </div>
+
+    <div class="tools" data-board-ui>
+      <button type="button" class="tool tool--menu" data-tools-toggle aria-expanded="false" aria-controls="tools-list" aria-label="Mjetet"><Fragment set:html={icon('dotsThreeVertical')} /></button>
+      <div class="tools__list" id="tools-list">
+        <button type="button" class="tool" data-new><span class="tool__icon"><Fragment set:html={icon('plus')} /></span><span class="tool__label" data-label>Lojë e re</span></button>
+        <button type="button" class="tool" data-undo><span class="tool__icon"><Fragment set:html={icon('arrowCounterClockwise')} /></span><span class="tool__label" data-label>Kthe lëvizjen</span></button>
+        <button type="button" class="tool" data-flip><span class="tool__icon"><Fragment set:html={icon('arrowsDownUp')} /></span><span class="tool__label" data-label>Rrotullo tabelën</span></button>
+        <button type="button" class="tool" data-angle><span class="tool__icon"><Fragment set:html={icon('videoCamera')} /></span><span class="tool__label" data-label>Këndi i kamerës</span></button>
+        <button type="button" class="tool" data-view aria-pressed="false"><span class="tool__icon"><Fragment set:html={icon('square')} /></span><span class="tool__label" data-label>Pamje e sheshtë</span></button>
+        <button type="button" class="tool tool--motion" data-motion-switch aria-pressed="false"><span class="tool__icon" data-when="on"><Fragment set:html={icon('pause')} /></span><span class="tool__icon" data-when="off"><Fragment set:html={icon('play')} /></span><span class="tool__label">Ndal lëvizjet</span></button>
+      </div>
+    </div>
+
+    <section class="lower" data-coach data-state="intro" aria-labelledby="coach-title" data-board-ui>
+      <h2 class="lower__tag" id="coach-title" data-tag>Trajneri</h2>
+      <div class="lower__head">
+        <p class="lower__glyph poster" data-glyph>Radha jote</p>
+        <p class="lower__title" data-title></p>
+      </div>
+      <div class="lower__body">
+        <ul class="lower__reasons" data-reasons></ul>
+        <p class="lower__warning" data-warning hidden></p>
+
+        <div class="lower__actions" data-actions>
+          <button type="button" class="cue cue--on" data-why hidden><Fragment set:html={icon('eye')} />Shiko pse</button>
+          <button type="button" class="cue" data-retry hidden><Fragment set:html={icon('arrowCounterClockwise')} />Provo përsëri</button>
+          <button type="button" class="cue" data-hint hidden><Fragment set:html={icon('lightbulb')} />Ndihmë</button>
+        </div>
+
+        <div class="study" data-study>
+          <ol class="study__line" data-study-line></ol>
+          <div class="study__bar">
+            <button type="button" class="cue" data-prev aria-label="Lëvizja e mëparshme"><Fragment set:html={icon('caretLeft')} /></button>
+            <button type="button" class="cue" data-next aria-label="Lëvizja tjetër"><Fragment set:html={icon('caretRight')} /></button>
+            <button type="button" class="cue cue--on" data-back><Fragment set:html={icon('arrowLeft')} />Kthehu te loja</button>
+          </div>
+          <div class="study__switch">
+            <button type="button" class="cue cue--quiet" data-study-why>Pse ishte gabim</button>
+            <button type="button" class="cue cue--quiet" data-study-best>Lëvizja më e mirë</button>
+          </div>
+        </div>
+
+        <div class="end" data-end hidden>
+          <p data-end-line></p>
+          <p class="end__acc">Saktësia <b class="tabular" data-end-acc></b></p>
+          <ul class="end__counts" data-end-counts></ul>
+          <p class="end__tag" data-end-tag></p>
+          <div class="lower__actions">
+            <button type="button" class="cue cue--on" data-again><Fragment set:html={icon('plus')} />Lojë e re</button>
+            <button type="button" class="cue" data-review><Fragment set:html={icon('eye')} />Rishiko gabimet</button>
+          </div>
+        </div>
+      </div>
+      <p class="visually-hidden" aria-live="polite" data-live></p>
+    </section>
+
+    <div class="ticker" data-board-ui aria-hidden="true">
+      <div class="ticker__rail" data-rail></div>
+      <div class="ticker__band"><div class="ticker__track" data-ticker></div></div>
+    </div>
+  </div>
+
+  <section class="record" aria-labelledby="sheet-title">
+    <h2 class="record__title wide" id="sheet-title">Fleta e lojës</h2>
+    <p class="record__opening" data-opening hidden></p>
+    <ol class="sheet" data-sheet></ol>
+    <div class="record__actions">
+      <button type="button" class="btn" data-resign><Fragment set:html={icon('flag')} /><span data-label>Dorëzohu</span></button>
+    </div>
+  </section>
+
+  <dialog class="setup" data-setup-dialog aria-labelledby="setup-title">
+    <form class="setup__form" data-setup method="dialog">
+      <h2 class="setup__title" id="setup-title" data-setup-title tabindex="-1">Lojë e re</h2>
+      <fieldset>
+        <legend>Luaj me</legend>
+        <div class="segmented">
+          <label><input type="radio" name="side" value="w" checked /><span>Të bardhat</span></label>
+          <label><input type="radio" name="side" value="b" /><span>Të zezat</span></label>
+          <label><input type="radio" name="side" value="random" /><span>Rastësisht</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Niveli i kundërshtarit</legend>
+        <div class="choices" data-levels></div>
+      </fieldset>
+      <div class="setup__actions">
+        <button type="submit" class="btn btn--solid" value="start">Fillo lojën</button>
+        <button type="button" class="btn btn--quiet" data-setup-close>Anulo</button>
+      </div>
+    </form>
+  </dialog>
+  <script>
+    import '../scripts/play';
+  </script>
+</App>

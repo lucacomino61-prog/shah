@@ -1,0 +1,66 @@
+---
+import App from '../../layouts/App.astro';
+import { LESSONS } from '../../data/lessons';
+import { icon } from '../../lib/icons';
+---
+
+<App title="Mësime · Shah" description="Mësime të shkurtra për lojtarin që di rregullat: vlera e figurave, piruni, lidhja, mati, hapja." tab="mesime">
+  <div class="page lessons">
+    <h1 class="page-title poster">Mësime</h1>
+    <p class="lede">Shtatë segmente të shkurtra. Secili shpjegon një ide në tabelë dhe të lë ta luash vetë.</p>
+    <ol class="lessons__list">
+      {LESSONS.map((l, i) => (
+        <li>
+          <a href={`/mesime/${l.slug}/`} class="lesson-row" data-lesson={l.slug}>
+            <span class="lesson-row__n tabular">{String(i + 1).padStart(2, '0')}</span>
+            <span class="lesson-row__body">
+              <b class="lesson-row__title">{l.title}</b>
+              <span class="lesson-row__lede">{l.lede}</span>
+            </span>
+            <span class="lesson-row__meta">
+              <span class="lesson-row__done" data-done hidden><Fragment set:html={icon('check')} />Kryer</span>
+              <span class="lesson-row__steps">{l.steps.length} hapa</span>
+            </span>
+            <span class="lesson-row__go" aria-hidden="true"><Fragment set:html={icon('arrowRight')} /></span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </div>
+  <script>
+    import { load } from '../../lib/store';
+    const done = new Set(load().lessons);
+    document.querySelectorAll<HTMLElement>('[data-lesson]').forEach((a) => {
+      if (done.has(a.dataset.lesson!)) a.querySelector<HTMLElement>('[data-done]')!.hidden = false;
+    });
+  </script>
+</App>
+
+<style>
+  .lessons { max-width: 64rem; margin-inline: auto; }
+  .lessons__list { margin-top: var(--space-l); border-top: 2px solid var(--text); }
+  .lesson-row {
+    display: grid; grid-template-columns: 2.75rem minmax(0, 1fr) auto; gap: 0.25rem 1rem; align-items: start;
+    padding: 1.1rem 0.25rem; border-bottom: 1px solid var(--rule); text-decoration: none;
+    transition: background-color var(--dur-ui) ease;
+  }
+  .lesson-row__n { font-variation-settings: 'wdth' 125; font-weight: 880; font-size: 1.25rem; line-height: 1.2; color: var(--text-2); }
+  .lesson-row__body { display: grid; gap: 0.2rem; }
+  .lesson-row__title { font-variation-settings: 'wdth' 118; font-weight: 820; font-size: var(--step-title); line-height: 1.1; }
+  .lesson-row__lede { color: var(--text-2); max-width: 52ch; }
+  .lesson-row__meta { grid-column: 2; display: flex; gap: 1rem; font-size: var(--step-small); color: var(--text-2); }
+  .lesson-row__done { display: inline-flex; align-items: center; gap: 0.25rem; color: var(--pointer-ink); font-weight: 700; }
+  .lesson-row__done[hidden] { display: none; }
+  .lesson-row__done .icon { width: 1rem; height: 1rem; }
+  .lesson-row__go { grid-column: 3; grid-row: 1; align-self: center; }
+  @media (hover: hover) and (pointer: fine) {
+    .lesson-row:hover { background: var(--well); }
+    .lesson-row:hover .lesson-row__go { color: var(--pointer-ink); }
+  }
+  @media (min-width: 768px) {
+    .lesson-row { grid-template-columns: 4rem minmax(0, 1fr) 10rem 2rem; align-items: center; }
+    .lesson-row__n { font-size: 2rem; }
+    .lesson-row__meta { grid-column: 3; display: grid; justify-items: end; }
+    .lesson-row__go { grid-column: 4; }
+  }
+</style>
