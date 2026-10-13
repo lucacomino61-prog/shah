@@ -1,13 +1,14 @@
 ---
 import App from '../../layouts/App.astro';
 import { LESSONS } from '../../data/lessons';
+import { REPERTOIRES } from '../../data/repertoires';
 import { icon } from '../../lib/icons';
 ---
 
 <App title="Mësime · Shah" description="Mësime të shkurtra për lojtarin që di rregullat: vlera e figurave, piruni, lidhja, mati, hapja." tab="mesime">
   <div class="page lessons">
     <h1 class="page-title poster" style="--chars: 6">Mësime</h1>
-    <p class="lede">Shtatë segmente të shkurtra. Secili shpjegon një ide në tabelë dhe të lë ta luash vetë.</p>
+    <p class="lede">Tetë segmente të shkurtra. Secili shpjegon një ide në tabelë dhe të lë ta luash vetë.</p>
     <ol class="lessons__list">
       {LESSONS.map((l, i) => (
         <li>
@@ -26,6 +27,26 @@ import { icon } from '../../lib/icons';
         </li>
       ))}
     </ol>
+
+    <h2 class="lessons__h wide">Trajno hapjet</h2>
+    <p class="lede">Zgjidh një repertor. Motori luan përgjigjet e kundërshtarit, ti luan lëvizjet e tua derisa t’i dish përmendsh.</p>
+    <ol class="lessons__list">
+      {REPERTOIRES.map((r) => (
+        <li>
+          <a href={`/mesime/hapje/${r.slug}/`} class="lesson-row" data-rep={r.slug} data-lines={r.lines.length}>
+            <span class="lesson-row__n tabular">{r.side === 'w' ? 'B' : 'Z'}</span>
+            <span class="lesson-row__body">
+              <b class="lesson-row__title">{r.title}</b>
+              <span class="lesson-row__lede">{r.lede}</span>
+            </span>
+            <span class="lesson-row__meta">
+              <span class="lesson-row__steps" data-rep-state>{r.lines.length} linja</span>
+            </span>
+            <span class="lesson-row__go" aria-hidden="true"><Fragment set:html={icon('arrowRight')} /></span>
+          </a>
+        </li>
+      ))}
+    </ol>
   </div>
   <script>
     import { load } from '../../lib/store';
@@ -33,12 +54,20 @@ import { icon } from '../../lib/icons';
     document.querySelectorAll<HTMLElement>('[data-lesson]').forEach((a) => {
       if (done.has(a.dataset.lesson!)) a.querySelector<HTMLElement>('[data-done]')!.hidden = false;
     });
+    const reps = load().reps;
+    document.querySelectorAll<HTMLElement>('[data-rep]').forEach((a) => {
+      const n = Number(a.dataset.lines);
+      const learnt = Array.from({ length: n }, (_, i) => reps[`${a.dataset.rep}:${i}`]?.streak ?? 0).filter((x) => x >= 3).length;
+      a.querySelector('[data-rep-state]')!.textContent = `${learnt} nga ${n} linja të mësuara`;
+    });
   </script>
 </App>
 
 <style>
   .lessons { max-width: 64rem; margin-inline: auto; }
   .lessons__list { margin-top: var(--space-l); border-top: 2px solid var(--text); }
+  .lessons__h { margin-top: var(--space-xl); font-size: var(--step-title); font-weight: 860; }
+  .lessons__h + .lede { margin-top: 0.5rem; }
   .lesson-row {
     display: grid; grid-template-columns: 2.75rem minmax(0, 1fr) auto; gap: 0.25rem 1rem; align-items: start;
     padding: 1.1rem 0.25rem; border-bottom: 1px solid var(--rule); text-decoration: none;

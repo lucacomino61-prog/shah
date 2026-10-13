@@ -31,6 +31,8 @@ export interface Progress {
   warnings: boolean;
   /** the game clock: 'none' or minutes+increment, e.g. '5+3' */
   clock: string;
+  /** opening lines: correct runs in a row and tries, by repertoire slug + line index */
+  reps: Record<string, { streak: number; tries: number }>;
   /** the learner's own mistakes, brought back as puzzles */
   cards: Card[];
 }
@@ -116,6 +118,7 @@ const fresh = (): Progress => ({
   view: '3d',
   warnings: true,
   clock: 'none',
+  reps: {},
   cards: [],
 });
 

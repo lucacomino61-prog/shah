@@ -20,6 +20,14 @@ for (const lesson of LESSONS) {
       console.log(`FAIL  ${label}: bad position or setup (${(e as Error).message})`);
       continue;
     }
+    if (step.playout) {
+      const a = await sf.analyse(chess.fen(), { depth: 16 });
+      const l = a.lines[0];
+      const won = l?.mate !== undefined ? l.mate > 0 : (l?.cp ?? 0) > 400;
+      if (!won) failed++;
+      console.log(`${won ? 'ok   ' : 'FAIL '} ${label}: play-out starts ${l?.mate !== undefined ? `mate in ${l.mate}` : `${l?.cp}cp`}`);
+      continue;
+    }
     if (!step.task) {
       console.log(`ok    ${label}`);
       continue;

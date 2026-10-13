@@ -1,0 +1,93 @@
+---
+import App from '../../../layouts/App.astro';
+import { REPERTOIRES } from '../../../data/repertoires';
+import { icon } from '../../../lib/icons';
+import '../../../styles/play.css';
+
+export function getStaticPaths() {
+  return REPERTOIRES.map((r) => ({ params: { slug: r.slug }, props: { rep: r } }));
+}
+const { rep } = Astro.props;
+---
+
+<App title={`${rep.title} · Trajneri i hapjeve · Shah`} description={`${rep.title}: ${rep.lede}`} tab="mesime" stage>
+  <h1 class="visually-hidden">{rep.title}</h1>
+  <div class="stage" data-stage-box data-rep={rep.slug}>
+    <div class="board" data-board tabindex="0" role="application" aria-label="Tabela e hapjes. Shigjetat lëvizin kursorin, Enter zgjedh figurën dhe e lëviz."></div>
+
+    <div class="bug bug--live" data-board-ui>
+      <span class="bug__live">Hapja</span>
+      <span class="bug__status" data-status>Po fillon…</span>
+    </div>
+
+    <div class="bug bug--score" data-board-ui>
+      <div class="score__row"><span class="score__name">Linja</span><span class="tabular" data-line-n></span></div>
+      <div class="score__row"><span class="score__name">Të mësuara</span><b class="tabular" data-learnt></b></div>
+    </div>
+
+    <div class="tools" data-board-ui>
+      <button type="button" class="tool tool--menu" data-tools-toggle aria-expanded="false" aria-controls="tools-list" aria-label="Mjetet"><Fragment set:html={icon('dotsThreeVertical')} /></button>
+      <div class="tools__list" id="tools-list">
+        <a class="tool" href="/mesime/"><span class="tool__icon"><Fragment set:html={icon('bookOpenText')} /></span><span class="tool__label">Të gjitha mësimet</span></a>
+        <button type="button" class="tool" data-angle><span class="tool__icon"><Fragment set:html={icon('videoCamera')} /></span><span class="tool__label" data-label>Këndi i kamerës</span></button>
+        <button type="button" class="tool" data-view aria-pressed="false"><span class="tool__icon"><Fragment set:html={icon('cube')} /></span><span class="tool__label" data-label>Pamje 3D</span></button>
+        <button type="button" class="tool tool--motion" data-motion-switch aria-pressed="false"><span class="tool__icon" data-when="on"><Fragment set:html={icon('pause')} /></span><span class="tool__icon" data-when="off"><Fragment set:html={icon('play')} /></span><span class="tool__label">Ndal lëvizjet</span></button>
+      </div>
+    </div>
+
+    <section class="lower" data-coach data-state="intro" aria-labelledby="rep-head" data-board-ui>
+      <div class="lower__head">
+        <p class="lower__tag">Trajneri</p>
+        <div class="lower__headline">
+          <h2 class="lower__glyph poster" id="rep-head" data-glyph>Repertori</h2>
+          <p class="lower__title" data-title></p>
+        </div>
+      </div>
+      <div class="lower__body">
+        <ul class="lower__reasons" data-reasons></ul>
+        <div class="lower__actions">
+          <button type="button" class="cue" data-hint><Fragment set:html={icon('lightbulb')} />Ndihmë</button>
+          <button type="button" class="cue" data-again hidden><Fragment set:html={icon('arrowCounterClockwise')} />Përsërit linjën</button>
+          <button type="button" class="cue cue--on" data-next hidden><Fragment set:html={icon('arrowRight')} />Linja tjetër</button>
+        </div>
+      </div>
+      <p class="visually-hidden" aria-live="polite" data-live></p>
+    </section>
+
+    <div class="ticker" data-board-ui>
+      <div class="ticker__rail" data-rail role="img" aria-label="Linjat e repertorit"></div>
+      <div class="ticker__band" aria-hidden="true"><div class="ticker__track" data-ticker></div></div>
+    </div>
+  </div>
+
+  <section class="record" aria-labelledby="lines-title">
+    <h2 class="record__title wide" id="lines-title">Linjat</h2>
+    <p class="record__opening">{rep.lede} Një linjë quhet e mësuar kur e luan tri herë rresht pa gabim.</p>
+    <ol class="rep-lines" data-lines>
+      {rep.lines.map((l, i) => (
+        <li>
+          <button type="button" class="rep-line" data-pick={i}>
+            <b>{l.name}</b>
+            <span>{l.idea}</span>
+            <span class="rep-line__state" data-state-of={i}></span>
+          </button>
+        </li>
+      ))}
+    </ol>
+  </section>
+  <script>
+    import '../../../scripts/trainer';
+  </script>
+</App>
+
+<style>
+  .rep-lines { margin-top: var(--space-s); border-top: 1px solid var(--rule); }
+  .rep-line {
+    display: grid; gap: 0.2rem; width: 100%; text-align: start; padding: 0.85rem 0.25rem; min-height: 48px;
+    border-bottom: 1px solid var(--rule); color: var(--text);
+  }
+  .rep-line b { font-variation-settings: 'wdth' 112; font-weight: 780; }
+  .rep-line span { color: var(--text-2); font-size: 0.9375rem; }
+  .rep-line .rep-line__state { color: var(--pointer-ink); font-weight: 700; font-size: 0.8125rem; }
+  @media (hover: hover) and (pointer: fine) { .rep-line:hover { background: var(--well); } }
+</style>

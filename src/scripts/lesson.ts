@@ -2,6 +2,7 @@
 
 import { Chess, type Square } from 'chess.js';
 import { lessonOf, type Step } from '../data/lessons.ts';
+import { Engine } from '../lib/engine.ts';
 import { icon } from '../lib/icons.ts';
 import { sentenceHtml } from '../lib/notation.ts';
 import { update } from '../lib/store.ts';
@@ -49,8 +50,11 @@ const step = (): Step => lesson.steps[index];
 const wait = (ms: number) => new Promise((r) => setTimeout(r, motionOn() ? ms : Math.min(ms, 120)));
 const toMove = (u: string) => ({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] || undefined });
 
+let engine: Engine | null = null;
+const getEngine = () => (engine ??= new Engine());
+
 function dests(sq: Sq): Sq[] {
-  const t = step().task;
+  const t = step().task ?? step().playout;
   if (!t || solved || busy || chess.turn() !== side) return [];
   const p = chess.get(sq as Square);
   if (!p || p.color !== side) return [];
@@ -77,8 +81,9 @@ async function show(i: number) {
   const s = step();
   chess = new Chess(s.fen);
   ply = 0;
-  solved = !s.task;
+  solved = !s.task && !s.playout;
   busy = !!s.setup;
+  if (s.playout) void getEngine().ready;
   hintStep = 0;
   side = s.side ?? (chess.turn() === 'w' ? (s.setup ? 'b' : 'w') : s.setup ? 'w' : 'b');
   board.setOrientation(side);
@@ -87,12 +92,12 @@ async function show(i: number) {
   marks({ arrows: s.arrows, focus: s.focus });
   ui.glyph.textContent = s.title;
   ui.reasons.innerHTML = `<li>${sentenceHtml(s.text)}</li>`;
-  ui.task.hidden = !s.task;
-  ui.task.textContent = s.task ? `Radha jote: ${side === 'w' ? 'të bardhat' : 'të zezat'}.` : '';
+  ui.task.hidden = !s.task && !s.playout;
+  ui.task.textContent = s.task ? `Radha jote: ${side === 'w' ? 'të bardhat' : 'të zezat'}.` : s.playout ? 'Luaj kundër motorit. Ai mbrohet me gjithë forcën.' : '';
   ui.status.textContent = `Hapi ${i + 1} nga ${lesson.steps.length}`;
   ui.prev.disabled = i === 0;
   ui.nextLabel.textContent = i === lesson.steps.length - 1 ? 'Përfundo' : 'Para';
-  ui.hint.hidden = !s.task;
+  ui.hint.hidden = !s.task && !s.playout;
   ui.again.hidden = true;
   ui.live.textContent = `${s.title}. ${s.text}`;
   rail();
@@ -105,7 +110,7 @@ async function show(i: number) {
     marks({ arrows: s.arrows, focus: s.focus });
     busy = false;
   }
-  board.setInteractive(!!s.task);
+  board.setInteractive(!!s.task || !!s.playout);
 }
 
 let promoAsk: ((k: string | null) => void) | null = null;
@@ -119,6 +124,7 @@ ui.promo.addEventListener('click', (e) => {
 });
 
 async function onMove(from: Sq, to: Sq) {
+  if (step().playout) return playout(from, to);
   const t = step().task;
   if (!t || solved || busy) return;
   const g = gen;
@@ -185,7 +191,77 @@ function done(text: string) {
   rail();
 }
 
-ui.hint.addEventListener('click', () => {
+/** A step played out against the engine: it answers with its best move; the coach watches the win. */
+async function playout(from: Sq, to: Sq) {
+  const goal = step().playout!;
+  if (solved || busy) return;
+  const g = gen;
+  busy = true;
+  board.setInteractive(false);
+  let m;
+  try {
+    m = chess.move({ from, to, promotion: 'q' });
+  } catch {
+    busy = false;
+    board.setInteractive(true);
+    board.setPosition(chess.fen(), true);
+    return;
+  }
+  board.setPosition(chess.fen(), true);
+  marks();
+  if (goal === 'promote' && m.promotion) return done('Ushtari u bë mbretëreshë. Kjo është fitorja.');
+  if (chess.isCheckmate()) return done(`Mat në ${Math.ceil(chess.history().length / 2)} lëvizje.`);
+  if (chess.isDraw())
+    return slipped(
+      chess.isStalemate()
+        ? 'Pat: mbreti nuk ka lëvizje dhe nuk është në shah. Barazim. Provo përsëri.'
+        : chess.isInsufficientMaterial()
+          ? 'Figura jote u mor: me dy mbretër vetëm është barazim. Provo përsëri.'
+          : 'Barazim. Provo përsëri.',
+    );
+  ui.task.textContent = 'Motori mendon…';
+  const a = await getEngine().analyse(chess.fen(), { depth: 12, movetime: 1200 });
+  if (g !== gen) return;
+  const l = a.lines[0];
+  // the win is still there: for a mate, while the queen or rook is on the board (a slow mate is still a mate);
+  // for the pawn, while the engine sees itself clearly lost (a drawn pawn ending scores near zero)
+  let pieces = 0;
+  for (const row of chess.board()) for (const p of row) if (p && p.color === side && p.type !== 'k' && p.type !== 'p') pieces++;
+  const losing = goal === 'mate' ? pieces > 0 : l?.mate !== undefined ? l.mate < 0 : (l?.cp ?? 0) < -150;
+  if (!losing) return slipped('Fitorja iku: motori tani mbahet. Provo përsëri nga fillimi.');
+  const u = a.bestmove!;
+  await wait(250);
+  if (g !== gen) return;
+  chess.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] || undefined });
+  board.setPosition(chess.fen(), true);
+  marks();
+  if (chess.isDraw()) return slipped(chess.isInsufficientMaterial() ? 'Figura jote u mor: me dy mbretër vetëm është barazim. Provo përsëri.' : 'Barazim. Provo përsëri.');
+  ui.task.textContent = l?.mate !== undefined ? `Motori sheh mat në ${Math.abs(l.mate)} lëvizje.` : 'Mirë. Vazhdo.';
+  busy = false;
+  board.setInteractive(true);
+}
+
+function slipped(text: string) {
+  busy = false;
+  solved = false;
+  ui.task.hidden = false;
+  ui.task.textContent = text;
+  ui.live.textContent = text;
+  ui.again.hidden = false;
+  ui.hint.hidden = true;
+  board.setInteractive(false);
+}
+
+ui.hint.addEventListener('click', async () => {
+  if (step().playout) {
+    if (solved || busy) return;
+    const a = await getEngine().analyse(chess.fen(), { depth: 12, movetime: 900 });
+    const u = a.bestmove;
+    if (!u) return;
+    marks({ focus: [u.slice(0, 2)], arrows: [{ from: u.slice(0, 2), to: u.slice(2, 4) }] });
+    ui.task.textContent = 'Lëvizja më e mirë sipas motorit.';
+    return;
+  }
   const t = step().task;
   if (!t || solved || busy) return;
   hintStep = Math.min(2, hintStep + 1);

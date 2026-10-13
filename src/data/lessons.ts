@@ -24,6 +24,8 @@ export interface Step {
   task?: Task;
   /** where the board is seen from; the side to move after the setup by default */
   side?: 'w' | 'b';
+  /** play it out against the engine at full strength until mate, or until a pawn becomes a queen */
+  playout?: 'mate' | 'promote';
 }
 
 export interface Lesson {
@@ -220,5 +222,31 @@ export const LESSONS: Lesson[] = [
     ],
   },
 ];
+
+LESSONS.push({
+  slug: 'fundloja',
+  title: 'Fundloja kundër motorit',
+  lede: 'Mbaroje vetë: mat me mbretëreshë, mat me torre, ushtari deri në fund. Motori mbrohet me gjithë forcën.',
+  steps: [
+    {
+      title: 'Mbretëresha dhe mbreti',
+      text: 'Me mbretëreshën ngushtoje mbretin kundërshtar drejt buzës, pastaj sill mbretin tënd afër dhe jep mat. Kujdes nga pati: lëre gjithmonë mbretin të ketë një lëvizje derisa jep mat.',
+      fen: '8/8/8/4k3/8/8/8/3QK3 w - - 0 1',
+      playout: 'mate',
+    },
+    {
+      title: 'Torra dhe mbreti',
+      text: 'Torra pret një rresht ose një kolonë; mbreti yt i zë mbretit kundërshtar fushat përballë. Hap pas hapi, shtyje në buzë dhe jep mat.',
+      fen: '8/8/8/4k3/8/8/8/R3K3 w - - 0 1',
+      playout: 'mate',
+    },
+    {
+      title: 'Ushtari deri në fund',
+      text: 'Mbreti yt para ushtarit dhe opozita fitojnë: çoje ushtarin deri në rreshtin e fundit pa e lënë mbretin kundërshtar ta ndalë.',
+      fen: '4k3/8/4K3/4P3/8/8/8/8 w - - 0 1',
+      playout: 'promote',
+    },
+  ],
+});
 
 export const lessonOf = (slug: string) => LESSONS.find((l) => l.slug === slug);
