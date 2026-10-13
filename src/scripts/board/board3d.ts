@@ -62,8 +62,8 @@ const STUDIO = { room: 0.45, hemi: 0.34, lamp: 3.6, exposure: 1.04 };
  *  table. Then straight overhead, and the low three-quarter the home page orbits in. Each has a steeper version
  *  for an upright phone, so the far ranks keep their size. dist is from the middle of the board, in squares. */
 export const ANGLES = [
-  { name: 'Si lojtar', upright: { el: 1.02, az: 0, dist: 11.5 }, wide: { el: 0.9, az: 0, dist: 12.5 } },
-  { name: 'Nga lart', upright: { el: 1.18, az: 0, dist: 15 }, wide: { el: 1.05, az: 0, dist: 15 } },
+  { name: 'Si lojtar', upright: { el: 1.16, az: 0, dist: 12 }, wide: { el: 1.04, az: 0, dist: 13 } },
+  { name: 'Nga lart', upright: { el: 1.4, az: 0, dist: 15 }, wide: { el: 1.32, az: 0, dist: 15 } },
   { name: 'Afër tabelës', upright: { el: 0.72, az: -0.42, dist: 15 }, wide: { el: 0.56, az: -0.5, dist: 15 } },
 ];
 

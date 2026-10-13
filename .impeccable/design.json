@@ -104,8 +104,8 @@
         { "name": "arrows", "type": "Shader, flat outline drawn on by share of length", "color": "var(--pointer)", "opacity": "0.92 (quiet 0.74)", "badge": "pointer disc with ink number, 800 Mona Sans" }
       ],
       "cameraAngles": [
-        { "name": "Si lojtar", "upright": { "el": 1.02, "az": 0, "dist": 11.5 }, "wide": { "el": 0.9, "az": 0, "dist": 12.5 }, "default": true },
-        { "name": "Nga lart", "upright": { "el": 1.18, "az": 0, "dist": 15 }, "wide": { "el": 1.05, "az": 0, "dist": 15 } },
+        { "name": "Si lojtar", "upright": { "el": 1.16, "az": 0, "dist": 12 }, "wide": { "el": 1.04, "az": 0, "dist": 13 }, "default": true },
+        { "name": "Nga lart", "upright": { "el": 1.4, "az": 0, "dist": 15 }, "wide": { "el": 1.32, "az": 0, "dist": 15 } },
         { "name": "Afër tabelës", "upright": { "el": 0.72, "az": -0.42, "dist": 15 }, "wide": { "el": 0.56, "az": -0.5, "dist": 15 } }
       ],
       "boardMarks2d": { "last": "pointer 0.2", "check": "pointer 0.42", "chosen": "pointer 0.26", "focus": "pointer stroke 7", "dot": "pointer 0.85", "take": "pointer ring 7 at 0.85", "cursor": "ink dashed 10 8, stroke 5", "arrowShaft": "pointer stroke 17 mitre at 0.88" }
