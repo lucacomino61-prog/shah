@@ -1,24 +1,35 @@
 ---
 name: Shah
-description: An Albanian chess coach staged as a commentary-room broadcast over a lit wooden board.
+description: An Albanian chess coach in the iOS 27 idiom, Liquid Glass floating over a lit wooden board.
 colors:
-  stone: "#e6e5e1"
-  ink: "#111214"
-  text-2: "#595a5a"
-  rule: "#c4c3c0"
-  rule-strong: "#91918f"
-  well: "#d9d8d5"
-  pointer: "#e65719"
-  pointer-ink: "#a83707"
-  pointer-dark: "#f27636"
-  pointer-ink-dark: "#f7904b"
-  pointer-stage: "#f06a2c"
-  verdict-on-stone: "#c8460f"
+  bg: "#f2f2f7"
+  cell: "#ffffff"
+  cell-press: "#e5e5ea"
+  label: "#000000"
+  label-2: "rgb(60 60 67 / 0.78)"
+  label-3: "rgb(60 60 67 / 0.36)"
+  sep: "rgb(60 60 67 / 0.29)"
+  fill: "rgb(120 120 128 / 0.2)"
+  fill-2: "rgb(118 118 128 / 0.12)"
+  seg-thumb: "#ffffff"
+  tint: "#007aff"
+  tint-fill: "#0066d6"
+  tint-ink: "#0066d6"
+  red: "#ff3b30"
+  red-fill: "#d70015"
+  red-ink: "#d70015"
+  orange: "#ff9500"
+  orange-ink: "#c93400"
+  green: "#34c759"
+  green-ink: "#248a3d"
+  last: "#ffd60a"
+  glass: "rgb(248 248 250 / 0.7)"
+  glass-stage: "rgb(30 32 34 / 0.6)"
+  bg-dark: "#000000"
+  cell-dark: "#1c1c1e"
+  tint-dark: "#0a84ff"
+  tint-ink-dark: "#409cff"
   stage-ground: "#070908"
-  room-black: "#0b0907"
-  bar-umber: "#110e0b"
-  bar-umber-raised: "#14110e"
-  sheet-umber: "#15120f"
   felt-pool: "#3d5444"
   felt-mid: "#24342a"
   felt-edge: "#111a14"
@@ -29,312 +40,367 @@ colors:
   mahogany-edge: "#2a1006"
   boxwood-stringing: "#e9d3a4"
   coord-inlay: "#ecd6aa"
-  boxwood: "#ecd8ae"
-  ebony: "#1a1a1d"
+  boxwood: "#f7ecd4"
+  ebony: "#121214"
   piece-fill-w: "#f6f4ee"
+  piece-edge-w: "#111214"
   piece-fill-b: "#17181b"
   piece-edge-b: "#f1efe9"
 typography:
-  display:
-    fontFamily: "'Mona Sans Variable', 'Mona Sans', system-ui, -apple-system, 'Segoe UI', sans-serif"
-    fontSize: "clamp(5.5rem, 2rem + 26vw, 24rem)"
-    fontWeight: 880
-    lineHeight: 0.86
-    letterSpacing: "-0.045em"
-    fontVariation: "'wdth' 125"
-  verdict:
-    fontFamily: "'Mona Sans Variable', 'Mona Sans', system-ui, sans-serif"
-    fontSize: "clamp(2.25rem, 1.6rem + 3.2vw, 4rem)"
-    fontWeight: 880
-    lineHeight: 0.86
-    letterSpacing: "-0.045em"
-    fontVariation: "'wdth' 125"
-  headline:
-    fontFamily: "'Mona Sans Variable', 'Mona Sans', system-ui, sans-serif"
+  wordmark:
+    fontFamily: "ui-rounded, 'SF Pro Rounded', -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI Variable Display', 'Segoe UI', Roboto, sans-serif"
+    fontSize: "clamp(5rem, 2rem + 17vw, 9.5rem)"
+    fontWeight: 800
+    lineHeight: 0.92
+    letterSpacing: "-0.04em"
+  large-title:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+    fontSize: "2.125rem"
+    fontWeight: 700
+    lineHeight: 1.08
+    letterSpacing: "-0.022em"
+  title1:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
     fontSize: "1.75rem"
-    fontWeight: 900
-    lineHeight: 1
-    letterSpacing: "0.01em"
-    fontVariation: "'wdth' 125"
-  title:
-    fontFamily: "'Mona Sans Variable', 'Mona Sans', system-ui, sans-serif"
-    fontSize: "clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem)"
-    fontWeight: 820
-    lineHeight: 1.1
-    fontVariation: "'wdth' 118"
-  caps:
-    fontFamily: "'Mona Sans Variable', 'Mona Sans', system-ui, sans-serif"
-    fontSize: "0.75rem"
-    fontWeight: 860
-    lineHeight: 1
-    letterSpacing: "0.05em"
-    fontVariation: "'wdth' 125"
+    fontWeight: 700
+    lineHeight: 1.12
+    letterSpacing: "-0.02em"
+  title2:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+    fontSize: "1.375rem"
+    fontWeight: 700
+  title3:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+    fontSize: "1.25rem"
+    fontWeight: 700
   body:
-    fontFamily: "'Mona Sans Variable', 'Mona Sans', system-ui, sans-serif"
-    fontSize: "1rem"
-    fontWeight: 430
-    lineHeight: 1.5
-    fontVariation: "'wdth' 100"
-  body-broadcast:
-    fontFamily: "'Mona Sans Variable', 'Mona Sans', system-ui, sans-serif"
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+    fontSize: "1.0625rem"
+    fontWeight: 400
+    lineHeight: 1.4
+    letterSpacing: "-0.012em"
+  subhead:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
     fontSize: "0.9375rem"
-    fontWeight: 430
-    lineHeight: 1.42
-    fontVariation: "'wdth' 100"
-  label:
-    fontFamily: "'Mona Sans Variable', 'Mona Sans', system-ui, sans-serif"
+    fontWeight: 400
+    lineHeight: 1.38
+  footnote:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
     fontSize: "0.8125rem"
     fontWeight: 600
-    lineHeight: 1.5
-    fontVariation: "'wdth' 100"
+  caption:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+    fontSize: "0.75rem"
+    fontWeight: 700
+  caption2:
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+    fontSize: "0.6875rem"
+    fontWeight: 600
+    letterSpacing: "0"
 rounded:
-  none: "0px"
+  capsule: "999px"
+  sheet: "2.25rem"
+  card: "1.625rem"
+  menu: "1.5rem"
+  list: "1.375rem"
+  inner: "1.125rem"
+  chip: "0.75rem"
+  tile: "0.625rem"
 spacing:
   2xs: "0.375rem"
   xs: "0.625rem"
   s: "1rem"
   m: "1.5rem"
   l: "2.25rem"
-  xl: "3.5rem"
+  xl: "3rem"
   gutter: "1rem"
   gutter-wide: "2rem"
-  mast-h: "3.5rem"
-  mast-h-wide: "4rem"
-  tab-h: "4rem"
-  ticker-h: "3.75rem"
+  mast-h: "3.25rem"
+  mast-h-wide: "4.25rem"
+  tab-h: "3.875rem"
+  acc-h: "2.875rem"
+  acc-h-wide: "3rem"
 components:
   button:
-    backgroundColor: "transparent"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.none}"
-    padding: "0 1.125rem"
-    height: "48px"
+    backgroundColor: "{colors.fill-2}"
+    textColor: "{colors.tint-ink}"
+    typography: "{typography.body}"
+    rounded: "{rounded.capsule}"
+    padding: "0 1.375rem"
+    height: "50px"
   button-hover:
-    backgroundColor: "{colors.well}"
+    backgroundColor: "{colors.fill}"
   button-solid:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.stone}"
-    rounded: "{rounded.none}"
-    padding: "0 1.125rem"
-    height: "48px"
+    backgroundColor: "{colors.tint-fill}"
+    textColor: "#ffffff"
+    rounded: "{rounded.capsule}"
+    padding: "0 1.375rem"
+    height: "50px"
   button-quiet:
     backgroundColor: "transparent"
-    textColor: "{colors.ink}"
-    padding: "0 0.625rem"
-    height: "48px"
+    textColor: "{colors.tint-ink}"
+    padding: "0 0.75rem"
   cue:
-    backgroundColor: "transparent"
-    textColor: "{colors.stone}"
-    typography: "{typography.caps}"
-    rounded: "{rounded.none}"
-    padding: "0 0.8rem"
+    backgroundColor: "{colors.fill}"
+    textColor: "{colors.label}"
+    typography: "{typography.subhead}"
+    rounded: "{rounded.capsule}"
+    padding: "0 1.0625rem"
     height: "44px"
   cue-on:
-    backgroundColor: "{colors.stone}"
-    textColor: "{colors.ink}"
-  tool:
-    backgroundColor: "{colors.bar-umber-raised}"
-    textColor: "{colors.stone}"
-    rounded: "{rounded.none}"
-    size: "44px"
-  tool-pressed:
-    backgroundColor: "{colors.stone}"
-    textColor: "{colors.ink}"
-  live-bug:
-    backgroundColor: "{colors.pointer-stage}"
-    textColor: "{colors.ink}"
-    typography: "{typography.caps}"
-    padding: "0.35rem 0.55rem 0.4rem"
-  status-bug:
-    backgroundColor: "{colors.stone}"
-    textColor: "{colors.ink}"
-    padding: "0.35rem 0.6rem 0.4rem"
-  score-row:
-    backgroundColor: "{colors.bar-umber-raised}"
-    textColor: "{colors.stone}"
-    padding: "0.1rem 0.55rem"
-    height: "1.6rem"
-  lower-tag:
-    backgroundColor: "{colors.pointer-stage}"
-    textColor: "{colors.ink}"
-    typography: "{typography.caps}"
-    padding: "0.32rem 0.6rem 0.36rem"
-  lower-head:
-    backgroundColor: "{colors.stone}"
-    textColor: "{colors.ink}"
-    typography: "{typography.verdict}"
-    padding: "0.3rem 0.75rem 0.4rem"
-  lower-body:
-    backgroundColor: "{colors.bar-umber}"
-    textColor: "{colors.stone}"
-    typography: "{typography.body-broadcast}"
-    padding: "0.6rem 0.75rem 0.75rem"
-  ticker-band:
-    backgroundColor: "{colors.stone}"
-    textColor: "{colors.ink}"
-    height: "2.5rem"
+    backgroundColor: "{colors.tint-fill}"
+    textColor: "#ffffff"
+  cue-quiet:
+    backgroundColor: "transparent"
+    textColor: "{colors.tint-ink}"
+    padding: "0 0.5rem"
+  status-capsule:
+    backgroundColor: "{colors.glass-stage}"
+    textColor: "{colors.label}"
+    rounded: "{rounded.capsule}"
+    padding: "0 0.875rem 0 0.3125rem"
+    height: "2.25rem"
+  live-tag:
+    backgroundColor: "{colors.red-fill}"
+    textColor: "#ffffff"
+    typography: "{typography.caption}"
+    rounded: "{rounded.capsule}"
+    padding: "0 0.625rem"
+    height: "1.625rem"
+  score-card:
+    backgroundColor: "{colors.glass-stage}"
+    textColor: "{colors.label}"
+    typography: "{typography.footnote}"
+    rounded: "{rounded.inner}"
+    padding: "0.1875rem 0"
+  coach-card:
+    backgroundColor: "{colors.glass-stage}"
+    textColor: "{colors.label}"
+    rounded: "{rounded.card}"
+    padding: "0.875rem 1rem 1rem"
+    width: "min(calc(100% - 1.5rem), 34rem)"
+  grade-pill:
+    backgroundColor: "{colors.fill}"
+    textColor: "{colors.label}"
+    typography: "{typography.footnote}"
+    rounded: "{rounded.capsule}"
+    padding: "0.1875rem 0.625rem"
   tab-bar:
-    backgroundColor: "{colors.stone}"
-    textColor: "{colors.text-2}"
-    typography: "{typography.label}"
-    height: "4rem"
-  masthead:
-    backgroundColor: "{colors.stone}"
-    textColor: "{colors.ink}"
-    height: "3.5rem"
-    padding: "0 1rem"
+    backgroundColor: "{colors.glass}"
+    textColor: "{colors.label}"
+    typography: "{typography.caption2}"
+    rounded: "{rounded.capsule}"
+    padding: "0.25rem"
+    height: "3.875rem"
+    width: "min(calc(100% - 1.5rem), 30rem)"
+  tab-bar-selected:
+    textColor: "{colors.tint-ink}"
+    rounded: "{rounded.capsule}"
+  list-group:
+    backgroundColor: "{colors.cell}"
+    textColor: "{colors.label}"
+    rounded: "{rounded.list}"
+  list-row:
+    backgroundColor: "{colors.cell}"
+    textColor: "{colors.label}"
+    typography: "{typography.body}"
+    padding: "0.6875rem 1rem"
+    height: "2.875rem"
+  list-row-pressed:
+    backgroundColor: "{colors.cell-press}"
+  segmented:
+    backgroundColor: "{colors.fill}"
+    rounded: "{rounded.capsule}"
+    padding: "0.1875rem"
+  segmented-thumb:
+    backgroundColor: "{colors.seg-thumb}"
+    typography: "{typography.subhead}"
+    rounded: "{rounded.capsule}"
+    height: "2.5rem"
   setup-sheet:
-    backgroundColor: "{colors.sheet-umber}"
-    textColor: "{colors.stone}"
-    padding: "1.5rem"
+    backgroundColor: "{colors.glass-stage}"
+    textColor: "{colors.label}"
+    rounded: "{rounded.sheet}"
     width: "min(100% - 1rem, 34rem)"
   board-plate:
-    backgroundColor: "{colors.pointer}"
-    textColor: "{colors.ink}"
-    padding: "0.25rem 0.625rem 0.375rem"
+    backgroundColor: "{colors.tint-fill}"
+    textColor: "#ffffff"
+    typography: "{typography.footnote}"
+    rounded: "{rounded.capsule}"
+    padding: "0.3rem 0.75rem"
 ---
 
 # Design System: Shah
 
 ## Overview
 
-**Creative North Star: "The Commentary Room"**
+**Creative North Star: "The Native Table"**
 
-A dark studio round one lamp, a classic wooden board on green felt, and over it a commentator who speaks in television graphics. The table is a place, not a page colour: every play, puzzle and home screen fills the viewport with the lit board, and the interface arrives as broadcast furniture laid on top of it (a live bug and score bug top left, a tool column top right, a lower third, a crawling ticker). Reading pages (lessons list, progress, 404) step out of the studio onto plain stone paper with the same type and the same pointer.
+Shah should feel like an app that shipped with an iPhone running iOS 27. Two places make up the whole app. The table pages (home, Luaj, Ushtrime, lessons, the opening trainer) fill the screen with a lit wooden board in a dark room, and everything else floats over it as Liquid Glass: a status capsule and score card top left, a round glass menu button top right, the coach as one glass card, a slim accessory carrying the headlines and the move rail above a floating capsule tab bar. Away from the table (Mësime, Progresi, 404) the app is an inset-grouped iOS list on the grouped background, under a large title.
 
-The graphics commit to two colours, stone and ink, square-cornered, with one lacquer orange as the commentator's pointer: the tag, the arrows, the chosen square, the live verdict. One family, Mona Sans, carries every voice; rank comes from the width axis and weight, not from a second face. The verdict is the interface: the move and its informant symbol (!! ! !? ?! ? ??) are set as type at poster size in the lower third, never as a badge.
-
-Built divergence from the direction contract, recorded because the build wins: the contract asks for every neutral to be stone or ink at an alpha; the shipped broadcast bars use a warm umber-black family (bar-umber, bar-umber-raised, sheet-umber, room-black) rather than ink, and the stage reading text runs at 0.9375rem beside the 1rem page body rather than a single body size.
+The system font and the iOS system colours carry the interface. One tint blue does actions and selection; red, orange and green appear only as status (live, verdict grades, done marks). The board is an object, not a theme: maple and walnut squares, a mahogany frame with boxwood stringing, boxwood and ebony pieces, and a warm yellow on the last move, the same in both appearances. The broadcast world that came before this one (stone and ink bars, poster Mona Sans, the orange pointer) is gone; Luca replaced it on 2026-10-13 with "make now everything more like iOS 27 theme".
 
 **Key Characteristics:**
-- The lit table fills the screen; graphics sit on it, never beside it in a sidebar.
-- Two colours plus one pointer; no third hue in the interface.
-- Square corners everywhere in 2D; the only rounding is the 3D frame's turned edge.
-- One family, ranked by width (100 / 108 / 112 / 118 / 125) and weight (430 to 900).
-- Expanded black caps for broadcast type; normal width for reading.
-- Motion is broadcast motion: wipes, crawls, draw-on arrows, pieces that fly and settle on springs.
+- The lit table fills the screen on table pages; controls float over it as glass and never sit beside it in a sidebar.
+- Liquid Glass is one recipe: tinted base, top sheen, lit rim, hairline, lifting shadow, heavy blur. The learner sets its tint from clear to tinted.
+- Table pages always use the dark token set; list pages follow the system appearance.
+- The system font, no web font. Hierarchy comes from the iOS text styles.
+- Capsules for every control, continuous large radii for cards, lists and sheets.
+- One tint for action, status colours only for status, yellow only for the last move.
 
 ## Colors
 
-Stone paper and ink, a lacquer pointer, and the warm materials of a wooden set under a lamp.
+The iOS system palette in light and dark, a dark glass for the table, and the warm materials of a wooden set under a lamp.
 
 ### Primary
-- **Lacquer Pointer** (pointer; pointer-dark in the dark theme; pointer-stage on the lit table): the commentator's only colour. Live bug, lower-third tag, ticker separators, arrows and their numbered discs, last-move and chosen-square tints, check glow, focus ring, text selection, the blunder tick on the rail. Always carries ink text when it is a fill. The 3D board reads it live from the CSS custom property, so board marks and graphics stay one colour.
-- **Pointer Ink** (pointer-ink; pointer-ink-dark on dark grounds): the same lacquer dark (or light) enough for small text: guide times, warnings, mistake symbols on the scoresheet, done marks, links on reading pages.
-- **Verdict on Stone** (verdict-on-stone): the informant symbol of an inaccuracy, mistake or blunder when it sits on the stone lower-third head. Poster size only (about 3.8:1 on stone, passes as large text, not as body text).
+- **System Blue** (tint; tint-dark #0a84ff on dark): the one action and selection colour. Checkmarks, the slider track, the current-move cap on the rail, the review graph's now-line, focus rings (75% mix), text selection (32% mix), the caret. The 3D board reads it live from `--pointer` (an alias of `--tint`) for move marks, chosen square, arrows and their discs.
+- **Filled Blue** (tint-fill): any blue fill that carries white text (solid buttons, the on cue, lesson step tiles, the board plate, the skip link, the study tag). A shade deeper than the system tint so white text passes AA.
+- **Blue Ink** (tint-ink; tint-ink-dark #409cff): blue text and icons: quiet buttons, links, the current tab, guide times.
+
+### Secondary: status
+- **Red** (red, red-fill, red-ink): the Live tag (red-fill, white text, a dot in currentColor), blunders (grade pill, informant symbol, rail tick, graph marks), the low clock, the reset row. red-fill exists for the same AA reason as tint-fill.
+- **Orange** (orange, orange-ink): inaccuracies and mistakes, the coach's warning line.
+- **Green** (green, green-ink): best and good moves, the side to move on the score card (a dot with a 3px 28% halo), done marks, wins.
+
+### Tertiary: the last move
+- **Last-Move Yellow** (last): the warm highlight chess players expect, in both appearances: 0.4 opacity on the flat board, 0.26 and not tone mapped in 3D.
 
 ### Neutral
-- **Stone** (stone): the light ground of reading pages; the bright bar in broadcast graphics (status bug, lower-third head, ticker band, pressed tools, the on-state cue).
-- **Ink** (ink): text on stone and on every pointer fill; the dark ground in the dark theme.
-- **Second Text, Rule, Strong Rule, Well** (text-2, rule, rule-strong, well): ink mixed into stone at 66%, 16%, 40% and 6%. The dark theme and the stage re-mix stone into their dark ground at matching percentages (70 / 15-16 / 38 / 6-7%). Canonical values are the color-mix expressions in the stylesheet.
-- **Bar Umber family** (bar-umber at 0.92-0.94 alpha for the lower-third body, ticker rail, programme guide and scoresheet bug; bar-umber-raised at 0.86-0.9 for tools and score rows; sheet-umber solid for the new-game sheet and open tool list; room-black for the intro card and promotion scrim; stage-ground for the page behind the canvas). Hairlines inside these bars are stone at 0.1-0.16 alpha.
+- **Grouped Background, Cell, Pressed Cell** (bg, cell, cell-press; bg-dark and cell-dark in dark, cell-press #2c2c2e): the page, the list groups, the pressed row.
+- **Labels** (label, label-2, label-3): primary, secondary and tertiary text. Light label-2 is rgb(60 60 67 / 0.78), darker than iOS ships, so secondary text clears 4.5:1 on the grouped background. Dark and table pages use rgb(235 235 245 / 0.62) and 0.66 respectively.
+- **Separators and Fills** (sep, fill, fill-2, seg-thumb): hairlines at 0.5px, the gray capsule fills, the segmented track and thumb.
+- **Glass** (glass, glass-stage): the floating surfaces. Canonical values are expressions of `--glass-level` (default 0.5): light rgb(248 248 250 / 0.45 + level x 0.5), dark rgb(38 38 42 / 0.36 + level x 0.52), table rgb(30 32 34 / 0.34 + level x 0.52); the frontmatter records the default.
 
-### Tertiary: the table and the set
-- **Felt** (felt-pool to felt-dark): the radial pool of green felt under the lamp, falling to near-black at the edges; the stage background and the whole picture behind the flat board. A further vignette darkens the corners to 45% black.
-- **Maple and Walnut** (sq-light, sq-dark): the flat board's squares. The 3D squares are painted per leaf a step closer together (maple hsl 34 50% 66%, walnut hsl 23 44% 37%, each leaf shifted a shade), so the near-white boxwood pieces stand off the maple and the ebony off the walnut (Luca, 2026-10-13: "more contrasted so pieces can be viewed").
-- **Mahogany and Boxwood Stringing** (mahogany, mahogany-edge, boxwood-stringing, coord-inlay): the frame, its edge, the two pale inlaid lines, and the inlaid coordinates.
-- **Boxwood and Ebony** (boxwood, ebony): the 3D pieces. The flat pieces use piece-fill-w with an ink edge and piece-fill-b with a pale edge.
+### The table and the set
+- **Felt** (felt-pool to felt-dark): the radial pool behind the canvas and the whole picture for the flat board, with a vignette to 45% black at the corners and a 4rem fade into the page at its foot. The 3D felt is a 160-unit plane of noise cloth (repeat 90).
+- **Studio Dark** (stage-ground): the 3D clear colour and fog colour.
+- **Maple and Walnut** (sq-light, sq-dark): the flat squares. The 3D squares are painted per veneer leaf, maple hsl(34 50% 66%) and walnut hsl(23 44% 37%), each leaf shifted a shade, so the near-white boxwood pieces stand off the maple and the ebony off the walnut.
+- **Mahogany, Edge, Boxwood Stringing, Coordinate Inlay** (mahogany, mahogany-edge, boxwood-stringing, coord-inlay): the frame, its stroke, the two pale lines, the inlaid coordinates (rgba(236, 214, 170, 0.9) in 3D).
+- **Boxwood and Ebony** (boxwood, ebony): the 3D pieces. Flat pieces use piece-fill-w with piece-edge-w and piece-fill-b with piece-edge-b.
 
 ### Named Rules
-**The One Pointer Rule.** Orange means "the commentator is pointing here". It never decorates, never marks the current move on the rail (that cap is stone), and never appears as a second accent hue.
+**The One Tint Rule.** Blue means "you can act here" or "this is chosen". Status colours never stand in for it, and it never decorates.
 
-**The Table Is A Place Rule.** The felt, wood and set keep their own tones in both system themes; only the paper pages follow light and dark.
+**The Table Is A Place Rule.** Table pages always use the dark token set, and the felt, wood and set keep their own tones in both system appearances; only the list pages follow light and dark.
+
+**The White-On-Fill Rule.** White text sits only on tint-fill or red-fill, never on the brighter system tint or red.
 
 ## Typography
 
-**Display Font:** Mona Sans Variable (with Mona Sans, system-ui, -apple-system, Segoe UI)
-**Body Font:** the same family at normal width
-**Label/Mono Font:** none; numbers use tabular figures
+**Display Font:** the system rounded face (ui-rounded, SF Pro Rounded, then the system sans) for the wordmark only
+**Body Font:** the system font (-apple-system, BlinkMacSystemFont, SF Pro Text, system-ui, Segoe UI Variable Text, Segoe UI, Roboto, Helvetica Neue, Arial)
+**Label/Mono Font:** none; clocks, counts and move numbers use tabular figures
 
-**Character:** one grotesque doing every job. At width 125 and weight 860-900 it is broadcast caps and poster type; at width 100 and weight 430 it is a quiet reading voice.
+**Character:** SF Pro where it exists and the platform sans elsewhere; no web font is loaded. The page sets body at 1.0625rem with -0.012em tracking, as iOS does.
 
 ### Hierarchy
-- **Display** (880, width 125, giant clamp, line-height 0.86, -0.045em): page titles on reading pages, sized from their own letter count so the longest word always fits without breaking. The home wordmark runs larger (clamp(6rem, 1rem + 30vw, 22rem)) in stone over the board, the intro mark at clamp(5rem, 1rem + 26vw, 16rem).
-- **Verdict** (880, width 125, clamp(2.25rem, 1.6rem + 3.2vw, 4rem); clamp(2.5rem, 1rem + 2.6vw, 4.25rem) on wide screens): the move in figurine notation plus its informant symbol in the lower-third head. Non-move states (intro, note, end, solved) drop to clamp(1.5rem, 1.1rem + 1.8vw, 2.5rem).
-- **Headline** (900, width 125, 1.75rem, uppercase): the new-game sheet title.
-- **Title** (820, width 118, step-title): lesson row titles, scoresheet and progress section heads.
-- **Caps** (860-900, width 125, 0.6875-1rem, uppercase, 0.03-0.08em): live bug, lower-third tag and title, intro line, cues (780, width 115), guide labels (820, width 118), ticker (700, width 112).
-- **Body** (430, width 100, 1rem, 1.5): reading pages; ledes cap at 42ch.
-- **Broadcast body** (430, 0.9375rem, 1.42; 1rem on wide screens): coach reasons in the lower third, max 56ch.
-- **Label** (560-600, 0.8125rem): tab labels, meta, move numbers.
+- **Wordmark** (800 rounded, clamp(5rem, 2rem + 17vw, 9.5rem), 0.92): "Shah" on home, white at 0.9 over the table like the Lock Screen clock. The intro mark is the same face at clamp(3.75rem, 2rem + 9vw, 6.5rem); the navigation mark is rounded 700 at body size (title3 on desktop).
+- **Large Title** (700, 2.125rem; 2.75rem from 768px, 1.08): list page titles.
+- **Title 1** (700, 1.75rem, 1.12; 2rem on desktop): the move in the coach card. Non-move states (intro, note, end, solved, wrong, good) drop to Title 2 and wrap.
+- **Title 2** (700, 1.375rem): the scoresheet and new-game sheet titles.
+- **Title 3** (700, 1.25rem): group headers, title-case and bold in the iOS 26 manner; the end accuracy figure.
+- **Body** (400, 1.0625rem, 1.4): list rows, buttons (600), guide rows.
+- **Subhead** (0.9375rem): coach reasons (1.38, 60ch; callout 1rem on desktop), cues (600), segmented cells, ledes (46ch).
+- **Footnote** (0.8125rem, 400 to 700): status text, score rows, grade pills, secondary row lines, group notes.
+- **Caption / Caption 2** (0.75rem 700; 0.6875rem 600): the Live tag and lesson meta; tab labels.
 
 ### Named Rules
-**The Width Carries Rank Rule.** Hierarchy is width and weight inside one family. No second typeface, no italics for emphasis.
+**The Text Styles Rule.** Sizes come from the iOS text-style ladder (--t-large to --t-cap2); no in-between sizes, no uppercase captions, no letter-spaced labels.
 
-**The Figurine Rule.** Moves are written as figurine plus square (piece silhouette inline at 0.95em, then the square in 700 tabular figures), never as letter notation.
+**The Figurine Rule.** Moves are written as figurine plus square (piece silhouette inline at 0.95em, 0.82em in the coach headline, then the square in 600 tabular figures), never as letter notation.
 
 ## Layout
 
-Phone first. Stage pages are a fixed-height stage (100svh less the tab bar, min 34rem) with every graphic absolutely positioned inside it at 0.75rem from the edges (1.5rem on wide screens). On phones the masthead is removed from stage pages and the table takes its room; a four-tab bar sits at the bottom (4rem plus safe area). From 1024px the tab bar becomes masthead navigation (4rem tall, 2rem gutter), the lower third moves into a left column (min(21rem, 30vw), 25rem from 1400px) beneath the bugs, a scoresheet bug fills the column foot, and the board is inset to the right of it. The 2D board is placed by stage insets (--inset-top / bottom / left / right) that each page tunes.
+Phone first. A table page is a stage of 100svh (min 36rem) with every glass surface absolutely positioned inside it at 0.75rem from the edges. On phones the navigation bar is removed from table pages and the motion switch moves into the tools menu. From the bottom up: the floating tab bar (3.875rem, a gap of max(safe-area, 0.75rem)) and the coach card just above it, centred at min(100% - 1.5rem, 34rem) (30rem for the tab bar). `--chrome-bottom` names the band the tab bar holds. Below 1024px the coach card is compact (Luca, 2026-10-13: it "takes like half the screen"): padding 0.6875 / 0.875 / 0.75rem, radius 1.5rem, the move at Title 2 and other states at Title 3, footnote pill and warning, and when a primary cue shows, the secondary cues become 44px round symbol buttons beside it (their text stays in the DOM as the accessible name). The accessory is hidden on phones; it only repeated the coach and general tips. Together the card and tab bar hold about a third of a 390 x 844 screen.
 
-Reading pages are a single column with a 1rem gutter, ledes at 42ch, rows separated by 1px rules and section heads underlined by a 2px ink rule. The scoresheet below the stage is capped at 40rem (48rem wide). Spacing steps: 0.375 / 0.625 / 1 / 1.5 / 2.25 / 3.5rem. Breakpoints: 640px (setup sheet centres), 1024px (desktop shell), 1400px (wider column). Every tap target is at least 44px; primary buttons 48px.
+The board frames itself inside the stage insets `--inset-top / bottom / left / right` (phone 7.25 / 19 / 0.5 / 0.5rem; home 16 / 17rem). They must stay plain lengths, never calc(): the 3D board reads them with parseFloat.
+
+From 1024px the iPad idiom takes over: the tab bar hides and the tabs float as one glass capsule in the middle of a 4.25rem navigation bar, fixed over the table on table pages; gutter 2rem. The status capsule and score card (21rem) sit at the top of a left column at 1.5rem, the coach card below them (21rem, 25rem from 1400px), the last moves as a glass card at the column foot, tools as a row of round glass buttons top right, the accessory spanning the foot. Insets become 5.5 / 5 / 24 (28 from 1400px) / 4.75rem. Home puts its guide on the right at 26rem.
+
+List pages are a single column (max 46rem for lessons and progress) with a 1rem gutter, inset-grouped lists, group headers 2.25rem above their group. The scoresheet below the stage is capped at 40rem. Spacing steps: 0.375 / 0.625 / 1 / 1.5 / 2.25 / 3rem. Breakpoints: 640px (the sheet centres), 768px (larger large title), 1024px (desktop shell), 1400px (wider column). Tap targets are at least 44px; primary buttons 50px.
 
 ## Elevation & Depth
 
-The interface is flat; depth belongs to the 3D table. Bars are solid or near-solid fills with no drop shadow; layering is told by fill (stone over umber over felt) and by z-order. The few shadows are functional: a soft text shadow on stone type set directly over the board, a lift shadow under a dragged flat piece, a 6px ground-coloured halo behind the focus ring. Inset 2px underlines (ink for navigation, pointer for the current move and chosen theme) do the work of selection.
+Depth is Liquid Glass over the table and flat cells on the list pages. Every floating surface uses one recipe; list groups have no shadow and separate from the grouped background by colour alone. The navigation bar is no bar: a scroll-edge layer under it (80% bg fading out, blur 10px, masked to transparent 1.25rem below) softens what scrolls beneath.
 
 ### Shadow Vocabulary
-- **Over-table type** (`text-shadow: 0 0.03em 0.12em rgb(0 0 0 / 0.45)` for the wordmark; `0 1px 8px rgb(0 0 0 / 0.6)` for the line under it): legibility of stone type set straight on the lit board.
-- **Piece in hand** (`filter: drop-shadow(0 8px 6px rgb(0 0 0 / 0.28))`): a flat piece being dragged.
-- **Focus halo** (`outline: 2px solid pointer; outline-offset: 3px; box-shadow: 0 0 0 6px ground`).
-- **Selection underline** (`box-shadow: inset 0 -2px 0 currentColor`): active nav item (ink), current move and chosen theme (pointer).
+- **Liquid Glass** (`background-color: var(--glass); background-image: linear-gradient(180deg, var(--glass-sheen), transparent 46%); backdrop-filter: blur(calc(16px + var(--glass-level) * 24px)) saturate(190%); box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 0.5px var(--glass-rim), var(--glass-depth)`): tab bar, nav capsule, motion switch, status capsule, score card, menu button and menu, coach card, accessory, last-moves card, promotion choices, setup sheet. Menus, the open menu button and the sheet use `--glass-strong`.
+- **Glass depth** (light `0 12px 32px -10px rgb(0 0 0 / 0.22), 0 2px 6px rgb(0 0 0 / 0.07)`; table `0 16px 38px -12px rgb(0 0 0 / 0.66), 0 2px 8px rgb(0 0 0 / 0.32)`).
+- **Segmented thumb** (`0 3px 8px rgb(0 0 0 / 0.16), 0 1px 1px rgb(0 0 0 / 0.08)`) and **slider thumb** (`0 0.5px 4px rgb(0 0 0 / 0.12), 0 6px 13px rgb(0 0 0 / 0.12)`).
+- **Over-table type** (`text-shadow: 0 2px 30px rgb(0 0 0 / 0.35)` on the wordmark, `0 1px 12px rgb(0 0 0 / 0.5)` on the line under it).
+- **Piece in hand** (`filter: drop-shadow(0 8px 6px rgb(0 0 0 / 0.28))`): a dragged flat piece.
 
 ### The Studio (3D depth)
-One warm spot lamp (#fff0dc, intensity 3.6, angle 0.5, penumbra 0.62) hangs over the player's left shoulder with soft VSM shadows; a dim hemisphere (#8fa596 over #0c140f, 0.34) and a room environment at 0.45 supply reflections per material; neutral tone mapping at exposure 1.04; clear colour stage-ground. Materials: matte oiled mahogany frame (roughness 0.78, specularIntensity 0.15, no clearcoat), matte veneer squares (roughness 0.88, specularIntensity 0.08, no clearcoat: the lamp lights the board but never mirrors in it, Luca 2026-10-13), boxwood pieces (0.42, clearcoat 0.45), ebony pieces (0.28, clearcoat 1), felt (roughness 1). Camera angles: Si lojtar (the player's seat: straight behind your pieces, close, default), Nga lart (overhead), Afër tabelës (low three-quarter, the home page's orbit), each with a steeper upright-phone variant. In the seat view on an upright phone the felt beside the board is out of frame, so taken pieces lie well clear of the edge.
+One warm spot lamp (#fff0dc, intensity 3.6, angle 0.5, penumbra 0.62, no decay) hangs high over the player's left shoulder at (-12, 20, 9), mirrored for black; 1024 shadow map, VSM radius 5 bias -0.0006 (PCF radius 2 as fallback). A dim hemisphere (#8fa596 over #0c140f, 0.34) and a room environment at 0.45, set per material and lit by a long softbox low behind the board, supply reflections. Neutral tone mapping at exposure 1.04; clear colour stage-ground. Fog in stage-ground from 26 to 72 units lets the enlarged felt run on into the dark, so a low camera never finds the table's edge.
+
+Materials: oiled mahogany frame (rounded box radius 0.06; roughness 0.78, specularIntensity 0.15, envMapIntensity 0.7, no clearcoat), veneer squares (roughness 0.88, specularIntensity 0.08, envMapIntensity 0.55, no clearcoat: the lamp lights the board but never mirrors in it), boxwood stringing (roughness 0.85), felt (roughness 1, envMapIntensity 0.05), boxwood pieces (roughness 0.4, clearcoat 0.5 at 0.18, envMapIntensity 0.85), ebony pieces (roughness 0.26, clearcoat 1 at 0.05, envMapIntensity 1.25).
+
+Camera angles: Si lojtar (default, the player's seat straight behind your pieces at elevation 1.396 rad, 80 degrees, distance 13), Nga lart (1.54 rad, 88 degrees, distance 15), Afër tabelës (the low three-quarter the home page orbits: 0.56 rad and azimuth -0.5 wide, 0.72 and -0.42 on an upright phone, distance 15).
 
 ### Named Rules
-**The Flat Graphics Rule.** Broadcast bars never cast shadows; only the table has light.
+**The One Recipe Rule.** Anything that floats over the table or the content is Liquid Glass by the shared recipe; nothing invents its own blur, tint or shadow.
+
+**The Glass Follows The System Rule.** `--glass-level` drives tint and blur together and is set on Progresi > Pamja (stored as `shah.glass`, applied in the head before paint). Reduce Transparency makes the glass solid cell colour with no blur; Increase Contrast draws the rim in label-2 and uses the strong glass.
 
 ## Shapes
 
-Square corners throughout the interface (0px): bars, buttons, cues, tools, bugs, tick marks, markers in the score bug and ticker are all squares. Borders are 1px hairlines, 1.5px for outlined buttons and segmented controls, 2px for section heads. Arrows are flat outlines with mitred joins, straight or bent like a knight's path, with a pointer disc carrying an ink number at the tail. The only curves are the turned 3D pieces and the frame's slightly rounded edge.
+Capsules (999px) for every control: buttons, cues, tabs, the nav capsule, status and live tags, grade pills, the segmented track and thumb, the accessory, the grabber, progress bars. Round 44px buttons for the menu on phones, the motion switch on phones and the desktop tools. Large continuous radii for containers: sheet 2.25rem, coach card 1.625rem, menu 1.5rem, lists 1.375rem, menu rows and score card 1.125rem, lesson tiles and scoresheet cells 0.625rem. Separators are 0.5px hairlines inset from the leading edge (1rem, or past the leading tile). The board keeps its own geometry: square squares, a rounded-box frame, turned pieces, arrows with round joins and caps and a tint disc carrying a white number.
 
 ## Components
 
 ### Buttons
-Outlined ink boxes; plain and confident.
-- **Shape:** square (0px), 1.5px ink border, min-height 48px, width 108, weight 680.
-- **Solid:** ink fill, stone text; hover mixes 14% ground in.
-- **Hover / Focus / Active:** well fill on hover (fine pointers only); pointer focus ring with ground halo; scale 0.97 on press over 110ms.
-- **Quiet:** borderless, 0.625rem inline padding.
-- On the new-game sheet the same buttons invert to stone.
+Capsules in the iOS manner: one filled for the primary action, gray fill for the rest, plain tint text for the least.
+- **Shape:** capsule, min-height 50px, 0 1.375rem, body size, 600.
+- **Solid:** tint-fill with white text; brightness 1.08 on hover.
+- **Gray:** fill-2 with tint-ink text; fill on hover (fine pointers only). Danger swaps the text to red-ink.
+- **Quiet:** transparent, 0.75rem inline padding.
+- **Press:** scale 0.96 over 120ms ease-out. Disabled at 0.4 opacity.
 
-### Cues (broadcast actions)
-Uppercase caps buttons inside the lower third: 1px stone border at 0.42 alpha, 44px high. The primary cue ("Shiko pse", the home "Luaj") is on: stone fill, ink text, white on hover. Quiet cues drop the border and underline.
+### Cues (on glass)
+The coach card's capsule buttons: 44px, subhead 600, fill background with label text, scale 0.95 on press. The on cue ("Shiko pse") is tint-fill with white text; quiet cues are tint-ink text that underlines on hover.
 
-### Tools
-44px umber squares top right holding a Phosphor icon. On phones one menu button opens a list of labelled 48px rows (scale-in 160ms from the top right); on wide screens they become a row of icon squares with hidden labels. Pressed tools turn stone.
-
-### Broadcast graphics (signature)
-- **Live bug:** a pointer tag in caps with a blinking ink square (1.6s, two steps), joined to a stone status bar.
-- **Score bug:** umber rows, a hollow square marker per player that fills with pointer on the side to move; captured pieces as small silhouettes and a material lead.
-- **Lower third:** a pointer tag (TRAJNERI, ANALIZË in study) welded to a stone head that holds the move and verdict at poster size; an umber body with the reasons, a pointer-ink warning, and the cues. While the coach thinks, the move stands in outline (1.5px ink stroke) and the verdict inks it (320ms colour). Parts reveal by a left-to-right clip wipe (0.32s, 0.06s stagger, power3.out).
-- **Ticker:** a rail of ticks, one per move, taller and louder the worse the move (3px plain to 13px pointer for a blunder; current move capped in stone), over a stone band crawling caps items separated by pointer squares (40s linear; pauses on hover, stops with motion off).
-- **Intro card:** room-black card with the wordmark and a caps line on a pointer tag, wiped upward (0.5s power3.inOut).
-
-### Navigation
-Masthead: wordmark at width 125 weight 900, then (from 1024px) icon-and-label links at 560 that go 760 with a 2px ink underline when current; a motion switch at the right. Phone: fixed four-tab bar, icon over 0.8125rem label, current tab in text colour at 760 with a 2px bar on its top edge.
+### Table surfaces (signature)
+- **Status capsule:** a 2.25rem glass capsule holding a tag and the status line. While a game runs the tag is red-fill "Drejtpërdrejt" with a white dot, the way the TV app marks live; in study it returns to tint-fill.
+- **Score card:** glass at 1.125rem radius, two rows separated by a hairline; a tertiary dot per player turns green with a halo for the side to move; captured pieces overlap as small silhouettes; the clock in tabular subhead turns red-ink when low.
+- **Tools:** on phones a round glass button opens a glass menu (strong glass, 1.5rem radius, 15.5rem, label leading and symbol trailing, rows 2.875rem; opens 300ms on the sheet curve from scale 0.86 and blur 10px). On desktop the tools are a row of round 44px glass buttons; pressed mixes 40% tint into the glass with a white icon.
+- **Coach card:** one glass card. The move at Title 1 with its informant symbol in the status colour, and the verdict as a status pill (footnote 700): green for best and good, orange 18-24% for inaccuracy and mistake, red 22% for blunder. While the coach looks, the move waits in label-3 and inks in over 320ms. Reasons in subhead, a warning in orange-ink, then the cues. The label is visually hidden; the headline speaks.
+- **Accessory** (wide screens only; hidden below 1024px): a glass capsule along the foot of the table: headlines crawl (40s linear, edges masked, pause on hover, stop with motion off) separated by small label-3 dots, and a rail of ticks along its foot, one per move, taller and in the status colour the worse the move (2px label-3 to 11px red); the current move carries a 2px tint cap.
 
 ### Inputs
-Segmented control: 1.5px stone border, 48px cells divided by 1.5px rules, checked cell filled stone with ink text. Choice rows and theme checkboxes use native inputs tinted with the pointer, separated by hairlines.
+- **Segmented control:** capsule fill track with 0.1875rem padding, 2.5rem cells, the choice on a seg-thumb capsule with a soft shadow.
+- **Checkmark list:** inset-grouped rows (min 3.25rem) with a tint check drawn by the `--check` mask (Phosphor check, bold) on the chosen row; used for levels and puzzle themes.
+- **Slider (Pamja):** a 4px capsule track filled in tint to a white 1.75rem thumb; it sets `--glass-level` live.
+
+### Lists
+Inset-grouped groups on cell, radius 1.375rem, rows min 2.875rem with 0.6875rem 1rem padding, pressed in cell-press, hover a 55% mix on fine pointers. Disclosure uses the `--chevron` mask (Phosphor caret-right) in label-3, rotated 90 degrees when a disclosure group opens. Lesson rows lead with a 2.25rem tile at 0.625rem radius: tint-fill with the white step number, or white or black for the side a repertoire trains. Results sit in small tinted capsules (win green, loss red).
+
+### Sheets and overlays
+- **New-game sheet:** a strong-glass dialog at 2.25rem radius with a 2.25rem grabber on phones, rising from the bottom over 460ms on the sheet curve; from 640px it centres and pops (scale 0.94, blur 8px, 320ms). Backdrop rgb(0 0 0 / 0.42). Title 2 centred, footnote legends, segmented control, checkmark list, full-width capsule buttons.
+- **Intro:** black, the rounded mark, and an 11rem 4px capsule progress bar filled in tint from the script's `--p`.
+- **Promotion:** glass tiles at 1.25rem radius over a 42% black scrim.
+
+### Navigation
+- **Phone:** a floating capsule tab bar of glass, four tabs with a 1.625rem icon over a caption2 label; the current tab is tint-ink in a glass-press lens; press scales 0.94. No navigation bar on table pages; elsewhere the rounded mark sits left and the round motion button right, over the scroll-edge blur.
+- **Desktop:** the tabs float as one glass capsule centred in the navigation bar, 40px items with icon and subhead label, current in tint-ink on glass-press, hover fill-2; the motion switch becomes a labelled glass capsule.
 
 ### Board
-Two views of one set. The 3D board as above; the flat board is an SVG with mahogany frame, boxwood stringing, maple and walnut squares and inlaid coordinates, pieces as side profiles of the turned pieces. Marks: last move 20% pointer, check 42%, chosen 26%, focus 7px pointer ring, move dots 85%, captures as rings, keyboard cursor a dashed ink square. Pieces settle on springs (rest k170 c19, carry k560 c42) in 3D and slide 210ms in 2D; arrows draw on from the tail (3D 0.32s cubic out, numbers land after; 2D 260ms with the head at +200ms).
+The 3D board as in Elevation & Depth; the flat board is an SVG with the same frame, stringing, maple and walnut and inlaid coordinates. Marks: last move in last-move yellow, check in the status red (0.5 on the flat board; the 3D check glow takes `--red` too), chosen tint at 0.3, focus a 7px tint ring, move dots tint at 0.85, captures as tint rings, keyboard cursor a dashed black square, arrows tint at 0.88 (quiet 0.66) with a white number in the system font on a tint disc. 3D pieces settle on springs (rest k170 c19, carry k560 c42, tilt k210 c17); flat pieces slide 240ms ease-out. Arrows draw on from the tail.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** put play, puzzle and home screens on the lit table and lay the interface over it as broadcast graphics.
-- **Do** keep graphics to stone, ink and the umber bar family, with the pointer as the only hue; fill the pointer with ink text.
-- **Do** rank type by width (125 for broadcast caps and posters, 100 for reading) and weight within Mona Sans.
-- **Do** write moves in figurine notation and grade them with informant symbols set as type.
-- **Do** keep every corner square and every tap target at least 44px (48px for primary buttons).
-- **Do** route every animation through the GSAP ticker or CSS, and make the Stop-animations switch and reduced motion place pieces and arrows at once (transition-duration 0s, not 0.01ms).
+- **Do** fill table pages with the lit board and float every control over it as Liquid Glass by the shared recipe.
+- **Do** use the dark token set on every table page, whatever the system appearance.
+- **Do** use the system font and the iOS text-style ladder; the rounded face only for the wordmark and intro mark.
+- **Do** put white text only on tint-fill (#0066d6) or red-fill (#d70015), and keep light label-2 at rgb(60 60 67 / 0.78).
+- **Do** use the tint for action and selection, red, orange and green only for status, and yellow only for the last move.
+- **Do** keep `--inset-*` on the stage as plain lengths; the 3D board parses them with parseFloat.
+- **Do** honour Reduce Transparency (solid glass) and Increase Contrast (drawn rim), and make the Stop-animations switch and reduced motion zero transitions with 0s, not 0.01ms.
+- **Do** keep the board matte: no clearcoat on the frame or squares, the lamp never mirrored in the board.
 
 ### Don't:
 - **Don't** build the flat green-and-cream board widget with a grey eval bar and a sidebar of tabs.
-- **Don't** add badges or pills for verdicts; the verdict word and symbol are the interface.
-- **Don't** use orange to mark the current move on the rail or as decoration.
-- **Don't** add drop shadows or rounded corners to broadcast bars.
-- **Don't** add a second typeface or set text as an icon glyph; icons are Phosphor regular SVG, one family, one weight.
-- **Don't** give the table a light theme: felt, wood and pieces keep their tones in both system themes.
+- **Don't** add web-dashboard chrome: cards in grids, hairline-bordered panels, uppercase captions.
+- **Don't** give the table a light theme: felt, wood and pieces keep their tones in both appearances.
+- **Don't** load a web font or set text as an icon glyph; icons are Phosphor SVG, and list symbols are CSS masks.
+- **Don't** put a solid bar under the navigation; the scroll edge is a fading blur.

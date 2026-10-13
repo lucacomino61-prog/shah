@@ -1,26 +1,37 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-12T00:00:00Z",
+  "generatedAt": "2026-10-13T00:00:00Z",
   "title": "Design System: Shah",
   "extensions": {
     "colorMeta": {
-      "stone": { "role": "neutral", "displayName": "Stone", "canonical": "#e6e5e1", "tonalRamp": ["#2a2927", "#43423f", "#5e5d59", "#7a7974", "#97968f", "#b4b3ad", "#cfcec9", "#e6e5e1"] },
-      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#111214", "tonalRamp": ["#111214", "#1c1d20", "#2a2b2f", "#3c3d42", "#55565b", "#727378", "#95969a", "#bfc0c3"] },
-      "text-2": { "role": "neutral", "displayName": "Second Text", "canonical": "color-mix(in srgb, var(--ink) 66%, var(--stone))" },
-      "rule": { "role": "neutral", "displayName": "Rule", "canonical": "color-mix(in srgb, var(--ink) 16%, var(--stone))" },
-      "rule-strong": { "role": "neutral", "displayName": "Strong Rule", "canonical": "color-mix(in srgb, var(--ink) 40%, var(--stone))" },
-      "well": { "role": "neutral", "displayName": "Well", "canonical": "color-mix(in srgb, var(--ink) 6%, var(--stone))" },
-      "pointer": { "role": "primary", "displayName": "Lacquer Pointer", "canonical": "#e65719", "tonalRamp": ["#3a1304", "#5e1f06", "#852d09", "#a83707", "#c8460f", "#e65719", "#f27636", "#f7904b"] },
-      "pointer-ink": { "role": "primary", "displayName": "Pointer Ink", "canonical": "#a83707" },
-      "pointer-dark": { "role": "primary", "displayName": "Lacquer Pointer (dark theme)", "canonical": "#f27636" },
-      "pointer-ink-dark": { "role": "primary", "displayName": "Pointer Ink (dark grounds)", "canonical": "#f7904b" },
-      "pointer-stage": { "role": "primary", "displayName": "Lacquer Pointer (lit table)", "canonical": "#f06a2c" },
-      "verdict-on-stone": { "role": "primary", "displayName": "Verdict on Stone", "canonical": "#c8460f" },
-      "stage-ground": { "role": "neutral", "displayName": "Studio Dark", "canonical": "#070908" },
-      "room-black": { "role": "neutral", "displayName": "Room Black", "canonical": "#0b0907" },
-      "bar-umber": { "role": "neutral", "displayName": "Bar Umber", "canonical": "rgb(17 14 11 / 0.94)" },
-      "bar-umber-raised": { "role": "neutral", "displayName": "Bar Umber Raised", "canonical": "rgb(20 17 14 / 0.86)" },
-      "sheet-umber": { "role": "neutral", "displayName": "Sheet Umber", "canonical": "#15120f" },
+      "bg": { "role": "neutral", "displayName": "Grouped Background", "canonical": "#f2f2f7", "tonalRamp": ["#1c1c1e", "#2c2c2e", "#48484a", "#636366", "#8e8e93", "#aeaeb2", "#d1d1d6", "#f2f2f7"] },
+      "cell": { "role": "neutral", "displayName": "Cell", "canonical": "#ffffff" },
+      "cell-press": { "role": "neutral", "displayName": "Pressed Cell", "canonical": "#e5e5ea" },
+      "label": { "role": "neutral", "displayName": "Label", "canonical": "#000000" },
+      "label-2": { "role": "neutral", "displayName": "Secondary Label (AA)", "canonical": "rgb(60 60 67 / 0.78)" },
+      "label-3": { "role": "neutral", "displayName": "Tertiary Label", "canonical": "rgb(60 60 67 / 0.36)" },
+      "sep": { "role": "neutral", "displayName": "Separator", "canonical": "rgb(60 60 67 / 0.29)" },
+      "fill": { "role": "neutral", "displayName": "Fill", "canonical": "rgb(120 120 128 / 0.2)" },
+      "fill-2": { "role": "neutral", "displayName": "Secondary Fill", "canonical": "rgb(118 118 128 / 0.12)" },
+      "seg-thumb": { "role": "neutral", "displayName": "Segment Thumb", "canonical": "#ffffff" },
+      "tint": { "role": "primary", "displayName": "System Blue", "canonical": "#007aff", "tonalRamp": ["#001a3d", "#002f6b", "#004599", "#0066d6", "#007aff", "#409cff", "#80bdff", "#cce4ff"] },
+      "tint-fill": { "role": "primary", "displayName": "Filled Blue (white text, AA)", "canonical": "#0066d6" },
+      "tint-ink": { "role": "primary", "displayName": "Blue Ink", "canonical": "#0066d6" },
+      "red": { "role": "secondary", "displayName": "System Red", "canonical": "#ff3b30", "tonalRamp": ["#3d0004", "#6b0009", "#99000e", "#d70015", "#ff3b30", "#ff6961", "#ff9a94", "#ffd2cf"] },
+      "red-fill": { "role": "secondary", "displayName": "Filled Red (white text, AA)", "canonical": "#d70015" },
+      "red-ink": { "role": "secondary", "displayName": "Red Ink", "canonical": "#d70015" },
+      "orange": { "role": "secondary", "displayName": "System Orange", "canonical": "#ff9500", "tonalRamp": ["#3d1300", "#6b2300", "#993000", "#c93400", "#ff9500", "#ffb340", "#ffcf85", "#ffebcc"] },
+      "orange-ink": { "role": "secondary", "displayName": "Orange Ink", "canonical": "#c93400" },
+      "green": { "role": "secondary", "displayName": "System Green", "canonical": "#34c759", "tonalRamp": ["#0a2912", "#124a20", "#1b6b2f", "#248a3d", "#34c759", "#30d158", "#8ae0a1", "#d4f5dc"] },
+      "green-ink": { "role": "secondary", "displayName": "Green Ink", "canonical": "#248a3d" },
+      "last": { "role": "tertiary", "displayName": "Last-Move Yellow", "canonical": "#ffd60a", "tonalRamp": ["#3d3300", "#6b5900", "#998000", "#c7a600", "#ffd60a", "#ffe04d", "#ffeb8a", "#fff6c7"] },
+      "glass": { "role": "neutral", "displayName": "Liquid Glass (light)", "canonical": "rgb(248 248 250 / calc(0.45 + var(--glass-level) * 0.5))" },
+      "glass-stage": { "role": "neutral", "displayName": "Liquid Glass (table)", "canonical": "rgb(30 32 34 / calc(0.34 + var(--glass-level) * 0.52))" },
+      "bg-dark": { "role": "neutral", "displayName": "Grouped Background (dark)", "canonical": "#000000" },
+      "cell-dark": { "role": "neutral", "displayName": "Cell (dark)", "canonical": "#1c1c1e" },
+      "tint-dark": { "role": "primary", "displayName": "System Blue (dark)", "canonical": "#0a84ff" },
+      "tint-ink-dark": { "role": "primary", "displayName": "Blue Ink (dark)", "canonical": "#409cff" },
+      "stage-ground": { "role": "tertiary", "displayName": "Studio Dark", "canonical": "#070908" },
       "felt-pool": { "role": "tertiary", "displayName": "Felt under the Lamp", "canonical": "#3d5444", "tonalRamp": ["#090d0a", "#111a14", "#1a271f", "#24342a", "#2f4436", "#3d5444", "#506a58", "#68836f"] },
       "felt-mid": { "role": "tertiary", "displayName": "Felt", "canonical": "#24342a" },
       "felt-edge": { "role": "tertiary", "displayName": "Felt Edge", "canonical": "#111a14" },
@@ -31,193 +42,220 @@
       "mahogany-edge": { "role": "tertiary", "displayName": "Mahogany Edge", "canonical": "#2a1006" },
       "boxwood-stringing": { "role": "tertiary", "displayName": "Boxwood Stringing", "canonical": "#e9d3a4" },
       "coord-inlay": { "role": "tertiary", "displayName": "Coordinate Inlay", "canonical": "#ecd6aa" },
-      "boxwood": { "role": "tertiary", "displayName": "Boxwood", "canonical": "#ecd8ae" },
-      "ebony": { "role": "tertiary", "displayName": "Ebony", "canonical": "#1a1a1d" },
+      "boxwood": { "role": "tertiary", "displayName": "Boxwood", "canonical": "#f7ecd4" },
+      "ebony": { "role": "tertiary", "displayName": "Ebony", "canonical": "#121214" },
       "piece-fill-w": { "role": "tertiary", "displayName": "Flat White Piece", "canonical": "#f6f4ee" },
+      "piece-edge-w": { "role": "tertiary", "displayName": "Flat White Piece Edge", "canonical": "#111214" },
       "piece-fill-b": { "role": "tertiary", "displayName": "Flat Black Piece", "canonical": "#17181b" },
       "piece-edge-b": { "role": "tertiary", "displayName": "Flat Black Piece Edge", "canonical": "#f1efe9" }
     },
     "themes": {
-      "dark": { "ground": "#111214", "text": "#e6e5e1", "text-2": "color-mix(in srgb, var(--stone) 70%, var(--ink))", "rule": "color-mix(in srgb, var(--stone) 15%, var(--ink))", "rule-strong": "color-mix(in srgb, var(--stone) 38%, var(--ink))", "well": "color-mix(in srgb, var(--stone) 6%, var(--ink))", "pointer": "#f27636", "pointer-ink": "#f7904b" },
-      "stage": { "selector": "html[data-stage]", "ground": "#070908", "text": "#e6e5e1", "text-2": "color-mix(in srgb, var(--stone) 70%, #0b0907)", "rule": "color-mix(in srgb, var(--stone) 16%, #0b0907)", "rule-strong": "color-mix(in srgb, var(--stone) 38%, #0b0907)", "well": "color-mix(in srgb, var(--stone) 7%, #0b0907)", "pointer": "#f06a2c", "pointer-ink": "#f7904b" }
+      "dark": { "selector": "@media (prefers-color-scheme: dark) :root", "bg": "#000000", "cell": "#1c1c1e", "cell-press": "#2c2c2e", "label": "#ffffff", "label-2": "rgb(235 235 245 / 0.62)", "label-3": "rgb(235 235 245 / 0.32)", "sep": "rgb(84 84 88 / 0.65)", "fill": "rgb(120 120 128 / 0.36)", "fill-2": "rgb(118 118 128 / 0.24)", "seg-thumb": "#636366", "tint": "#0a84ff", "tint-ink": "#409cff", "red": "#ff453a", "red-ink": "#ff6961", "orange": "#ff9f0a", "orange-ink": "#ffb340", "green": "#30d158", "green-ink": "#30d158", "glass": "rgb(38 38 42 / calc(0.36 + var(--glass-level) * 0.52))", "glass-strong": "rgb(38 38 42 / calc(0.7 + var(--glass-level) * 0.3))", "glass-sheen": "rgb(255 255 255 / 0.08)", "glass-hi": "rgb(255 255 255 / 0.2)", "glass-rim": "rgb(255 255 255 / 0.09)", "glass-depth": "0 16px 38px -12px rgb(0 0 0 / 0.62), 0 2px 8px rgb(0 0 0 / 0.3)", "glass-press": "rgb(255 255 255 / 0.1)" },
+      "stage": { "selector": "html[data-stage] (always, in either appearance)", "bg": "#000000", "cell": "#1c1c1e", "cell-press": "#2c2c2e", "label": "#ffffff", "label-2": "rgb(235 235 245 / 0.66)", "label-3": "rgb(235 235 245 / 0.34)", "sep": "rgb(84 84 88 / 0.65)", "fill": "rgb(120 120 128 / 0.36)", "fill-2": "rgb(118 118 128 / 0.24)", "seg-thumb": "#636366", "tint": "#0a84ff", "tint-ink": "#409cff", "red": "#ff453a", "red-ink": "#ff6961", "orange": "#ff9f0a", "orange-ink": "#ffb340", "green": "#30d158", "green-ink": "#30d158", "glass": "rgb(30 32 34 / calc(0.34 + var(--glass-level) * 0.52))", "glass-strong": "rgb(30 32 34 / calc(0.72 + var(--glass-level) * 0.28))", "glass-sheen": "rgb(255 255 255 / 0.08)", "glass-hi": "rgb(255 255 255 / 0.22)", "glass-rim": "rgb(255 255 255 / 0.1)", "glass-depth": "0 16px 38px -12px rgb(0 0 0 / 0.66), 0 2px 8px rgb(0 0 0 / 0.32)", "glass-press": "rgb(255 255 255 / 0.12)", "theme-color": "#090d0a" },
+      "reduced-transparency": { "selector": "@media (prefers-reduced-transparency: reduce)", "glass": "var(--cell)", "glass-strong": "var(--cell)", "blur": "none" },
+      "more-contrast": { "selector": "@media (prefers-contrast: more)", "glass-rim": "var(--label-2)", "glass": "var(--glass-strong)" },
+      "aliases": { "note": "Older names kept for pages and scripts; not for new work.", "--ground": "var(--bg)", "--text": "var(--label)", "--text-2": "var(--label-2)", "--rule": "var(--sep)", "--rule-strong": "var(--label-3)", "--well": "var(--fill-2)", "--pointer": "var(--tint)", "--pointer-ink": "var(--tint-ink)", "--stone": "#f2f2f7", "--ink": "#000000" }
+    },
+    "glass": {
+      "level": { "token": "--glass-level", "default": 0.5, "range": "0 clear to 1 tinted", "setBy": "Progresi > Pamja slider, stored as localStorage shah.glass, applied by the head script before paint (with shah.motion)" },
+      "lightGlass": "rgb(248 248 250 / calc(0.45 + var(--glass-level) * 0.5))",
+      "lightGlassStrong": "rgb(248 248 250 / calc(0.7 + var(--glass-level) * 0.3))",
+      "lightSheen": "rgb(255 255 255 / 0.5)",
+      "lightHi": "rgb(255 255 255 / 0.95)",
+      "lightRim": "rgb(0 0 0 / 0.07)",
+      "lightPress": "rgb(0 0 0 / 0.06)",
+      "blur": "blur(calc(16px + var(--glass-level) * 24px)) saturate(190%)",
+      "recipe": "background-color: var(--glass); background-image: linear-gradient(180deg, var(--glass-sheen), transparent 46%); backdrop-filter: var(--blur); box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 0.5px var(--glass-rim), var(--glass-depth)",
+      "scrollEdge": "under .mast: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 80%, transparent), transparent), backdrop-filter blur(10px), mask fading from 50%, extends 1.25rem below the bar"
+    },
+    "masks": {
+      "--check": "Phosphor check (bold), drawn as a tint mask on the chosen row",
+      "--chevron": "Phosphor caret-right, drawn as a label-3 mask for disclosure"
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "Reading-page titles sized from their letter count (min(step-giant, 100cqi / (chars * 0.74))); the home wordmark and intro mark run the same voice larger." },
-      "verdict": { "displayName": "Verdict", "purpose": "The move in figurine notation plus its informant symbol, in the lower-third head." },
-      "headline": { "displayName": "Headline", "purpose": "The new-game sheet title, uppercase." },
-      "title": { "displayName": "Title", "purpose": "Lesson rows, scoresheet and progress section heads." },
-      "caps": { "displayName": "Broadcast Caps", "purpose": "Live bug, lower-third tag and title, cues, guide labels, ticker; uppercase, width 112-125, weight 700-900." },
-      "body": { "displayName": "Body", "purpose": "Reading pages; ledes at 42ch." },
-      "body-broadcast": { "displayName": "Broadcast Body", "purpose": "Coach reasons in the lower third, 56ch; 1rem on wide screens." },
-      "label": { "displayName": "Label", "purpose": "Tab labels, meta, move numbers, motion switch." }
+      "wordmark": { "displayName": "Wordmark", "purpose": "\"Shah\" on home, rounded 800, white at 0.9 over the table like the Lock Screen clock; intro mark at clamp(3.75rem, 2rem + 9vw, 6.5rem)." },
+      "large-title": { "displayName": "Large Title", "purpose": "List page titles; 2.75rem from 768px." },
+      "title1": { "displayName": "Title 1", "purpose": "The move in the coach card; 2rem on desktop." },
+      "title2": { "displayName": "Title 2", "purpose": "Scoresheet and new-game sheet titles; coach non-move states." },
+      "title3": { "displayName": "Title 3", "purpose": "Group headers (title-case, bold), the end accuracy figure, desktop nav mark." },
+      "body": { "displayName": "Body", "purpose": "List rows, buttons at 600, guide rows." },
+      "subhead": { "displayName": "Subhead", "purpose": "Coach reasons (60ch), cues, segmented cells, ledes (46ch)." },
+      "footnote": { "displayName": "Footnote", "purpose": "Status line, score rows, grade pills, secondary row lines, group notes, motion switch." },
+      "caption": { "displayName": "Caption", "purpose": "Live tag, lesson meta." },
+      "caption2": { "displayName": "Caption 2", "purpose": "Tab labels." }
     },
     "shadows": [
-      { "name": "over-table-mark", "value": "text-shadow: 0 0.03em 0.12em rgb(0 0 0 / 0.45)", "purpose": "Stone wordmark set directly on the lit board." },
-      { "name": "over-table-line", "value": "text-shadow: 0 1px 8px rgb(0 0 0 / 0.6)", "purpose": "Stone reading line set directly on the lit board." },
-      { "name": "piece-in-hand", "value": "filter: drop-shadow(0 8px 6px rgb(0 0 0 / 0.28))", "purpose": "A flat piece being dragged." },
-      { "name": "focus-halo", "value": "outline: 2px solid var(--pointer); outline-offset: 3px; box-shadow: 0 0 0 6px var(--ground)", "purpose": "Every focus-visible element." },
-      { "name": "selection-underline", "value": "box-shadow: inset 0 -2px 0 currentColor", "purpose": "Current nav item (ink), current move and chosen theme (pointer)." },
-      { "name": "stage-vignette", "value": "radial-gradient(ellipse 85% 70% at 50% 40%, transparent 55%, rgb(0 0 0 / 0.45) 100%)", "purpose": "Darkens the room toward the corners over the felt pool." }
+      { "name": "glass-depth-light", "value": "0 12px 32px -10px rgb(0 0 0 / 0.22), 0 2px 6px rgb(0 0 0 / 0.07)", "purpose": "Lifts light glass off the content." },
+      { "name": "glass-depth-stage", "value": "0 16px 38px -12px rgb(0 0 0 / 0.66), 0 2px 8px rgb(0 0 0 / 0.32)", "purpose": "Lifts table glass off the board." },
+      { "name": "glass-rim", "value": "inset 0 1px 0 var(--glass-hi), inset 0 0 0 0.5px var(--glass-rim)", "purpose": "Lit top edge and hairline of every glass surface." },
+      { "name": "segment-thumb", "value": "0 3px 8px rgb(0 0 0 / 0.16), 0 1px 1px rgb(0 0 0 / 0.08)", "purpose": "The chosen segment." },
+      { "name": "slider-thumb", "value": "0 0.5px 4px rgb(0 0 0 / 0.12), 0 6px 13px rgb(0 0 0 / 0.12), 0 0 0 0.5px rgb(0 0 0 / 0.04)", "purpose": "The Pamja slider thumb." },
+      { "name": "over-table-mark", "value": "text-shadow: 0 2px 30px rgb(0 0 0 / 0.35)", "purpose": "The home wordmark over the board." },
+      { "name": "over-table-line", "value": "text-shadow: 0 1px 12px rgb(0 0 0 / 0.5)", "purpose": "The home line over the board." },
+      { "name": "piece-in-hand", "value": "filter: drop-shadow(0 8px 6px rgb(0 0 0 / 0.28))", "purpose": "A dragged flat piece." },
+      { "name": "focus-ring", "value": "outline: 3px solid color-mix(in srgb, var(--tint) 75%, transparent); outline-offset: 2px", "purpose": "Every focus-visible element." },
+      { "name": "stage-vignette", "value": "radial-gradient(ellipse 85% 70% at 50% 40%, transparent 55%, rgb(0 0 0 / 0.45) 100%)", "purpose": "Darkens the room toward the corners over the felt pool." },
+      { "name": "scrim", "value": "rgb(0 0 0 / 0.42)", "purpose": "Sheet backdrop and promotion overlay." }
     ],
     "motion": [
-      { "name": "dur-press", "value": "110ms", "purpose": "Press scale (0.97 buttons and cues, 0.95 tools)." },
-      { "name": "dur-ui", "value": "200ms", "purpose": "Background and colour state changes." },
-      { "name": "ease-out", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Default easing for presses, piece slides, menu and sheet entrances, 2D arrows." },
+      { "name": "dur-press", "value": "120ms", "purpose": "Press scale (0.96 buttons and tools, 0.95 cues and motion switch, 0.94 tabs)." },
+      { "name": "dur-ui", "value": "220ms", "purpose": "Background, colour and chevron rotation changes." },
+      { "name": "ease-out", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Presses, piece slides, verdict ink." },
       { "name": "ease-in-out", "value": "cubic-bezier(0.65, 0, 0.35, 1)", "purpose": "Symmetric moves." },
-      { "name": "piece-slide-2d", "value": "transform 210ms ease-out", "purpose": "Flat pieces moving between squares." },
-      { "name": "verdict-ink", "value": "color 320ms ease-out", "purpose": "The outlined move fills in when the verdict lands." },
-      { "name": "menu-in", "value": "160ms ease-out, opacity 0 and scale 0.96 from top right", "purpose": "Phone tool list opening." },
-      { "name": "sheet-in", "value": "240ms ease-out, translateY 1.5rem and opacity 0", "purpose": "New-game sheet opening." },
-      { "name": "graphic-wipe", "value": "clip-path inset(0 100% 0 0) to inset(0 0% 0 0), 0.32-0.34s, stagger 0.06-0.07s, power3.out", "purpose": "Lower-third parts arriving left to right." },
-      { "name": "intro-wipe", "value": "clip-path inset(0 0 100% 0), 0.5s power3.inOut, delay 0.15s", "purpose": "The intro card lifting off the table." },
-      { "name": "arrow-draw-3d", "value": "0.32s cubic out, each arrow offset by 0.35 of the line, numbers after", "purpose": "Demonstrated lines drawing on from the tail." },
-      { "name": "arrow-draw-2d", "value": "stroke-dashoffset 260ms ease-out; head opacity 120ms at +200ms", "purpose": "Same on the flat board (WAAPI)." },
-      { "name": "study-step", "value": "0.55s first step, 1.05s between steps", "purpose": "Shiko pse replay pacing." },
-      { "name": "live-blink", "value": "1.6s steps(2, jump-none) infinite, opacity 0.25 at 50%", "purpose": "The live bug's square; off in study mode." },
-      { "name": "ticker-crawl", "value": "translateX(-50%) var(--crawl, 40s) linear infinite", "purpose": "Ticker band; pauses on hover, stops with motion off or reduced motion." },
+      { "name": "ease-sheet", "value": "cubic-bezier(0.32, 0.72, 0, 1)", "purpose": "The iOS sheet curve: menus and sheets." },
+      { "name": "menu-in", "value": "300ms ease-sheet from opacity 0, scale 0.86, translateY -0.5rem, blur 10px; origin top right", "purpose": "Glass tools menu opening." },
+      { "name": "sheet-in", "value": "460ms ease-sheet from translateY(100%)", "purpose": "New-game sheet rising on phones." },
+      { "name": "sheet-pop", "value": "320ms ease-sheet from scale 0.94, opacity 0, blur 8px", "purpose": "New-game sheet from 640px." },
+      { "name": "verdict-ink", "value": "color 320ms ease-out", "purpose": "The move goes from label-3 to full strength when the verdict lands." },
+      { "name": "piece-slide-2d", "value": "transform 240ms ease-out", "purpose": "Flat pieces moving between squares." },
+      { "name": "ticker-crawl", "value": "translateX(-50%) var(--crawl, 40s) linear infinite", "purpose": "Accessory headlines; pause on hover, stop with motion off or reduced motion." },
       { "name": "spring-rest", "value": "k 170, c 19", "purpose": "3D piece set down with the faintest overshoot." },
       { "name": "spring-carry", "value": "k 560, c 42", "purpose": "3D piece following the hand." },
       { "name": "spring-tilt", "value": "k 210, c 17", "purpose": "3D piece tilt while carried." },
       { "name": "lift", "value": "hover 0.05, chosen 0.24, carry 0.6 (board units)", "purpose": "How high a 3D piece rides." },
-      { "name": "engine", "value": "GSAP ticker is the only loop (lagSmoothing 0); motion off sets globalTimeline.timeScale 1000; reduced motion and data-motion=off zero transitions (0s) and animations", "purpose": "One animation engine." }
+      { "name": "engine", "value": "GSAP ticker is the only loop (lagSmoothing 0); motion off sets globalTimeline.timeScale 1000; reduced motion and data-motion=off set transition-duration 0s and animation-duration 0.01ms", "purpose": "One animation engine." }
     ],
     "breakpoints": [
       { "name": "sheet", "value": "640px" },
+      { "name": "title", "value": "768px" },
       { "name": "desktop", "value": "1024px" },
       { "name": "wide", "value": "1400px" }
     ],
+    "stageInsets": {
+      "note": "--inset-* on .stage must stay plain lengths (rem or px), never calc(): board3d.ts reads them with parseFloat.",
+      "phone": { "top": "7.25rem", "bottom": "19rem", "left": "0.5rem", "right": "0.5rem" },
+      "desktop": { "top": "5.5rem", "bottom": "5rem", "left": "24rem (28rem from 1400px)", "right": "4.75rem" },
+      "home": { "phone": "top 16rem, bottom 17rem", "desktop": "7 / 5 / 22 / 28rem" }
+    },
     "studio3d": {
       "renderer": { "clearColor": "#070908", "toneMapping": "NeutralToneMapping", "exposure": 1.04, "shadowMap": "VSM (PCF fallback)" },
+      "fog": { "type": "Fog", "color": "#070908", "near": 26, "far": 72, "purpose": "The enlarged felt (160 x 160 plane, cloth repeat 90) runs on into the dark; a low camera never finds the table's edge." },
       "lights": [
-        { "name": "lamp", "type": "SpotLight", "color": "#fff0dc", "intensity": 3.6, "angle": 0.5, "penumbra": 0.62, "position": "(-12, 20, 9) mirrored for black (its reflection falls on the frame, not the a1 corner, under the near-overhead camera): over the player's left shoulder", "shadow": "1024 map, radius 5 VSM, bias -0.0006" },
+        { "name": "lamp", "type": "SpotLight", "color": "#fff0dc", "intensity": 3.6, "distance": 0, "angle": 0.5, "penumbra": 0.62, "decay": 0, "position": "(-12, 20, 9), mirrored for black: high over the player's left shoulder", "shadow": "1024 map, near 8 far 40; VSM radius 5 bias -0.0006; PCF radius 2 bias -0.0003 normalBias 0.015" },
         { "name": "fill", "type": "HemisphereLight", "sky": "#8fa596", "ground": "#0c140f", "intensity": 0.34 },
-        { "name": "room", "type": "RoomEnvironment envMap per material", "intensity": 0.45 }
+        { "name": "room", "type": "RoomEnvironment envMap per material, plus a 16 x 1.1 softbox strip low behind the board", "intensity": 0.45 }
       ],
       "materials": [
-        { "name": "felt", "type": "MeshStandard", "map": "noise around rgb(52 82 62), repeat 36", "roughness": 1, "envMapIntensity": 0.05 },
-        { "name": "mahogany-frame", "type": "MeshPhysical", "map": "grain on #4b2213", "roughness": 0.78, "specularIntensity": 0.15, "envMapIntensity": 0.7, "geometry": "RoundedBox radius 0.06" },
-        { "name": "boxwood-stringing", "type": "MeshStandard", "color": "#e9d3a4", "roughness": 0.45, "envMapIntensity": 0.5, "note": "two lines: round the squares (0.032) and near the outer edge (0.022)" },
-        { "name": "veneer-squares", "type": "MeshPhysical", "map": "per-leaf maple hsl(34 50% 66%) and walnut hsl(23 44% 37%), grain along the file on maple, across on walnut; matte, no reflections", "roughness": 0.88, "specularIntensity": 0.08, "envMapIntensity": 0.55 },
-        { "name": "coordinate-inlay", "type": "MeshBasic, not tone mapped", "color": "rgba(236, 214, 170, 0.9)", "font": "600 Mona Sans" },
+        { "name": "felt", "type": "MeshStandard", "map": "noise cloth, repeat 90 on a 160 plane", "roughness": 1, "envMapIntensity": 0.05 },
+        { "name": "mahogany-frame", "type": "MeshPhysical", "map": "grain on #4b2213", "roughness": 0.78, "specularIntensity": 0.15, "envMapIntensity": 0.7, "clearcoat": "none", "geometry": "RoundedBox radius 0.06" },
+        { "name": "boxwood-stringing", "type": "MeshStandard", "color": "#e9d3a4", "roughness": 0.85, "envMapIntensity": 0.5 },
+        { "name": "veneer-squares", "type": "MeshPhysical", "map": "per-leaf maple hsl(34 50% 66%) and walnut hsl(23 44% 37%), each leaf shifted a shade", "roughness": 0.88, "specularIntensity": 0.08, "envMapIntensity": 0.55, "clearcoat": "none" },
+        { "name": "coordinate-inlay", "type": "MeshBasic", "color": "rgba(236, 214, 170, 0.9)", "font": "600 system font stack" },
         { "name": "boxwood-pieces", "type": "MeshPhysical", "map": "light grain on #f7ecd4", "roughness": 0.4, "clearcoat": 0.5, "clearcoatRoughness": 0.18, "envMapIntensity": 0.85 },
         { "name": "ebony-pieces", "type": "MeshPhysical", "color": "#121214", "roughness": 0.26, "clearcoat": 1, "clearcoatRoughness": 0.05, "envMapIntensity": 1.25 },
-        { "name": "arrows", "type": "Shader, flat outline drawn on by share of length", "color": "var(--pointer)", "opacity": "0.92 (quiet 0.74)", "badge": "pointer disc with ink number, 800 Mona Sans" }
+        { "name": "last-move", "type": "MeshBasic, not tone mapped", "color": "var(--last)", "opacity": 0.26 },
+        { "name": "marks-and-arrows", "type": "MeshBasic / shader", "color": "var(--pointer) = var(--tint)", "opacity": "marks 0.88, chosen 0.22, ring 0.95", "badge": "tint disc, white 700 system-font number" }
       ],
       "cameraAngles": [
-        { "name": "Si lojtar", "upright": { "el": 1.396, "az": 0, "dist": 13 }, "wide": { "el": 1.396, "az": 0, "dist": 13 }, "default": true },
-        { "name": "Nga lart", "upright": { "el": 1.54, "az": 0, "dist": 15 }, "wide": { "el": 1.54, "az": 0, "dist": 15 } },
+        { "name": "Si lojtar", "degrees": 80, "upright": { "el": 1.396, "az": 0, "dist": 13 }, "wide": { "el": 1.396, "az": 0, "dist": 13 }, "default": true },
+        { "name": "Nga lart", "degrees": 88, "upright": { "el": 1.54, "az": 0, "dist": 15 }, "wide": { "el": 1.54, "az": 0, "dist": 15 } },
         { "name": "Afër tabelës", "upright": { "el": 0.72, "az": -0.42, "dist": 15 }, "wide": { "el": 0.56, "az": -0.5, "dist": 15 } }
       ],
-      "boardMarks2d": { "last": "pointer 0.2", "check": "pointer 0.42", "chosen": "pointer 0.26", "focus": "pointer stroke 7", "dot": "pointer 0.85", "take": "pointer ring 7 at 0.85", "cursor": "ink dashed 10 8, stroke 5", "arrowShaft": "pointer stroke 17 mitre at 0.88" }
+      "boardMarks2d": { "last": "var(--last) 0.4", "check": "var(--red) 0.5", "chosen": "tint 0.3", "focus": "tint stroke 7", "dot": "tint 0.85", "take": "tint ring 7 at 0.85", "cursor": "#000 dashed 10 8, stroke 5", "arrowShaft": "tint stroke 17, round joins and caps, 0.88 (quiet 0.66)", "arrowNumber": "#fff 700 22px system font" }
     }
   },
   "components": [
     {
-      "name": "Button",
-      "kind": "button",
-      "refersTo": "button",
-      "description": "Outlined ink box for reading pages and the scoresheet.",
-      "html": "<button class=\"ds-btn\">Dorëzohu</button>",
-      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 48px; padding: 0 1.125rem; font-family: 'Mona Sans Variable', system-ui, sans-serif; font-weight: 680; font-variation-settings: 'wdth' 108; line-height: 1.1; border: 1.5px solid #111214; color: #111214; background: transparent; border-radius: 0; cursor: pointer; transition: transform 110ms cubic-bezier(0.22,1,0.36,1), background-color 200ms ease; } .ds-btn:hover { background: #d9d8d5; } .ds-btn:active { transform: scale(0.97); } .ds-btn:focus-visible { outline: 2px solid #e65719; outline-offset: 3px; box-shadow: 0 0 0 6px #e6e5e1; }"
-    },
-    {
-      "name": "Solid Button",
+      "name": "Filled Button",
       "kind": "button",
       "refersTo": "button-solid",
-      "description": "The primary action on reading pages.",
-      "html": "<button class=\"ds-btn-solid\">Kthehu në fillim</button>",
-      "css": ".ds-btn-solid { display: inline-flex; align-items: center; min-height: 48px; padding: 0 1.125rem; font-family: 'Mona Sans Variable', system-ui, sans-serif; font-weight: 680; font-variation-settings: 'wdth' 108; border: 1.5px solid #111214; background: #111214; color: #e6e5e1; border-radius: 0; cursor: pointer; transition: transform 110ms cubic-bezier(0.22,1,0.36,1), background-color 200ms ease; } .ds-btn-solid:hover { background: color-mix(in srgb, #111214 86%, #e6e5e1); } .ds-btn-solid:active { transform: scale(0.97); } .ds-btn-solid:focus-visible { outline: 2px solid #e65719; outline-offset: 3px; box-shadow: 0 0 0 6px #e6e5e1; }"
+      "description": "The one primary action on a screen: a tint-fill capsule with white text.",
+      "html": "<button class=\"ds-btn ds-btn--solid\">Luaj</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; min-height: 50px; padding: 0 1.375rem; border: 0; border-radius: 999px; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, sans-serif; font-size: 1.0625rem; font-weight: 600; line-height: 1.1; cursor: pointer; transition: transform 120ms cubic-bezier(0.22,1,0.36,1), background-color 220ms ease, filter 220ms ease; } .ds-btn--solid { background: #0066d6; color: #fff; } .ds-btn--solid:hover { filter: brightness(1.08); } .ds-btn:active { transform: scale(0.96); } .ds-btn:focus-visible { outline: 3px solid color-mix(in srgb, #007aff 75%, transparent); outline-offset: 2px; }"
     },
     {
-      "name": "Cue",
+      "name": "Gray Button",
       "kind": "button",
-      "refersTo": "cue-on",
-      "description": "Broadcast caps actions in the lower third; the on cue is the primary (Shiko pse).",
-      "html": "<div class=\"ds-cue-row\"><button class=\"ds-cue ds-cue--on\">Shiko pse</button><button class=\"ds-cue\">Provo përsëri</button></div>",
-      "css": ".ds-cue-row { display: flex; gap: 0.4rem; padding: 0.75rem; background: rgb(17 14 11 / 0.94); } .ds-cue { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.8rem; border: 1px solid rgb(230 229 225 / 0.42); background: transparent; color: #e6e5e1; font-family: 'Mona Sans Variable', system-ui, sans-serif; font-variation-settings: 'wdth' 115; font-weight: 780; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.04em; border-radius: 0; cursor: pointer; transition: transform 110ms cubic-bezier(0.22,1,0.36,1), background-color 200ms ease; } .ds-cue:hover { background: rgb(230 229 225 / 0.1); } .ds-cue:active { transform: scale(0.97); } .ds-cue:focus-visible { outline: 2px solid #f06a2c; outline-offset: 3px; } .ds-cue--on { background: #e6e5e1; color: #111214; border-color: #e6e5e1; } .ds-cue--on:hover { background: #fff; }"
+      "refersTo": "button",
+      "description": "Every other action: a gray-fill capsule with tint text; quiet drops the fill.",
+      "html": "<div style=\"display:flex;gap:0.5rem\"><button class=\"ds-btn-gray\">Rifillo</button><button class=\"ds-btn-gray ds-btn-gray--quiet\">Anulo</button></div>",
+      "css": ".ds-btn-gray { display: inline-flex; align-items: center; min-height: 50px; padding: 0 1.375rem; border: 0; border-radius: 999px; background: rgb(118 118 128 / 0.12); color: #0066d6; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, sans-serif; font-size: 1.0625rem; font-weight: 600; cursor: pointer; transition: transform 120ms cubic-bezier(0.22,1,0.36,1), background-color 220ms ease; } .ds-btn-gray:hover { background: rgb(120 120 128 / 0.2); } .ds-btn-gray:active { transform: scale(0.96); } .ds-btn-gray:focus-visible { outline: 3px solid color-mix(in srgb, #007aff 75%, transparent); outline-offset: 2px; } .ds-btn-gray--quiet { background: transparent; padding-inline: 0.75rem; }"
     },
     {
-      "name": "Live and Score Bugs",
+      "name": "Coach Card",
+      "kind": "card",
+      "refersTo": "coach-card",
+      "description": "One Liquid Glass card over the table: the move, the verdict as a status pill, the reasons, capsule cues.",
+      "html": "<div class=\"ds-table\"><div class=\"ds-coach\"><div class=\"ds-coach__head\"><span class=\"ds-coach__move\">a6<span class=\"ds-coach__ann\">??</span></span><span class=\"ds-coach__pill\">Gabim i rëndë</span></div><p class=\"ds-coach__why\">Oficeri yt në a6 mbeti pa mbrojtje.</p><p class=\"ds-coach__warn\">Kujdes: oficeri yt në a6 është nën sulm.</p><div class=\"ds-coach__cues\"><button class=\"ds-cue ds-cue--on\">Shiko pse</button><button class=\"ds-cue\">Provo përsëri</button></div></div></div>",
+      "css": ".ds-table { padding: 1.5rem 0.75rem; background: radial-gradient(ellipse 52% 46% at 50% 42%, #3d5444 0%, #24342a 46%, #111a14 78%, #090d0a 100%); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, sans-serif; } .ds-coach { display: grid; gap: 0.375rem; max-width: 34rem; margin-inline: auto; padding: 0.875rem 1rem 1rem; border-radius: 1.625rem; color: #fff; background-color: rgb(30 32 34 / 0.6); background-image: linear-gradient(180deg, rgb(255 255 255 / 0.08), transparent 46%); -webkit-backdrop-filter: blur(28px) saturate(190%); backdrop-filter: blur(28px) saturate(190%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), inset 0 0 0 0.5px rgb(255 255 255 / 0.1), 0 16px 38px -12px rgb(0 0 0 / 0.66), 0 2px 8px rgb(0 0 0 / 0.32); } .ds-coach__head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.625rem; } .ds-coach__move { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; } .ds-coach__ann { color: #ff453a; } .ds-coach__pill { padding: 0.1875rem 0.625rem; border-radius: 999px; font-size: 0.8125rem; font-weight: 700; color: #ff6961; background: color-mix(in srgb, #ff453a 22%, transparent); } .ds-coach__why { font-size: 0.9375rem; line-height: 1.38; } .ds-coach__warn { color: #ffb340; font-weight: 600; font-size: 0.9375rem; } .ds-coach__cues { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.25rem; } .ds-cue { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1.0625rem; border: 0; border-radius: 999px; background: rgb(120 120 128 / 0.36); color: #fff; font: inherit; font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: transform 120ms cubic-bezier(0.22,1,0.36,1), filter 220ms ease; } .ds-cue:active { transform: scale(0.95); } .ds-cue:focus-visible { outline: 3px solid color-mix(in srgb, #0a84ff 75%, transparent); outline-offset: 2px; } .ds-cue--on { background: #0066d6; } .ds-cue--on:hover { filter: brightness(1.1); }"
+    },
+    {
+      "name": "Status Capsule and Score Card",
       "kind": "custom",
-      "refersTo": "live-bug",
-      "description": "Top-left broadcast bugs: what is happening now, and who plays whom.",
-      "html": "<div class=\"ds-bugs\"><div class=\"ds-live\"><span class=\"ds-live__tag\">Drejtpërdrejt</span><span class=\"ds-live__status\">Radha jote.</span></div><div class=\"ds-score\"><div class=\"ds-score__row\"><span class=\"ds-score__name\">Motori · Niveli 2</span></div><div class=\"ds-score__row ds-score__row--turn\"><span class=\"ds-score__name\">Ti</span></div></div></div>",
-      "css": ".ds-bugs { display: grid; gap: 0.25rem; padding: 1rem; background: #24342a; font-family: 'Mona Sans Variable', system-ui, sans-serif; } .ds-live { display: flex; } .ds-live__tag { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.55rem 0.4rem; background: #f06a2c; color: #111214; font-variation-settings: 'wdth' 125; font-weight: 880; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.07em; line-height: 1; } .ds-live__tag::before { content: ''; width: 0.45rem; height: 0.45rem; background: #111214; animation: ds-live 1.6s steps(2, jump-none) infinite; } @keyframes ds-live { 50% { opacity: 0.25; } } .ds-live__status { padding: 0.35rem 0.6rem 0.4rem; background: #e6e5e1; color: #111214; font-weight: 720; font-size: 0.8125rem; } .ds-score { display: grid; min-width: 11.5rem; justify-self: start; } .ds-score__row { display: flex; align-items: center; min-height: 1.6rem; padding: 0.1rem 0.55rem; background: rgb(20 17 14 / 0.9); color: #e6e5e1; font-size: 0.75rem; font-weight: 640; } .ds-score__row + .ds-score__row { border-top: 1px solid rgb(230 229 225 / 0.14); } .ds-score__name { position: relative; padding-left: 0.7rem; } .ds-score__name::before { content: ''; position: absolute; left: 0; top: 50%; width: 0.35rem; height: 0.35rem; translate: 0 -50%; border: 1px solid currentColor; } .ds-score__row--turn .ds-score__name { font-weight: 820; } .ds-score__row--turn .ds-score__name::before { background: #f06a2c; border-color: #f06a2c; }"
+      "refersTo": "status-capsule",
+      "description": "Top left of the table: a glass capsule with the red Live tag and the status, and a glass score card with the side to move in green.",
+      "html": "<div class=\"ds-top\"><div class=\"ds-status\"><span class=\"ds-live\">Drejtpërdrejt</span><span class=\"ds-status__text\">Radha jote.</span></div><div class=\"ds-score\"><div class=\"ds-score__row\"><span class=\"ds-score__name\">Motori · Niveli 2</span></div><div class=\"ds-score__row ds-score__row--turn\"><span class=\"ds-score__name\">Ti</span></div></div></div>",
+      "css": ".ds-top { display: grid; gap: 0.5rem; justify-items: start; padding: 1rem; background: #24342a; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, sans-serif; color: #fff; } .ds-status, .ds-score { background-color: rgb(30 32 34 / 0.6); background-image: linear-gradient(180deg, rgb(255 255 255 / 0.08), transparent 46%); -webkit-backdrop-filter: blur(28px) saturate(190%); backdrop-filter: blur(28px) saturate(190%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), inset 0 0 0 0.5px rgb(255 255 255 / 0.1), 0 16px 38px -12px rgb(0 0 0 / 0.66); } .ds-status { display: flex; align-items: center; gap: 0.5rem; height: 2.25rem; padding: 0 0.875rem 0 0.3125rem; border-radius: 999px; } .ds-live { display: inline-flex; align-items: center; gap: 0.3rem; height: 1.625rem; padding: 0 0.625rem; border-radius: 999px; background: #d70015; color: #fff; font-size: 0.75rem; font-weight: 700; } .ds-live::before { content: ''; width: 0.375rem; height: 0.375rem; border-radius: 50%; background: currentColor; } .ds-status__text { font-size: 0.8125rem; font-weight: 600; } .ds-score { display: grid; min-width: 12.5rem; padding: 0.1875rem 0; border-radius: 1.125rem; } .ds-score__row { display: flex; align-items: center; min-height: 1.75rem; padding: 0 0.875rem; font-size: 0.8125rem; font-weight: 500; } .ds-score__row + .ds-score__row { box-shadow: inset 0 0.5px 0 rgb(84 84 88 / 0.65); } .ds-score__name { position: relative; padding-inline-start: 0.875rem; } .ds-score__name::before { content: ''; position: absolute; left: 0; top: 50%; width: 0.4375rem; height: 0.4375rem; translate: 0 -50%; border-radius: 50%; background: rgb(235 235 245 / 0.34); } .ds-score__row--turn .ds-score__name { font-weight: 700; } .ds-score__row--turn .ds-score__name::before { background: #30d158; box-shadow: 0 0 0 3px color-mix(in srgb, #30d158 28%, transparent); }"
     },
     {
-      "name": "Lower Third",
-      "kind": "custom",
-      "refersTo": "lower-head",
-      "description": "The coach's verdict: pointer tag, stone head with move and informant symbol at poster size, umber body with reasons.",
-      "html": "<div class=\"ds-lower\"><div class=\"ds-lower__head\"><span class=\"ds-lower__tag\">Trajneri</span><div class=\"ds-lower__headline\"><span class=\"ds-lower__glyph\">a6<span class=\"ds-lower__ann\">??</span></span><span class=\"ds-lower__title\">Gabim i rëndë</span></div></div><div class=\"ds-lower__body\"><p>Oficeri yt në a6 mbeti pa mbrojtje.</p><p class=\"ds-lower__warn\">Kujdes: oficeri yt në a6 është nën sulm.</p></div></div>",
-      "css": ".ds-lower { display: grid; max-width: 26rem; font-family: 'Mona Sans Variable', system-ui, sans-serif; } .ds-lower__head { display: grid; grid-template-columns: auto minmax(0,1fr); background: #e6e5e1; color: #111214; } .ds-lower__tag { display: grid; place-items: center; padding: 0.32rem 0.6rem 0.36rem; background: #f06a2c; color: #111214; font-variation-settings: 'wdth' 125; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1; } .ds-lower__headline { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.75rem; padding: 0.3rem 0.75rem 0.4rem; } .ds-lower__glyph { font-size: clamp(2.25rem, 1.6rem + 3.2vw, 4rem); font-variation-settings: 'wdth' 125; font-weight: 880; letter-spacing: -0.045em; line-height: 0.86; } .ds-lower__ann { color: #c8460f; } .ds-lower__title { font-variation-settings: 'wdth' 125; font-weight: 860; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.03em; line-height: 1.05; } .ds-lower__body { padding: 0.6rem 0.75rem 0.75rem; background: rgb(17 14 11 / 0.94); color: #e6e5e1; font-size: 0.9375rem; line-height: 1.42; } .ds-lower__warn { margin-top: 0.45rem; color: #f7904b; font-weight: 680; }"
-    },
-    {
-      "name": "Ticker",
-      "kind": "custom",
-      "refersTo": "ticker-band",
-      "description": "Rail of verdict ticks over a stone band crawling caps items separated by pointer squares.",
-      "html": "<div class=\"ds-ticker\"><div class=\"ds-ticker__rail\"><i></i><i class=\"g\"></i><i class=\"m\"></i><i class=\"g\"></i><i class=\"b\"></i><i class=\"now\"></i></div><div class=\"ds-ticker__band\"><div class=\"ds-ticker__track\"><span>Niveli 2: i lehtë</span><span>Lëvizja 2</span><span>Kujdes: oficeri</span><span>Niveli 2: i lehtë</span><span>Lëvizja 2</span><span>Kujdes: oficeri</span></div></div></div>",
-      "css": ".ds-ticker { display: grid; grid-template-rows: 1.25rem 2.5rem; font-family: 'Mona Sans Variable', system-ui, sans-serif; } .ds-ticker__rail { display: flex; align-items: end; gap: 2px; padding: 3px 0.75rem; background: rgb(17 14 11 / 0.92); } .ds-ticker__rail i { width: 4px; height: 3px; background: rgb(230 229 225 / 0.32); } .ds-ticker__rail i.g { height: 6px; background: rgb(230 229 225 / 0.78); } .ds-ticker__rail i.m { height: 11px; background: #e6e5e1; } .ds-ticker__rail i.b { height: 13px; background: #f06a2c; } .ds-ticker__rail i.now { height: 5px; background: rgb(230 229 225 / 0.6); box-shadow: 0 -3px 0 #e6e5e1; } .ds-ticker__band { display: flex; align-items: center; overflow: hidden; background: #e6e5e1; color: #111214; } .ds-ticker__track { display: flex; flex: none; white-space: nowrap; font-weight: 700; font-size: 0.8125rem; font-variation-settings: 'wdth' 112; text-transform: uppercase; letter-spacing: 0.03em; animation: ds-crawl 40s linear infinite; } .ds-ticker__track span { display: inline-flex; align-items: center; } .ds-ticker__track span::after { content: ''; width: 0.4rem; height: 0.4rem; margin-inline: 1.1rem; background: #f06a2c; } .ds-ticker__band:hover .ds-ticker__track { animation-play-state: paused; } @keyframes ds-crawl { to { transform: translateX(-50%); } } @media (prefers-reduced-motion: reduce) { .ds-ticker__track { animation: none; } }"
-    },
-    {
-      "name": "Tool",
-      "kind": "button",
-      "refersTo": "tool",
-      "description": "44px umber square with a Phosphor icon, top right of the stage; pressed turns stone.",
-      "html": "<div class=\"ds-tools\"><button class=\"ds-tool\" aria-label=\"Ushtrimi tjetër\"><svg viewBox=\"0 0 256 256\" width=\"20\" height=\"20\" fill=\"currentColor\"><path d=\"M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z\"/></svg></button><button class=\"ds-tool\" aria-pressed=\"true\" aria-label=\"Pamje 3D\"><svg viewBox=\"0 0 256 256\" width=\"20\" height=\"20\" fill=\"currentColor\"><path d=\"M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z\"/></svg></button></div>",
-      "css": ".ds-tools { display: flex; gap: 0.25rem; padding: 0.75rem; background: #24342a; } .ds-tool { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 0; background: rgb(20 17 14 / 0.86); color: #e6e5e1; cursor: pointer; transition: transform 110ms cubic-bezier(0.22,1,0.36,1), background-color 200ms ease; } .ds-tool:hover { background: rgb(40 34 28 / 0.95); } .ds-tool:active { transform: scale(0.95); } .ds-tool:focus-visible { outline: 2px solid #f06a2c; outline-offset: 3px; } .ds-tool[aria-pressed='true'] { background: #e6e5e1; color: #111214; }"
-    },
-    {
-      "name": "Tab Bar",
+      "name": "Floating Tab Bar",
       "kind": "nav",
       "refersTo": "tab-bar",
-      "description": "Phone navigation: four tabs, icon over label, current tab inked with a 2px top bar.",
-      "html": "<nav class=\"ds-tabs\"><a href=\"#\" aria-current=\"page\">Luaj</a><a href=\"#\">Ushtrime</a><a href=\"#\">Mësime</a><a href=\"#\">Progresi</a></nav>",
-      "css": ".ds-tabs { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); height: 4rem; background: #e6e5e1; border-top: 1px solid #c4c3c0; font-family: 'Mona Sans Variable', system-ui, sans-serif; } .ds-tabs a { position: relative; display: grid; place-items: center; font-size: 0.8125rem; font-weight: 560; color: #595a5a; text-decoration: none; } .ds-tabs a:hover { color: #111214; } .ds-tabs a:focus-visible { outline: 2px solid #e65719; outline-offset: -3px; } .ds-tabs a[aria-current='page'] { color: #111214; font-weight: 760; } .ds-tabs a[aria-current='page']::before { content: ''; position: absolute; top: -1px; left: 22%; right: 22%; height: 2px; background: #111214; }"
+      "description": "Phone navigation: a glass capsule floating over the content, the current tab in a lighter lens in tint ink.",
+      "html": "<div class=\"ds-tabs-wrap\"><nav class=\"ds-tabs\"><a href=\"#\" aria-current=\"page\">Luaj</a><a href=\"#\">Ushtrime</a><a href=\"#\">Mësime</a><a href=\"#\">Progresi</a></nav></div>",
+      "css": ".ds-tabs-wrap { padding: 1.5rem 0.75rem; background: #f2f2f7; } .ds-tabs { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 0.125rem; width: min(100%, 30rem); height: 3.875rem; margin-inline: auto; padding: 0.25rem; border-radius: 999px; background-color: rgb(248 248 250 / 0.7); background-image: linear-gradient(180deg, rgb(255 255 255 / 0.5), transparent 46%); -webkit-backdrop-filter: blur(28px) saturate(190%); backdrop-filter: blur(28px) saturate(190%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.95), inset 0 0 0 0.5px rgb(0 0 0 / 0.07), 0 12px 32px -10px rgb(0 0 0 / 0.22), 0 2px 6px rgb(0 0 0 / 0.07); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, sans-serif; } .ds-tabs a { display: grid; place-items: center; border-radius: 999px; font-size: 0.6875rem; font-weight: 600; color: #000; text-decoration: none; transition: transform 120ms cubic-bezier(0.22,1,0.36,1), background-color 220ms ease; } .ds-tabs a:active { transform: scale(0.94); } .ds-tabs a:focus-visible { outline: 3px solid color-mix(in srgb, #007aff 75%, transparent); outline-offset: -3px; } .ds-tabs a[aria-current='page'] { color: #0066d6; background: rgb(0 0 0 / 0.06); }"
+    },
+    {
+      "name": "Inset-Grouped List",
+      "kind": "card",
+      "refersTo": "list-group",
+      "description": "The list pages: white cells on the grouped background, inset hairlines, chevrons by CSS mask.",
+      "html": "<div class=\"ds-page\"><h3 class=\"ds-group-h\">Përmbledhja</h3><ul class=\"ds-group\"><li><a class=\"ds-row\" href=\"#\"><span>Lojëra</span><span class=\"ds-row__v\">0</span></a></li><li><a class=\"ds-row\" href=\"#\"><span>Mësime të kryera</span><span class=\"ds-row__v\">0 nga 8</span></a></li></ul></div>",
+      "css": ".ds-page { padding: 1rem; background: #f2f2f7; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, sans-serif; font-size: 1.0625rem; letter-spacing: -0.012em; color: #000; } .ds-group-h { margin: 0 0 0.375rem; padding-inline: 0.25rem; font-size: 1.25rem; font-weight: 700; } .ds-group { margin: 0; padding: 0; list-style: none; background: #fff; border-radius: 1.375rem; overflow: hidden; } .ds-group > li + li::before { content: ''; display: block; height: 0.5px; margin-inline-start: 1rem; background: rgb(60 60 67 / 0.29); } .ds-row { display: grid; grid-template-columns: minmax(0,1fr) auto auto; align-items: center; gap: 0.75rem; min-height: 2.875rem; padding: 0.6875rem 1rem; color: inherit; text-decoration: none; transition: background-color 120ms ease; } .ds-row::after { content: ''; width: 0.9rem; height: 0.9rem; background: rgb(60 60 67 / 0.36); -webkit-mask: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z'/%3E%3C/svg%3E\") center / contain no-repeat; mask: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z'/%3E%3C/svg%3E\") center / contain no-repeat; } .ds-row:hover { background: color-mix(in srgb, #e5e5ea 55%, #fff); } .ds-row:active { background: #e5e5ea; } .ds-row:focus-visible { outline: 3px solid color-mix(in srgb, #007aff 75%, transparent); outline-offset: -3px; } .ds-row__v { color: rgb(60 60 67 / 0.78); font-variant-numeric: tabular-nums; }"
     },
     {
       "name": "Segmented Control",
       "kind": "input",
-      "refersTo": "setup-sheet",
-      "description": "Side choice on the new-game sheet: stone-ruled cells, checked cell filled stone.",
+      "refersTo": "segmented",
+      "description": "Side choice on the new-game sheet: a capsule track, the choice on a raised thumb.",
       "html": "<div class=\"ds-seg\"><label><input type=\"radio\" name=\"s\" checked>Të bardhat</label><label><input type=\"radio\" name=\"s\">Rastësisht</label><label><input type=\"radio\" name=\"s\">Të zezat</label></div>",
-      "css": ".ds-seg { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); border: 1.5px solid #e6e5e1; background: #15120f; color: #e6e5e1; font-family: 'Mona Sans Variable', system-ui, sans-serif; } .ds-seg label { position: relative; display: grid; place-items: center; min-height: 48px; font-weight: 660; cursor: pointer; } .ds-seg label + label { border-left: 1.5px solid #e6e5e1; } .ds-seg input { position: absolute; inset: 0; opacity: 0; cursor: pointer; } .ds-seg label:has(input:checked) { background: #e6e5e1; color: #111214; } .ds-seg label:has(input:focus-visible) { outline: 2px solid #f06a2c; outline-offset: 2px; }"
+      "css": ".ds-seg { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); max-width: 26rem; padding: 0.1875rem; border-radius: 999px; background: rgb(120 120 128 / 0.2); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, sans-serif; color: #000; } .ds-seg label { position: relative; display: grid; place-items: center; min-height: 2.5rem; padding-inline: 0.25rem; border-radius: 999px; font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: background-color 220ms cubic-bezier(0.22,1,0.36,1), box-shadow 220ms cubic-bezier(0.22,1,0.36,1); } .ds-seg input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; } .ds-seg label:has(input:checked) { background: #fff; box-shadow: 0 3px 8px rgb(0 0 0 / 0.16), 0 1px 1px rgb(0 0 0 / 0.08); } .ds-seg label:has(input:focus-visible) { outline: 3px solid color-mix(in srgb, #007aff 75%, transparent); outline-offset: 1px; }"
+    },
+    {
+      "name": "Checkmark List",
+      "kind": "input",
+      "refersTo": "list-row",
+      "description": "Levels and puzzle themes: inset-grouped rows, a tint check on the chosen row.",
+      "html": "<div class=\"ds-choices\"><label class=\"ds-choice\"><input type=\"radio\" name=\"l\" checked><span><b>Niveli 2</b><span>I lehtë</span></span></label><label class=\"ds-choice\"><input type=\"radio\" name=\"l\"><span><b>Niveli 3</b><span>Mesatar</span></span></label></div>",
+      "css": ".ds-choices { display: grid; max-width: 26rem; background: #fff; border-radius: 1.375rem; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', Roboto, sans-serif; font-size: 1.0625rem; color: #000; } .ds-choice { position: relative; display: grid; grid-template-columns: minmax(0,1fr) 1.25rem; gap: 0.75rem; align-items: center; min-height: 3.25rem; padding: 0.625rem 1rem; cursor: pointer; transition: background-color 120ms ease; } .ds-choice + .ds-choice { box-shadow: inset 1rem 0 0 #fff, inset 0 0.5px 0 rgb(60 60 67 / 0.29); } .ds-choice:active { background: #e5e5ea; } .ds-choice input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; } .ds-choice > span { display: grid; gap: 0.0625rem; } .ds-choice b { font-weight: 500; } .ds-choice > span > span { font-size: 0.8125rem; color: rgb(60 60 67 / 0.78); } .ds-choice::after { content: ''; width: 1.125rem; height: 1.125rem; background: #007aff; opacity: 0; -webkit-mask: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z'/%3E%3C/svg%3E\") center / contain no-repeat; mask: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z'/%3E%3C/svg%3E\") center / contain no-repeat; } .ds-choice:has(input:checked)::after { opacity: 1; } .ds-choice:has(input:focus-visible) { outline: 3px solid color-mix(in srgb, #007aff 75%, transparent); outline-offset: -3px; border-radius: 1.375rem; }"
     }
   ],
   "narrative": {
-    "northStar": "The Commentary Room",
-    "overview": "A dark studio round one lamp, a classic wooden board on green felt, and over it a commentator who speaks in television graphics. The table is a place, not a page colour: every play, puzzle and home screen fills the viewport with the lit board, and the interface arrives as broadcast furniture laid on top of it (a live bug and score bug top left, a tool column top right, a lower third, a crawling ticker). Reading pages (lessons list, progress, 404) step out of the studio onto plain stone paper with the same type and the same pointer.\n\nThe graphics commit to two colours, stone and ink, square-cornered, with one lacquer orange as the commentator's pointer: the tag, the arrows, the chosen square, the live verdict. One family, Mona Sans, carries every voice; rank comes from the width axis and weight, not from a second face. The verdict is the interface: the move and its informant symbol (!! ! !? ?! ? ??) are set as type at poster size in the lower third, never as a badge.\n\nBuilt divergence from the direction contract, recorded because the build wins: the contract asks for every neutral to be stone or ink at an alpha; the shipped broadcast bars use a warm umber-black family (bar-umber, bar-umber-raised, sheet-umber, room-black) rather than ink, and the stage reading text runs at 0.9375rem beside the 1rem page body rather than a single body size.",
+    "northStar": "The Native Table",
+    "overview": "Shah should feel like an app that shipped with an iPhone running iOS 27. Two places make up the whole app. The table pages (home, Luaj, Ushtrime, lessons, the opening trainer) fill the screen with a lit wooden board in a dark room, and everything else floats over it as Liquid Glass: a status capsule and score card top left, a round glass menu button top right, the coach as one glass card, a slim accessory carrying the headlines and the move rail above a floating capsule tab bar. Away from the table (Mësime, Progresi, 404) the app is an inset-grouped iOS list on the grouped background, under a large title.\n\nThe system font and the iOS system colours carry the interface. One tint blue does actions and selection; red, orange and green appear only as status (live, verdict grades, done marks). The board is an object, not a theme: maple and walnut squares, a mahogany frame with boxwood stringing, boxwood and ebony pieces, and a warm yellow on the last move, the same in both appearances. The broadcast world that came before this one (stone and ink bars, poster Mona Sans, the orange pointer) is gone; Luca replaced it on 2026-10-13 with \"make now everything more like iOS 27 theme\".",
     "keyCharacteristics": [
-      "The lit table fills the screen; graphics sit on it, never beside it in a sidebar.",
-      "Two colours plus one pointer; no third hue in the interface.",
-      "Square corners everywhere in 2D; the only rounding is the 3D frame's turned edge.",
-      "One family, ranked by width (100 / 108 / 112 / 118 / 125) and weight (430 to 900).",
-      "Expanded black caps for broadcast type; normal width for reading.",
-      "Motion is broadcast motion: wipes, crawls, draw-on arrows, pieces that fly and settle on springs."
+      "The lit table fills the screen on table pages; controls float over it as glass and never sit beside it in a sidebar.",
+      "Liquid Glass is one recipe: tinted base, top sheen, lit rim, hairline, lifting shadow, heavy blur. The learner sets its tint from clear to tinted.",
+      "Table pages always use the dark token set; list pages follow the system appearance.",
+      "The system font, no web font. Hierarchy comes from the iOS text styles.",
+      "Capsules for every control, continuous large radii for cards, lists and sheets.",
+      "One tint for action, status colours only for status, yellow only for the last move."
     ],
     "rules": [
-      { "name": "The One Pointer Rule", "body": "Orange means \"the commentator is pointing here\". It never decorates, never marks the current move on the rail (that cap is stone), and never appears as a second accent hue.", "section": "colors" },
-      { "name": "The Table Is A Place Rule", "body": "The felt, wood and set keep their own tones in both system themes; only the paper pages follow light and dark.", "section": "colors" },
-      { "name": "The Width Carries Rank Rule", "body": "Hierarchy is width and weight inside one family. No second typeface, no italics for emphasis.", "section": "typography" },
-      { "name": "The Figurine Rule", "body": "Moves are written as figurine plus square (piece silhouette inline at 0.95em, then the square in 700 tabular figures), never as letter notation.", "section": "typography" },
-      { "name": "The Flat Graphics Rule", "body": "Broadcast bars never cast shadows; only the table has light.", "section": "elevation" }
+      { "name": "The One Tint Rule", "body": "Blue means \"you can act here\" or \"this is chosen\". Status colours never stand in for it, and it never decorates.", "section": "colors" },
+      { "name": "The Table Is A Place Rule", "body": "Table pages always use the dark token set, and the felt, wood and set keep their own tones in both system appearances; only the list pages follow light and dark.", "section": "colors" },
+      { "name": "The White-On-Fill Rule", "body": "White text sits only on tint-fill or red-fill, never on the brighter system tint or red.", "section": "colors" },
+      { "name": "The Text Styles Rule", "body": "Sizes come from the iOS text-style ladder (--t-large to --t-cap2); no in-between sizes, no uppercase captions, no letter-spaced labels.", "section": "typography" },
+      { "name": "The Figurine Rule", "body": "Moves are written as figurine plus square (piece silhouette inline at 0.95em, 0.82em in the coach headline, then the square in 600 tabular figures), never as letter notation.", "section": "typography" },
+      { "name": "The One Recipe Rule", "body": "Anything that floats over the table or the content is Liquid Glass by the shared recipe; nothing invents its own blur, tint or shadow.", "section": "elevation" },
+      { "name": "The Glass Follows The System Rule", "body": "`--glass-level` drives tint and blur together and is set on Progresi > Pamja (stored as `shah.glass`, applied in the head before paint). Reduce Transparency makes the glass solid cell colour with no blur; Increase Contrast draws the rim in label-2 and uses the strong glass.", "section": "elevation" }
     ],
     "dos": [
-      "Do put play, puzzle and home screens on the lit table and lay the interface over it as broadcast graphics.",
-      "Do keep graphics to stone, ink and the umber bar family, with the pointer as the only hue; fill the pointer with ink text.",
-      "Do rank type by width (125 for broadcast caps and posters, 100 for reading) and weight within Mona Sans.",
-      "Do write moves in figurine notation and grade them with informant symbols set as type.",
-      "Do keep every corner square and every tap target at least 44px (48px for primary buttons).",
-      "Do route every animation through the GSAP ticker or CSS, and make the Stop-animations switch and reduced motion place pieces and arrows at once (transition-duration 0s, not 0.01ms)."
+      "Do fill table pages with the lit board and float every control over it as Liquid Glass by the shared recipe.",
+      "Do use the dark token set on every table page, whatever the system appearance.",
+      "Do use the system font and the iOS text-style ladder; the rounded face only for the wordmark and intro mark.",
+      "Do put white text only on tint-fill (#0066d6) or red-fill (#d70015), and keep light label-2 at rgb(60 60 67 / 0.78).",
+      "Do use the tint for action and selection, red, orange and green only for status, and yellow only for the last move.",
+      "Do keep `--inset-*` on the stage as plain lengths; the 3D board parses them with parseFloat.",
+      "Do honour Reduce Transparency (solid glass) and Increase Contrast (drawn rim), and make the Stop-animations switch and reduced motion zero transitions with 0s, not 0.01ms.",
+      "Do keep the board matte: no clearcoat on the frame or squares, the lamp never mirrored in the board."
     ],
     "donts": [
       "Don't build the flat green-and-cream board widget with a grey eval bar and a sidebar of tabs.",
-      "Don't add badges or pills for verdicts; the verdict word and symbol are the interface.",
-      "Don't use orange to mark the current move on the rail or as decoration.",
-      "Don't add drop shadows or rounded corners to broadcast bars.",
-      "Don't add a second typeface or set text as an icon glyph; icons are Phosphor regular SVG, one family, one weight.",
-      "Don't give the table a light theme: felt, wood and pieces keep their tones in both system themes."
+      "Don't add web-dashboard chrome: cards in grids, hairline-bordered panels, uppercase captions.",
+      "Don't give the table a light theme: felt, wood and pieces keep their tones in both appearances.",
+      "Don't load a web font or set text as an icon glyph; icons are Phosphor SVG, and list symbols are CSS masks.",
+      "Don't put a solid bar under the navigation; the scroll edge is a fading blur."
     ]
   }
 }

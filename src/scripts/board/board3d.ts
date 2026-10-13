@@ -1290,7 +1290,8 @@ export function createBoard3d(o: BoardOptions): BoardView {
     lastMat.color.set(token('--last'));
     overMat.color.copy(accent);
     ringMat.color.copy(accent);
-    glowMat.color.copy(accent);
+    // check is a warning, so it glows in the status red, as on the flat board
+    glowMat.color.set(token('--red'));
     for (const a of arrows) {
       a.mat.uniforms.uColor.value.copy(accent);
       if (a.badge) ((a.badge.children[0] as Mesh).material as MeshBasicMaterial).color.copy(accent);
