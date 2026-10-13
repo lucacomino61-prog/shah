@@ -982,7 +982,10 @@ export function createBoard3d(o: BoardOptions): BoardView {
         if (t.becomes) setShape(b, t.becomes);
         place(b, t.to);
       }
-      for (const b of taken) lie(b, outside(b.side, lyingCount(b.side), b.kind));
+      if (o.keepTaken === false) {
+        for (const b of taken) retire(b);
+        for (const b of bodies) if (!b.sq && b.mode === 'off' && b.group.visible && !b.flight) retire(b);
+      } else for (const b of taken) lie(b, outside(b.side, lyingCount(b.side), b.kind));
       for (const a of plan.arrive) {
         const b = spare(a.side, a.kind);
         place(b, a.to);
@@ -1016,7 +1019,10 @@ export function createBoard3d(o: BoardOptions): BoardView {
       });
       longest = Math.max(longest, b.flight!.dur + b.flight!.delay);
     });
-    taken.forEach((b) => {
+    // a capture takes one piece; several leaving at once is a jump to another position, which a puzzle or a lesson
+    // does not lay out beside the board
+    if (o.keepTaken === false && taken.length > 1) taken.forEach(retire);
+    else taken.forEach((b) => {
       const slot = outside(b.side, lyingCount(b.side) + takenCount++, b.kind);
       b.sq = null;
       fly(b, slot, lying, { arc: 0.9, dur: 0.7, delay: longest * 0.8, spin: Math.PI * 2, end: () => ((takenCount = Math.max(0, takenCount - 1)), lie(b, slot)) });

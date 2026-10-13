@@ -57,18 +57,10 @@ await sleep(1200);
 const task = await page.$eval('[data-task]', (e) => e.textContent);
 ok(task.includes('motorit'), 'the play-out step says it is against the engine', task);
 await page.evaluate(() => document.querySelector('[data-board]').focus());
-// play Qd1-d3 (a safe squeeze) by taps on the flat board
-const sq = async (s) =>
-  page.evaluate((sq) => {
-    const svg = document.querySelector('.board-svg').getBoundingClientRect();
-    const size = Math.min(svg.width, svg.height);
-    const k = size / 888;
-    const x0 = svg.left + (svg.width - size) / 2 + 44 * k;
-    const y0 = svg.top + (svg.height - size) / 2 + 44 * k;
-    const f = 'abcdefgh'.indexOf(sq[0]);
-    const r = Number(sq[1]) - 1;
-    return { x: x0 + (f + 0.5) * 100 * k, y: y0 + (7 - r + 0.5) * 100 * k };
-  }, s);
+// play Qd1-d3 (a safe squeeze) by taps on the 3D board, where its test hook says each square is on screen
+await page.waitForFunction(() => window.__board, { timeout: 20000 });
+await sleep(800);
+const sq = async (s) => page.evaluate((x) => window.__board.square(x), s);
 let a = await sq('d1');
 await page.touchscreen.tap(a.x, a.y);
 await sleep(200);

@@ -47,7 +47,7 @@ npx wrangler pages deploy dist --project-name shah-trajneri --branch master
 - `src/lib/levels.ts`: the six strengths. The weak ones pick worse lines on purpose.
 - `src/lib/store.ts`: progress in localStorage, the spaced-repetition cards of your own mistakes.
 - `src/scripts/board/board3d.ts`: the wooden board in three.js (camera angles, arrows, the replay).
-- `src/scripts/board/board2d.ts`: the flat board.
+- `src/scripts/board/board2d.ts`: the flat board, used only where WebGL fails (every page shows the 3D table).
 - `src/scripts/trainer.ts` and `src/data/repertoires.ts`: the opening trainer and its lines.
 - `src/data/puzzles.json`: 246 puzzles from the Lichess database (CC0), rebuilt with `tools/fetch-puzzles.mjs` and
   `tools/build-puzzles.mjs`, each solution checked with the engine.

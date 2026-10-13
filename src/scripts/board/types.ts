@@ -32,6 +32,9 @@ export interface BoardOptions {
   onMove: (from: Sq, to: Sq) => void;
   /** spoken name of the board for screen readers */
   label: string;
+  /** a game keeps what was taken lying beside the board; a puzzle or a lesson that jumps to a new position puts
+   *  the pieces it does not use away instead (default true) */
+  keepTaken?: boolean;
 }
 
 export interface BoardView {

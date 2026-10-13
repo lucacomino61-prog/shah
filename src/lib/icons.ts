@@ -9,8 +9,6 @@ import caretLeft from '@phosphor-icons/core/assets/regular/caret-left.svg?raw';
 import caretRight from '@phosphor-icons/core/assets/regular/caret-right.svg?raw';
 import chartLineUp from '@phosphor-icons/core/assets/regular/chart-line-up.svg?raw';
 import check from '@phosphor-icons/core/assets/regular/check.svg?raw';
-import cube from '@phosphor-icons/core/assets/regular/cube.svg?raw';
-import gridFour from '@phosphor-icons/core/assets/regular/grid-four.svg?raw';
 import dotsThreeVertical from '@phosphor-icons/core/assets/regular/dots-three-vertical.svg?raw';
 import eye from '@phosphor-icons/core/assets/regular/eye.svg?raw';
 import flag from '@phosphor-icons/core/assets/regular/flag.svg?raw';
@@ -33,7 +31,6 @@ const raw = {
   caretRight,
   chartLineUp,
   check,
-  cube,
   dotsThreeVertical,
   eye,
   flag,
@@ -43,7 +40,6 @@ const raw = {
   play,
   plus,
   puzzlePiece,
-  gridFour,
   videoCamera,
   x,
 };

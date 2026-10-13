@@ -6,7 +6,6 @@ import { Chess, type Square } from 'chess.js';
 import { GRADES, TAG_NAMES, afterReply, gameAccuracy, judge, passTurn, threatWarning, uciSan, winChance, type Grade, type Verdict } from '../lib/coach.ts';
 import { Engine, type Analysis } from '../lib/engine.ts';
 import { LEVELS, levelOf, pickMove, type Level } from '../lib/levels.ts';
-import { icon } from '../lib/icons.ts';
 import { sanHtml, sentenceHtml, sentenceText } from '../lib/notation.ts';
 import { openingOf } from '../lib/openings.ts';
 import { addCard, load, loadGame, saveGame, update, type Progress } from '../lib/store.ts';
@@ -57,7 +56,6 @@ const ui = {
   setupClose: $<HTMLButtonElement>('[data-setup-close]'),
   undo: $<HTMLButtonElement>('[data-undo]'),
   flip: $<HTMLButtonElement>('[data-flip]'),
-  viewToggle: $<HTMLButtonElement>('[data-view]'),
   resign: $<HTMLButtonElement>('[data-resign]'),
   promo: $('[data-promo]'),
   end: $('[data-end]'),
@@ -178,9 +176,10 @@ function dests(sq: Sq): Sq[] {
   return chess.moves({ square: sq as Square, verbose: true }).map((m) => m.to);
 }
 
-async function mountBoard(kind: '3d' | '2d') {
+/** The board is always the 3D table (the flat one comes only where WebGL fails). */
+async function mountBoard() {
   board?.dispose();
-  board = await createBoard(kind, {
+  board = await createBoard('3d', {
     host: ui.host,
     orientation,
     motion: motionOn,
@@ -191,10 +190,7 @@ async function mountBoard(kind: '3d' | '2d') {
   board.setPosition(fen(), false);
   marks();
   board.setInteractive(phase === 'user');
-  ui.viewToggle.querySelector('[data-label]')!.textContent = board.kind === '3d' ? 'Pamje e sheshtë' : 'Pamje 3D';
-  ui.viewToggle.querySelector('.tool__icon')!.innerHTML = board.kind === '3d' ? icon('gridFour') : icon('cube');
   document.querySelector<HTMLButtonElement>('[data-angle]')!.hidden = board.kind !== '3d';
-  ui.viewToggle.setAttribute('aria-pressed', board.kind === '2d' ? 'true' : 'false');
 }
 
 function marks(extra: { arrows?: Arrow[]; focus?: Sq[] } = {}) {
@@ -1017,12 +1013,6 @@ ui.flip.addEventListener('click', () => {
   board.setOrientation(orientation);
 });
 
-ui.viewToggle.addEventListener('click', async () => {
-  const next = board.kind === '3d' ? '2d' : '3d';
-  prefs = update((p) => (p.view = next));
-  await mountBoard(next);
-});
-
 let resignArmed: ReturnType<typeof setTimeout> | null = null;
 ui.resign.addEventListener('click', () => {
   if (phase === 'over') return;
@@ -1073,7 +1063,7 @@ keyboard(ui.host, () => board, () => orientation);
     side = prefs.side === 'b' ? 'b' : 'w';
     orientation = side;
   }
-  await mountBoard(prefs.view);
+  await mountBoard();
   boardReady = true;
   // the table is what the intro hides; the engine can finish loading behind it (the live bug says so)
   introTo(1);

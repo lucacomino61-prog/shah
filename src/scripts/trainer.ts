@@ -4,7 +4,6 @@
 
 import { Chess, type Square } from 'chess.js';
 import { repertoireOf } from '../data/repertoires.ts';
-import { icon } from '../lib/icons.ts';
 import { sentenceHtml, sentenceText } from '../lib/notation.ts';
 import { openingOf } from '../lib/openings.ts';
 import { load, update } from '../lib/store.ts';
@@ -31,7 +30,6 @@ const ui = {
   again: $<HTMLButtonElement>('[data-again]'),
   next: $<HTMLButtonElement>('[data-next]'),
   angle: $<HTMLButtonElement>('[data-angle]'),
-  view: $<HTMLButtonElement>('[data-view]'),
   ticker: $('[data-ticker]'),
   rail: $('[data-rail]'),
   live: $('[data-live]'),
@@ -50,7 +48,6 @@ const LINES = rep.lines.map((l) => {
 const keyOf = (i: number) => `${rep.slug}:${i}`;
 
 let board: BoardView;
-let kind: '3d' | '2d' = '2d';
 let chess = new Chess();
 let line = 0;
 let ply = 0;
@@ -236,18 +233,15 @@ function render() {
   ui.ticker.style.setProperty('--crawl', `${Math.max(50, items.join(' ').length * 0.28)}s`);
 }
 
-async function mount(k: '3d' | '2d') {
+/** The board is always the 3D table (the flat one comes only where WebGL fails). */
+async function mount() {
   board?.dispose();
-  kind = k;
-  board = await createBoard(k, { host: ui.host, orientation: side, motion: motionOn, dests, onMove: (f, t) => void onMove(f, t), label: 'Tabela e hapjes' });
+  board = await createBoard('3d', { host: ui.host, orientation: side, motion: motionOn, dests, onMove: (f, t) => void onMove(f, t), label: 'Tabela e hapjes', keepTaken: false });
   board.setPosition(chess.fen(), false);
   marks();
   board.setInteractive(!busy && !done && chess.turn() === side);
   ui.angle.hidden = board.kind !== '3d';
-  ui.view.querySelector('[data-label]')!.textContent = board.kind === '3d' ? 'Pamje e sheshtë' : 'Pamje 3D';
-  ui.view.querySelector('.tool__icon')!.innerHTML = board.kind === '3d' ? icon('gridFour') : icon('cube');
 }
-ui.view.addEventListener('click', () => void mount(kind === '3d' ? '2d' : '3d'));
 ui.angle.addEventListener('click', () => {
   const n = board.cycleAngle?.();
   if (n) ui.live.textContent = n;
@@ -259,7 +253,7 @@ followBroadcast(ui.host, ui.coach, () => board);
 keyboard(ui.host, () => board, () => side);
 
 (async () => {
-  await mount('2d');
+  await mount();
   await start(pickLine());
 })();
 

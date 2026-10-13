@@ -55,7 +55,7 @@ players use.
 ## Buttons and labels
 
 Luaj, Ushtrime, Mësime, Progresi · Shiko pse · Provo përsëri · Ndihmë · Kthehu te loja · Lojë e re ·
-Kthe lëvizjen · Rrotullo tabelën · Pamje e sheshtë / Pamje 3D · Këndi i kamerës · Ndal animacionet ·
+Kthe lëvizjen · Rrotullo tabelën · Këndi i kamerës · Ndal animacionet ·
 Dorëzohu / Konfirmo dorëzimin · Fillo lojën · Zgjidhja · Tjetri · Linja tjetër · Përsërit linjën ·
 Drejtpërdrejt · Po përgatitet tabela · Kalo · Sot në program · Gabimet e tua · Vlerësimi fillestar ·
 Kthehet nesër / Kthehet pas 3 ditësh · Grafiku i lojës · Momenti kyç · Pa orë.
@@ -73,4 +73,5 @@ Kthehet nesër / Kthehet pas 3 ditësh · Grafiku i lojës · Momenti kyç · Pa
   (clear / tinted), **Mesatar** (the middle setting, read aloud by screen readers), and the note under the slider:
   "Sa shihet tabela përmes xhamit të menyve dhe kartave. Majtas më e qartë, djathtas më e lexueshme."
 - The status during a replay said "Analizë: loja pret." next to the tag "Analizë"; it now says **"Loja pret."**
+- "Pamje e sheshtë / Pamje 3D" is gone: the board is always 3D.
 - The level is written one way everywhere: **"Niveli 2, i lehtë"** (it was also "Niveli 2: I lehtë").

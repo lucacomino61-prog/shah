@@ -1,5 +1,5 @@
 // Real taps on the boards in headless Chrome (phone profile): the 3D board on /luaj/ (piece, then square; and a
-// drag), and the flat board on /ushtrime/. node tools/test-taps.mjs [base]
+// drag), and the puzzle board on /ushtrime/. node tools/test-taps.mjs [base]
 import { join } from 'node:path';
 import puppeteer from 'puppeteer-core';
 
@@ -88,27 +88,14 @@ await page.click('[data-intro-skip]').catch(() => {});
 await sleep(800);
 ok(await page.evaluate(() => document.querySelector('[data-intro]').hidden), 'the intro closes on "Kalo"');
 
-// 2D: the puzzle board answers taps
+// the puzzle board answers taps
 await page.goto(base + '/ushtrime/', { waitUntil: 'networkidle0' });
 await page.waitForFunction(() => window.__puzzle && window.__puzzle.state().next && !document.querySelector('[data-status]').textContent.includes('lëviz…'), { timeout: 20000 });
 await sleep(600);
 const next = await page.evaluate(() => window.__puzzle.state().next);
-const rect = async (sq) =>
-  page.evaluate((sq) => {
-    const svg = document.querySelector('.board-svg');
-    const r = svg.getBoundingClientRect();
-    const side = window.__puzzle.state().side;
-    const f = 'abcdefgh'.indexOf(sq[0]);
-    const rk = Number(sq[1]) - 1;
-    // the viewBox is cropped on a phone; read it rather than assume the framed 888-unit square
-    const vb = svg.viewBox.baseVal;
-    const k = Math.min(r.width / vb.width, r.height / vb.height);
-    const x0 = r.left + (r.width - vb.width * k) / 2 - vb.x * k;
-    const y0 = r.top + (r.height - vb.height * k) / 2 - vb.y * k;
-    const cx = side === 'w' ? f : 7 - f;
-    const cy = side === 'w' ? 7 - rk : rk;
-    return { x: x0 + (cx + 0.5) * 100 * k, y: y0 + (cy + 0.5) * 100 * k };
-  }, sq);
+// the puzzle board is the 3D table too: its test hook says where each square is on screen
+await page.waitForFunction(() => window.__board && !window.__board.state().busy, { timeout: 20000 });
+const rect = async (sq) => page.evaluate((s) => window.__board.square(s), sq);
 const a = await rect(next.slice(0, 2));
 await page.touchscreen.tap(a.x, a.y);
 await sleep(250);
@@ -116,7 +103,7 @@ const b = await rect(next.slice(2, 4));
 await page.touchscreen.tap(b.x, b.y);
 await sleep(1500);
 const st = await page.evaluate(() => window.__puzzle.state());
-ok(st.step > 1 && !st.failed, 'the right move on the flat board is accepted', `step ${st.step}`);
+ok(st.step > 1 && !st.failed, 'the right move on the puzzle board is accepted', `step ${st.step}`);
 
 await browser.close();
 console.log(failed ? `\n${failed} FAILED` : '\nall taps work');

@@ -28,7 +28,6 @@ const ui = {
   hint: $<HTMLButtonElement>('[data-hint]'),
   again: $<HTMLButtonElement>('[data-again]'),
   angle: $<HTMLButtonElement>('[data-angle]'),
-  view: $<HTMLButtonElement>('[data-view]'),
   promo: $('[data-promo]'),
   ticker: $('[data-ticker]'),
   rail: $('[data-rail]'),
@@ -44,7 +43,6 @@ let solved = false;
 let busy = false;
 let hintStep = 0;
 let gen = 0;
-let kind: '3d' | '2d' = '2d';
 
 const step = (): Step => lesson.steps[index];
 const wait = (ms: number) => new Promise((r) => setTimeout(r, motionOn() ? ms : Math.min(ms, 120)));
@@ -287,18 +285,15 @@ function rail() {
   ui.ticker.style.setProperty('--crawl', `${Math.max(36, items.join(' ').length * 0.3)}s`);
 }
 
-async function mount(k: '3d' | '2d') {
+/** The board is always the 3D table (the flat one comes only where WebGL fails). */
+async function mount() {
   board?.dispose();
-  kind = k;
-  board = await createBoard(k, { host: ui.host, orientation: side, motion: motionOn, dests, onMove: (f, t) => void onMove(f, t), label: 'Tabela e mësimit' });
+  board = await createBoard('3d', { host: ui.host, orientation: side, motion: motionOn, dests, onMove: (f, t) => void onMove(f, t), label: 'Tabela e mësimit', keepTaken: false });
   board.setPosition(chess.fen(), false);
   marks(solved ? {} : { arrows: step()?.arrows, focus: step()?.focus });
   board.setInteractive(!!step()?.task && !solved && !busy);
   ui.angle.hidden = board.kind !== '3d';
-  ui.view.querySelector('[data-label]')!.textContent = board.kind === '3d' ? 'Pamje e sheshtë' : 'Pamje 3D';
-  ui.view.querySelector('.tool__icon')!.innerHTML = board.kind === '3d' ? icon('gridFour') : icon('cube');
 }
-ui.view.addEventListener('click', () => void mount(kind === '3d' ? '2d' : '3d'));
 ui.angle.addEventListener('click', () => {
   const n = board.cycleAngle?.();
   if (n) ui.live.textContent = n;
@@ -310,6 +305,6 @@ followBroadcast(ui.host, ui.coach, () => board);
 keyboard(ui.host, () => board, () => side);
 
 (async () => {
-  await mount('2d');
+  await mount();
   await show(0);
 })();

@@ -27,7 +27,6 @@ export interface Progress {
   lessons: string[];
   level: number;
   side: 'w' | 'b' | 'random';
-  view: '3d' | '2d';
   warnings: boolean;
   /** the game clock: 'none' or minutes+increment, e.g. '5+3' */
   clock: string;
@@ -115,7 +114,6 @@ const fresh = (): Progress => ({
   lessons: [],
   level: 2,
   side: 'w',
-  view: '3d',
   warnings: true,
   clock: 'none',
   reps: {},

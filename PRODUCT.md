@@ -68,8 +68,8 @@ coach speaks as a TV broadcast, not as a flat web widget.
 - The play, puzzle and lesson screens keep their structure: the lit table fills the screen, a status capsule and a
   score card sit at the top, the coach is one glass card with the verdict as a status pill, and the headlines run in
   an accessory above the tab bar.
-- The board also has a flat 2D view (the default for puzzles and lessons). Its pieces are the side profiles of the
-  turned pieces.
+- The board is always the 3D table, on every page (Luca, 2026-10-13: "i want the board to be always 3d"); the
+  flat 2D board is kept only as the fallback where WebGL fails. Its pieces are the side profiles of the turned pieces.
 - Kept from the award-site vocabulary of Luca's other builds: one signature moment (the wooden board), a
   Stop-animations switch, and a loader with a skip. Poster type, the two-colour rule and the broadcast graphics gave
   way to the iOS look.
