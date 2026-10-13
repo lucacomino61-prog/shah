@@ -57,12 +57,14 @@ const token = (name: string) => getComputedStyle(document.documentElement).getPr
  *  a place, not a page colour. */
 const STUDIO = { room: 0.45, hemi: 0.34, lamp: 3.6, exposure: 1.04 };
 
-/** Where the broadcast camera stands: a three-quarter view from the player's left, straight overhead, or low
- *  across the table. Each has a steeper version for an upright phone, so the far ranks keep their size. */
+/** Where the camera stands. First, the player's own seat: straight behind your pieces, at the height of a seated
+ *  player's eyes and as close, so the near ranks loom and the far ones recede the way they do across a real
+ *  table. Then straight overhead, and the low three-quarter the home page orbits in. Each has a steeper version
+ *  for an upright phone, so the far ranks keep their size. dist is from the middle of the board, in squares. */
 export const ANGLES = [
-  { name: 'Kënd klasik', upright: { el: 0.9, az: -0.26 }, wide: { el: 0.74, az: -0.32 } },
-  { name: 'Nga lart', upright: { el: 1.18, az: 0 }, wide: { el: 1.05, az: 0 } },
-  { name: 'Afër tabelës', upright: { el: 0.72, az: -0.42 }, wide: { el: 0.56, az: -0.5 } },
+  { name: 'Si lojtar', upright: { el: 0.86, az: 0, dist: 11 }, wide: { el: 0.72, az: 0, dist: 12 } },
+  { name: 'Nga lart', upright: { el: 1.18, az: 0, dist: 15 }, wide: { el: 1.05, az: 0, dist: 15 } },
+  { name: 'Afër tabelës', upright: { el: 0.72, az: -0.42, dist: 15 }, wide: { el: 0.56, az: -0.5, dist: 15 } },
 ];
 
 /** How high a piece rides: under the pointer, chosen, in the hand. */
@@ -634,14 +636,22 @@ export function createBoard3d(o: BoardOptions): BoardView {
     return b;
   }
 
-  /** Where taken pieces leave the board: beside it, on the taker's right. */
   /** Where taken pieces leave the board: onto the open felt on the player's right (the broadcast graphics hold the
    *  left on a wide screen), white's nearer the player, black's further away. */
   const outside = (side: Side, i: number, kind: Kind = 'q') => {
     const toward = orientation === 'w' ? 1 : -1;
     const near = side === 'w' ? 1 : -1;
     const row = Math.floor(i / 4);
-    return new Vector3((F + 1.05 + row * 0.95) * toward, GIRTH[kind], toward * near * (0.9 + (i % 4) * 0.85));
+    // seen straight from the seat on an upright phone, the felt beside the board is out of frame: lay them well
+    // clear of the edge rather than cut in half by it (the score bug counts them)
+    const gap = portrait && preset().az === 0 ? 4.2 : 1.05;
+    return new Vector3((F + gap + row * 0.95) * toward, GIRTH[kind], toward * near * (0.9 + (i % 4) * 0.85));
+  };
+  /** Lay the taken pieces again after the framing changes (a turned phone, another camera angle). */
+  const relay = () => {
+    for (const side of ['w', 'b'] as Side[]) {
+      bodies.filter((x) => x.mode === 'off' && x.group.visible && x.side === side && !x.flight).forEach((b, i) => lie(b, outside(side, i, b.kind)));
+    }
   };
   /** taken pieces already lying beside the board, per side */
   const lyingCount = (side: Side) => bodies.filter((x) => x.mode === 'off' && x.group.visible && x.side === side && !x.flight).length;
@@ -1228,6 +1238,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
     elevation = preset().el;
     el = elevation;
     az = azimuthFor();
+    relay();
     placeCamera(true);
   }
   const lens: { at: { fov: number; ox: number; oy: number } | null; to: { fov: number; ox: number; oy: number }; snap: boolean } = {
@@ -1243,7 +1254,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
     camera.updateProjectionMatrix();
   }
   function placeCamera(refit: boolean) {
-    const rig = rigFor(az, el);
+    const rig = rigFor(az, el, preset().dist);
     camera.position.set(...rig.camera);
     camera.lookAt(...rig.target);
     if (refit) {
@@ -1255,7 +1266,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
         return (parseFloat(v) || 0) * (v.endsWith('rem') ? rem : 1);
       };
       const box = { x: px('--inset-left'), y: px('--inset-top'), w: W - px('--inset-left') - px('--inset-right'), h: H - px('--inset-top') - px('--inset-bottom') };
-      const f = frameBounds(boardBounds(rigFor(azimuthFor(), elevation)), W, H, box.w > 50 && box.h > 50 ? box : undefined);
+      const f = frameBounds(boardBounds(rigFor(azimuthFor(), elevation, preset().dist)), W, H, box.w > 50 && box.h > 50 ? box : undefined);
       lens.to = { fov: f.fov, ox: f.ox, oy: f.oy };
       // a resize or the first frame snaps; a change of the free space (the coach saying more) eases, like a
       // broadcast camera reframing

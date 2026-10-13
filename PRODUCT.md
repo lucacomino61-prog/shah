@@ -57,8 +57,9 @@ coach speaks as a TV broadcast, not as a flat web widget.
 - The board is a 3D three.js board, first built in marble for LC/salvato. On 2026-10-12 Luca asked for "the whole
   page the table", the coach's suggestions as "a little broadcast like news broadcast", and the board "more classic
   high quality wood" with "a better angle". So: maple and walnut squares, a mahogany frame with boxwood stringing,
-  boxwood and ebony pieces, on a dark felt table under one lamp. The camera defaults to a three-quarter view, with
-  overhead and low angles one button away.
+  boxwood and ebony pieces, on a dark felt table under one lamp. On 2026-10-13 he asked for the view "like a 3d
+  person": the camera defaults to the player's seat (straight behind your pieces, a seated player's eye height and
+  distance), with overhead and a low three-quarter angle one button away.
 - The play, puzzle and lesson screens are a broadcast: the lit table fills the screen and the coach speaks in TV
   graphics (live bug, score bug, lower third, ticker).
 - The board also has a flat 2D view (the default for puzzles and lessons). Its pieces are the side profiles of the
