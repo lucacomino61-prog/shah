@@ -17,11 +17,15 @@ import { gsap, motionOn, onMotion, onTick } from './shell.ts';
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const START = new Chess().fen();
 
+/** the move the strip holds in view while a past move is open on the board; null follows the game */
+let stripPly: number | null = null;
+
 const ui = {
   host: $('[data-board]'),
   them: $('[data-them]'),
   you: $('[data-you]'),
   rail: $('[data-rail]'),
+  strip: $('[data-strip]'),
   status: $('[data-status]'),
   opening: $('[data-opening]'),
   coach: $('[data-coach]'),
@@ -708,6 +712,10 @@ function leaveStudy(redraw = true) {
   study.timer?.kill();
   const resume = study.resume;
   study = null;
+  if (stripPly !== null) {
+    stripPly = null;
+    showInStrip(sans.length - 1);
+  }
   ui.coach.dataset.mode = '';
   delete document.documentElement.dataset.mode;
   ui.tag.textContent = 'Trajneri';
@@ -784,8 +792,40 @@ function renderSheet() {
     }
     mini.innerHTML = lis.slice(-6).map((l) => l + '</li>').join('');
   }
+  renderStrip();
   status();
 }
+
+// the move strip over the board on a phone, as chess.com keeps it: every move in one line, sliding so the move on
+// the board stays in view; a tap opens that move
+function renderStrip() {
+  if (!sans.length) {
+    ui.strip.innerHTML = '<li class="strip__empty">Lëvizjet shfaqen këtu.</li>';
+    return;
+  }
+  const offset = fens[0].split(' ')[1] === 'b' ? 1 : 0;
+  const items: string[] = [];
+  for (let i = 0; i < sans.length; i++) {
+    const ply = i + offset;
+    const v = verdicts[i];
+    if (ply % 2 === 0 || i === 0) items.push(`<li class="strip__n tabular" aria-hidden="true">${Math.floor(ply / 2) + 1}${ply % 2 ? '…' : '.'}</li>`);
+    items.push(`<li><button type="button" class="strip__mv" data-ply="${i}">${sanHtml(sans[i])}${v && v.symbol ? `<span class="ann" data-grade="${v.grade}">${v.symbol}</span>` : ''}</button></li>`);
+  }
+  ui.strip.innerHTML = items.join('');
+  showInStrip(stripPly ?? sans.length - 1);
+}
+function showInStrip(i: number) {
+  ui.strip.querySelectorAll('[aria-current]').forEach((b) => b.removeAttribute('aria-current'));
+  const b = ui.strip.querySelector<HTMLElement>(`[data-ply="${i}"]`);
+  if (!b) return;
+  b.setAttribute('aria-current', 'true');
+  const left = b.offsetLeft - (ui.strip.clientWidth - b.offsetWidth) / 2;
+  ui.strip.scrollTo({ left: Math.max(0, left), behavior: motionOn() ? 'smooth' : 'instant' });
+}
+ui.strip.addEventListener('click', (e) => {
+  const b = (e.target as Element).closest<HTMLButtonElement>('[data-ply]');
+  if (b) openPly(Number(b.dataset.ply));
+});
 
 ui.sheet.addEventListener('click', (e) => {
   const b = (e.target as Element).closest<HTMLButtonElement>('[data-ply]');
@@ -796,6 +836,8 @@ ui.sheet.addEventListener('click', (e) => {
 /** Show one move of the game on the board, with the coach's word on it. */
 function openPly(i: number) {
   if (i < 0 || i >= ucis.length) return;
+  stripPly = i;
+  showInStrip(i);
   const v = verdicts[i];
   if (v) {
     lastVerdict = v;

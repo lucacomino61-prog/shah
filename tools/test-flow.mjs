@@ -27,6 +27,8 @@ page.on('pageerror', (e) => errors.push(e.message));
 await page.goto(base + '/luaj/', { waitUntil: 'networkidle0' });
 await page.waitForFunction(() => window.__play && window.__play.engine() === 'ready', { timeout: 30000 });
 await page.evaluate(() => document.querySelector('[data-new]').click());
+// the sheet rises for 460ms; choose once it has arrived
+await sleep(700);
 await page.click('input[name="clock"][value="3+2"]');
 await page.click('input[name="level"][value="5"]');
 await page.click('.setup button[type="submit"]');
@@ -50,6 +52,14 @@ const area = await page.$('.review__area');
 ok(!!area && marks === 1, 'the graph draws, with one mistake marked', `marks ${marks}`);
 const cap = await page.$eval('[data-review-cap]', (e) => e.textContent);
 ok(cap.includes('Momenti kyç: lëvizja 2'), 'the turning point is the blunder', cap);
+// the move strip over the board: every move in one line, the last one current; a tap opens that move
+const strip = await page.$$eval('.strip__mv', (l) => l.map((b) => b.textContent.trim()));
+const now = await page.$eval('.strip__mv[aria-current]', (b) => b.dataset.ply);
+ok(strip.length === 4 && now === '3', 'the strip lists the moves with the last one current', `${strip.join(' ')} | current ${now}`);
+await page.click('.strip__mv[data-ply="0"]');
+await sleep(500);
+const opened = await page.evaluate(() => [document.documentElement.dataset.mode, document.querySelector('.strip__mv[aria-current]')?.dataset.ply]);
+ok(opened[0] === 'study' && opened[1] === '0', 'a tap on the strip opens that move', opened.join(' '));
 
 // the card on the puzzles page
 await page.goto(base + '/ushtrime/?tema=gabimet', { waitUntil: 'networkidle0' });
