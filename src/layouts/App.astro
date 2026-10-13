@@ -11,8 +11,29 @@ interface Props {
   tab: 'luaj' | 'ushtrime' | 'mesime' | 'progresi' | null;
   /** the page is the lit table: dark studio throughout, whatever the system theme */
   stage?: boolean;
+  /** kept out of search results (the 404) */
+  noindex?: boolean;
+  /** the home page carries the app's structured data */
+  home?: boolean;
 }
-const { title, description, tab, stage = false } = Astro.props;
+const { title, description, tab, stage = false, noindex = false, home = false } = Astro.props;
+const site = Astro.site!;
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL('/og.png', site).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'Shah',
+  alternateName: 'Shah: trajner shahu në shqip',
+  url: new URL('/', site).href,
+  description,
+  inLanguage: 'sq',
+  applicationCategory: 'EducationalApplication',
+  operatingSystem: 'Web',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+  license: 'https://www.gnu.org/licenses/gpl-3.0.html',
+};
 const tabs = [
   { id: 'luaj', href: '/luaj/', label: 'Luaj', icon: 'horse' },
   { id: 'ushtrime', href: '/ushtrime/', label: 'Ushtrime', icon: 'puzzlePiece' },
@@ -28,10 +49,24 @@ const tabs = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="robots" content="noindex, nofollow" />
-    <meta name="theme-color" content="#e6e5e1" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)" />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    {stage ? <meta name="theme-color" content="#070908" /> : <meta name="theme-color" content="#e6e5e1" media="(prefers-color-scheme: light)" />}
+    {!stage && <meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)" />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Shah" />
+    <meta property="og:locale" content="sq_AL" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Tabela prej druri e Shah nën një llambë, me titullin Shah." />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    {home && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     <link rel="preload" href={fontUrl} as="font" type="font/woff2" crossorigin />
     <style is:inline>@view-transition{navigation:auto}</style>
     <script is:inline>
@@ -54,8 +89,8 @@ const tabs = [
         ))}
       </nav>
       <button class="motion-switch" type="button" data-motion-switch aria-pressed="false">
-        <span data-when="on"><Fragment set:html={icon('pause')} />Ndal lëvizjet</span>
-        <span data-when="off"><Fragment set:html={icon('play')} />Lëvizjet të ndalura</span>
+        <span data-when="on"><Fragment set:html={icon('pause')} />Ndal animacionet</span>
+        <span data-when="off"><Fragment set:html={icon('play')} />Animacionet të ndalura</span>
       </button>
     </header>
     <main id="main" tabindex="-1">
@@ -73,5 +108,10 @@ const tabs = [
       import { initShell } from '../scripts/shell';
       initShell();
     </script>
+    {import.meta.env.PROD && (
+      <script is:inline>
+        if ('serviceWorker' in navigator) addEventListener('load', function () { navigator.serviceWorker.register('/sw.js').catch(function () {}); });
+      </script>
+    )}
   </body>
 </html>

@@ -5,7 +5,7 @@ import { LESSONS } from '../data/lessons';
 import '../styles/play.css';
 ---
 
-<App title="Shah · Mëso shah duke luajtur" description="Trajner shahu në shqip: luaj kundër motorit, dëgjo pse ishte gabim, zgjidh ushtrime." tab={null} stage>
+<App title="Shah · Mëso shah duke luajtur" description="Trajner shahu në shqip: luaj kundër motorit, dëgjo pse ishte gabim, zgjidh ushtrime." tab={null} stage home>
   <div class="stage home" data-stage-box>
     <div class="board" data-board aria-hidden="true"></div>
 
@@ -48,7 +48,7 @@ import '../styles/play.css';
         <div class="ticker__track">
           {[0, 1].map(() => (
             <Fragment>
-              <span>Trajneri flet shqip</span><span>Motori Stockfish punon në shfletuesin tënd</span><span>Ushtrime nga Lichess</span><span>Shtatë mësime për lojtarin që di rregullat</span><span>Pa llogari, pa pagesë</span>
+              <span>Trajneri flet shqip</span><span>Motori Stockfish punon në shfletuesin tënd</span><span>Ushtrime nga Lichess</span><span>Tetë mësime dhe trajneri i hapjeve</span><span>Pa llogari, pa pagesë</span>
             </Fragment>
           ))}
         </div>
@@ -90,6 +90,6 @@ import '../styles/play.css';
   @media (min-width: 1024px) {
     .home { --inset-top: 6rem; --inset-bottom: 4rem; --inset-left: 22rem; --inset-right: 28rem; }
     .home__title { left: 2rem; top: 1.5rem; }
-    .home__guide { left: auto; right: 1.5rem; width: 26rem; top: auto; }
+    .home__guide { left: auto; right: 1.5rem; width: 26rem; top: auto; bottom: calc(var(--ticker-h) + 1.25rem); }
   }
 </style>

@@ -26,6 +26,15 @@ import { icon } from '../lib/icons';
       <ol class="games" data-games><li class="empty">&nbsp;</li></ol>
     </section>
 
+    <section class="progress__block about" aria-labelledby="about-title">
+      <h2 class="progress__h wide" id="about-title">Rreth aplikacionit</h2>
+      <p class="progress__note">
+        Shah është softuer i lirë me licencën GPL-3.0. Motori është <a href="https://stockfishchess.org/">Stockfish</a>, që punon
+        brenda shfletuesit tënd. Ushtrimet vijnë nga baza e hapur e <a href="https://database.lichess.org/#puzzles">Lichess</a>.
+        Kodi burimor: <a href="https://github.com/lucacomino61-prog/shah">github.com/lucacomino61-prog/shah</a>.
+      </p>
+    </section>
+
     <section class="progress__block">
       <button type="button" class="btn" data-reset><Fragment set:html={icon('x')} /><span data-label>Fshi progresin</span></button>
     </section>
@@ -40,6 +49,7 @@ import { icon } from '../lib/icons';
   .progress__block { margin-top: var(--space-xl); }
   .progress__h { font-size: var(--step-title); font-weight: 820; padding-bottom: 0.5rem; border-bottom: 2px solid var(--text); }
   .progress__note { margin-top: 0.5rem; color: var(--text-2); max-width: 52ch; }
+  .about a { color: var(--text); text-underline-offset: 0.2em; }
   .progress :global(.sheet-rows) { display: grid; }
   .progress :global(.sheet-rows > div) { display: flex; justify-content: space-between; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--rule); }
   .progress :global(.sheet-rows dt) { color: var(--text-2); }
