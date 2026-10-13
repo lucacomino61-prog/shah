@@ -12,7 +12,6 @@
     "preview:lan": "astro preview --port 3772 --host 0.0.0.0"
   },
   "dependencies": {
-    "@fontsource-variable/mona-sans": "^5.2.8",
     "@phosphor-icons/core": "^2.1.1",
     "astro": "7.3.5",
     "chess.js": "1.4.0",

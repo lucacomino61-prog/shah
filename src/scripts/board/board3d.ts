@@ -12,6 +12,7 @@ import {
   CylinderGeometry,
   DoubleSide,
   ExtrudeGeometry,
+  Fog,
   Group,
   HemisphereLight,
   LatheGeometry,
@@ -276,7 +277,7 @@ function inlay(size: number, orientation: Side): CanvasTexture {
   const k = size / (2 * F);
   const at = (x: number, z: number) => [(x + F) * k, (z + F) * k] as const;
   g.fillStyle = 'rgba(236, 214, 170, 0.9)';
-  g.font = `600 ${Math.round(k * 0.27)}px "Mona Sans Variable", system-ui, sans-serif`;
+  g.font = `600 ${Math.round(k * 0.27)}px -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif`;
   g.textAlign = 'center';
   g.textBaseline = 'middle';
   const edge = BOARD.half + BOARD.frame / 2;
@@ -305,8 +306,8 @@ function numberTexture(n: string): CanvasTexture {
   const c = document.createElement('canvas');
   c.width = c.height = 128;
   const g = c.getContext('2d')!;
-  g.fillStyle = '#111214';
-  g.font = '800 84px "Mona Sans Variable", system-ui, sans-serif';
+  g.fillStyle = '#ffffff';
+  g.font = "700 84px -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto, sans-serif";
   g.textAlign = 'center';
   g.textBaseline = 'middle';
   g.fillText(n, 64, 70);
@@ -430,6 +431,8 @@ export function createBoard3d(o: BoardOptions): BoardView {
   renderer.setPixelRatio(dpr);
 
   const scene = new Scene();
+  // the felt runs on into the dark of the room: a low camera never finds the table's edge
+  scene.fog = new Fog(0x070908, 26, 72);
   const studios = new Map<number, Texture>();
   const studioFor = (dim: number) => {
     let map = studios.get(dim);
@@ -454,7 +457,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
     return map;
   };
 
-  const camera = new PerspectiveCamera(30, 1, 4, 60);
+  const camera = new PerspectiveCamera(30, 1, 4, 140);
   let orientation: Side = o.orientation;
   let elevation = 0.95;
   let az = 0;
@@ -494,10 +497,10 @@ export function createBoard3d(o: BoardOptions): BoardView {
   // reflections come from a studio map set on each material (scene.environment would light the table evenly)
   const room = studioFor(STUDIO.room);
   const cloth = felt(256);
-  cloth.repeat.set(36, 36);
+  cloth.repeat.set(90, 90);
   cloth.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   textures.push(cloth);
-  const table = new Mesh(keep(new PlaneGeometry(64, 64).rotateX(-Math.PI / 2)), own(new MeshStandardMaterial({ map: cloth, roughness: 1, envMap: room, envMapIntensity: 0.05 })));
+  const table = new Mesh(keep(new PlaneGeometry(160, 160).rotateX(-Math.PI / 2)), own(new MeshStandardMaterial({ map: cloth, roughness: 1, envMap: room, envMapIntensity: 0.05 })));
   table.receiveShadow = true;
   scene.add(table);
 
@@ -660,8 +663,11 @@ export function createBoard3d(o: BoardOptions): BoardView {
   const accent = new Color();
   const markMat = own(new MeshBasicMaterial({ transparent: true, opacity: 0.88, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
   markMat.toneMapped = false;
-  const lastMat = own(new MeshBasicMaterial({ transparent: true, opacity: 0.22, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 }));
+  // the last move in the warm yellow of a chess highlight; the square under the pointer in the tint
+  const lastMat = own(new MeshBasicMaterial({ transparent: true, opacity: 0.26, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 }));
   lastMat.toneMapped = false;
+  const overMat = own(new MeshBasicMaterial({ transparent: true, opacity: 0.22, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 }));
+  overMat.toneMapped = false;
   const ringMat = own(new MeshBasicMaterial({ transparent: true, opacity: 0.95, depthWrite: false, side: DoubleSide, polygonOffset: true, polygonOffsetFactor: -3 }));
   ringMat.toneMapped = false;
   const glowMap = glowTexture();
@@ -693,7 +699,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
     board.add(m);
     return m;
   });
-  const overTile = new Mesh(tileGeo, lastMat);
+  const overTile = new Mesh(tileGeo, overMat);
   overTile.visible = false;
   board.add(overTile);
   const checkGlow = new Mesh(glowGeo, glowMat);
@@ -1281,7 +1287,8 @@ export function createBoard3d(o: BoardOptions): BoardView {
   function recolour() {
     accent.set(token('--pointer'));
     markMat.color.copy(accent);
-    lastMat.color.copy(accent);
+    lastMat.color.set(token('--last'));
+    overMat.color.copy(accent);
     ringMat.color.copy(accent);
     glowMat.color.copy(accent);
     for (const a of arrows) {

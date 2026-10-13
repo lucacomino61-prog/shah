@@ -7,42 +7,42 @@ import { icon } from '../../lib/icons';
 
 <App title="Mësime · Shah" description="Mësime të shkurtra për lojtarin që di rregullat: vlera e figurave, piruni, lidhja, mati, hapja." tab="mesime">
   <div class="page lessons">
-    <h1 class="page-title poster" style="--chars: 6">Mësime</h1>
+    <h1 class="page-title poster">Mësime</h1>
     <p class="lede">Tetë segmente të shkurtra. Secili shpjegon një ide në tabelë dhe të lë ta luash vetë.</p>
-    <ol class="lessons__list">
+    <ol class="group lessons__list">
       {LESSONS.map((l, i) => (
         <li>
-          <a href={`/mesime/${l.slug}/`} class="lesson-row" data-lesson={l.slug}>
-            <span class="lesson-row__n tabular">{String(i + 1).padStart(2, '0')}</span>
+          <a href={`/mesime/${l.slug}/`} class="row lesson-row" data-lesson={l.slug}>
+            <span class="lesson-row__n tabular" aria-hidden="true">{i + 1}</span>
             <span class="lesson-row__body">
               <b class="lesson-row__title">{l.title}</b>
               <span class="lesson-row__lede">{l.lede}</span>
+              <span class="lesson-row__meta">
+                <span class="lesson-row__done" data-done hidden><Fragment set:html={icon('check')} />Kryer</span>
+                <span class="lesson-row__steps">{l.steps.length} hapa</span>
+              </span>
             </span>
-            <span class="lesson-row__meta">
-              <span class="lesson-row__done" data-done hidden><Fragment set:html={icon('check')} />Kryer</span>
-              <span class="lesson-row__steps">{l.steps.length} hapa</span>
-            </span>
-            <span class="lesson-row__go" aria-hidden="true"><Fragment set:html={icon('arrowRight')} /></span>
+            <span class="lesson-row__go" aria-hidden="true"><Fragment set:html={icon('caretRight')} /></span>
           </a>
         </li>
       ))}
     </ol>
 
-    <h2 class="lessons__h wide">Trajno hapjet</h2>
-    <p class="lede">Zgjidh një repertor. Motori luan përgjigjet e kundërshtarit, ti luan lëvizjet e tua derisa t’i dish përmendsh.</p>
-    <ol class="lessons__list">
+    <h2 class="group-h">Trajno hapjet</h2>
+    <p class="group-note">Zgjidh një repertor. Motori luan përgjigjet e kundërshtarit, ti luan lëvizjet e tua derisa t’i dish përmendsh.</p>
+    <ol class="group lessons__list">
       {REPERTOIRES.map((r) => (
         <li>
-          <a href={`/mesime/hapje/${r.slug}/`} class="lesson-row" data-rep={r.slug} data-lines={r.lines.length}>
-            <span class="lesson-row__n tabular">{r.side === 'w' ? 'B' : 'Z'}</span>
+          <a href={`/mesime/hapje/${r.slug}/`} class="row lesson-row" data-rep={r.slug} data-lines={r.lines.length}>
+            <span class="lesson-row__n lesson-row__n--side" data-side={r.side} aria-hidden="true">{r.side === 'w' ? 'B' : 'Z'}</span>
             <span class="lesson-row__body">
               <b class="lesson-row__title">{r.title}</b>
               <span class="lesson-row__lede">{r.lede}</span>
+              <span class="lesson-row__meta">
+                <span class="lesson-row__steps" data-rep-state>{r.lines.length} linja</span>
+              </span>
             </span>
-            <span class="lesson-row__meta">
-              <span class="lesson-row__steps" data-rep-state>{r.lines.length} linja</span>
-            </span>
-            <span class="lesson-row__go" aria-hidden="true"><Fragment set:html={icon('arrowRight')} /></span>
+            <span class="lesson-row__go" aria-hidden="true"><Fragment set:html={icon('caretRight')} /></span>
           </a>
         </li>
       ))}
@@ -64,32 +64,24 @@ import { icon } from '../../lib/icons';
 </App>
 
 <style>
-  .lessons { max-width: 64rem; margin-inline: auto; }
-  .lessons__list { margin-top: var(--space-l); border-top: 2px solid var(--text); }
-  .lessons__h { margin-top: var(--space-xl); font-size: var(--step-title); font-weight: 860; }
-  .lessons__h + .lede { margin-top: 0.5rem; }
-  .lesson-row {
-    display: grid; grid-template-columns: 2.75rem minmax(0, 1fr) auto; gap: 0.25rem 1rem; align-items: start;
-    padding: 1.1rem 0.25rem; border-bottom: 1px solid var(--rule); text-decoration: none;
-    transition: background-color var(--dur-ui) ease;
+  .lessons { max-width: 46rem; margin-inline: auto; }
+  .lessons__list { margin-top: var(--space-s); --sep-inset: 4.125rem; }
+  .lede + .lessons__list { margin-top: var(--space-m); }
+  .lesson-row { grid-template-columns: 2.25rem minmax(0, 1fr) auto; gap: 0.875rem; align-items: center; padding-block: 0.75rem; }
+  /* the step in the sequence on a tile, the way Settings sets its symbols */
+  .lesson-row__n {
+    display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 0.625rem;
+    background: var(--tint-fill); color: #fff; font-weight: 700; font-size: var(--t-callout);
   }
-  .lesson-row__n { font-variation-settings: 'wdth' 125; font-weight: 880; font-size: 1.25rem; line-height: 1.2; color: var(--text-2); }
-  .lesson-row__body { display: grid; gap: 0.2rem; }
-  .lesson-row__title { font-variation-settings: 'wdth' 118; font-weight: 820; font-size: var(--step-title); line-height: 1.1; }
-  .lesson-row__lede { color: var(--text-2); max-width: 52ch; }
-  .lesson-row__meta { grid-column: 2; display: flex; gap: 1rem; font-size: var(--step-small); color: var(--text-2); }
-  .lesson-row__done { display: inline-flex; align-items: center; gap: 0.25rem; color: var(--pointer-ink); font-weight: 700; }
+  /* a repertoire's tile is the colour its learner plays */
+  .lesson-row__n--side[data-side="w"] { background: #f2f2f7; color: #000; box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 0.2); }
+  .lesson-row__n--side[data-side="b"] { background: #1c1c1e; color: #fff; box-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.18); }
+  .lesson-row__body { display: grid; gap: 0.125rem; }
+  .lesson-row__title { font-weight: 600; font-size: var(--t-body); line-height: 1.25; }
+  .lesson-row__lede { color: var(--label-2); font-size: var(--t-foot); line-height: 1.35; max-width: 52ch; }
+  .lesson-row__meta { display: flex; flex-wrap: wrap; gap: 0.125rem 0.75rem; margin-top: 0.125rem; font-size: var(--t-cap); color: var(--label-2); }
+  .lesson-row__done { display: inline-flex; align-items: center; gap: 0.25rem; color: var(--green-ink); font-weight: 600; }
   .lesson-row__done[hidden] { display: none; }
-  .lesson-row__done .icon { width: 1rem; height: 1rem; }
-  .lesson-row__go { grid-column: 3; grid-row: 1; align-self: center; }
-  @media (hover: hover) and (pointer: fine) {
-    .lesson-row:hover { background: var(--well); }
-    .lesson-row:hover .lesson-row__go { color: var(--pointer-ink); }
-  }
-  @media (min-width: 768px) {
-    .lesson-row { grid-template-columns: 4rem minmax(0, 1fr) 10rem 2rem; align-items: center; }
-    .lesson-row__n { font-size: 2rem; }
-    .lesson-row__meta { grid-column: 3; display: grid; justify-items: end; }
-    .lesson-row__go { grid-column: 4; }
-  }
+  .lesson-row__done .icon { width: 0.875rem; height: 0.875rem; }
+  .lesson-row__go .icon { width: 0.875rem; height: 0.875rem; color: var(--label-3); }
 </style>

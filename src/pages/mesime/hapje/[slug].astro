@@ -63,10 +63,10 @@ const { rep } = Astro.props;
   <section class="record" aria-labelledby="lines-title">
     <h2 class="record__title wide" id="lines-title">Linjat</h2>
     <p class="record__opening">{rep.lede} Një linjë quhet e mësuar kur e luan tri herë rresht pa gabim.</p>
-    <ol class="rep-lines" data-lines>
+    <ol class="group rep-lines" data-lines>
       {rep.lines.map((l, i) => (
         <li>
-          <button type="button" class="rep-line" data-pick={i}>
+          <button type="button" class="row rep-line" data-pick={i}>
             <b>{l.name}</b>
             <span>{l.idea}</span>
             <span class="rep-line__state" data-state-of={i}></span>
@@ -81,13 +81,10 @@ const { rep } = Astro.props;
 </App>
 
 <style>
-  .rep-lines { margin-top: var(--space-s); border-top: 1px solid var(--rule); }
-  .rep-line {
-    display: grid; gap: 0.2rem; width: 100%; text-align: start; padding: 0.85rem 0.25rem; min-height: 48px;
-    border-bottom: 1px solid var(--rule); color: var(--text);
-  }
-  .rep-line b { font-variation-settings: 'wdth' 112; font-weight: 780; }
-  .rep-line span { color: var(--text-2); font-size: 0.9375rem; }
-  .rep-line .rep-line__state { color: var(--pointer-ink); font-weight: 700; font-size: 0.8125rem; }
-  @media (hover: hover) and (pointer: fine) { .rep-line:hover { background: var(--well); } }
+  .rep-lines { margin-top: var(--space-s); }
+  .rep-line { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.125rem; width: 100%; text-align: start; padding-block: 0.75rem; }
+  .rep-line b { font-weight: 600; }
+  .rep-line span { color: var(--label-2); font-size: var(--t-foot); line-height: 1.35; }
+  .rep-line .rep-line__state { color: var(--green-ink); font-weight: 600; font-size: var(--t-cap); }
+  .rep-line .rep-line__state:empty { display: none; }
 </style>

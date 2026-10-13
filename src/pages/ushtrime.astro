@@ -81,10 +81,23 @@ import '../styles/play.css';
 </App>
 
 <style>
-  .themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(14rem, 100%), 1fr)); margin-top: var(--space-s); border-top: 1px solid var(--rule); }
-  .theme { display: flex; gap: 0.75rem; align-items: center; padding: 0.75rem 0.25rem; border-bottom: 1px solid var(--rule); cursor: pointer; }
-  .theme input { width: 1.25rem; height: 1.25rem; accent-color: var(--pointer); flex: none; }
-  .theme > span { display: grid; }
-  .theme > span > span { font-size: var(--step-small); color: var(--text-2); }
-  .theme:has(input:checked) b { box-shadow: inset 0 -2px 0 var(--pointer); }
+  .themes { display: grid; margin-top: var(--space-s); background: var(--cell); border-radius: var(--r-list); overflow: hidden; }
+  .theme {
+    position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 1.25rem; gap: 0.75rem; align-items: center;
+    min-height: 3.25rem; padding: 0.625rem 1rem; cursor: pointer; transition: background-color 120ms ease;
+  }
+  .theme + .theme { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
+  .theme:active { background: var(--cell-press); }
+  .theme input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+  .theme > span { display: grid; gap: 0.0625rem; }
+  .theme b { font-weight: 500; }
+  .theme > span > span { font-size: var(--t-foot); color: var(--label-2); }
+  .theme::after {
+    content: ''; width: 1.125rem; height: 1.125rem; background: var(--tint); opacity: 0;
+    -webkit-mask: var(--check) center / contain no-repeat;
+    mask: var(--check) center / contain no-repeat;
+  }
+  .theme:has(input:checked)::after { opacity: 1; }
+  .theme:has(input:focus-visible) { outline: 3px solid color-mix(in srgb, var(--tint) 75%, transparent); outline-offset: -3px; border-radius: var(--r-list); }
+  @media (hover: hover) and (pointer: fine) { .theme:hover { background: color-mix(in srgb, var(--cell-press) 55%, var(--cell)); } }
 </style>

@@ -123,17 +123,20 @@ function closeIntro() {
   if (intro.done) return;
   intro.done = true;
   intro.pct.textContent = '100%';
+  intro.el.style.setProperty('--p', '1');
   if (!motionOn()) {
     intro.el.hidden = true;
     return;
   }
-  gsap.to(intro.el, { clipPath: 'inset(0 0 100% 0)', duration: 0.5, ease: 'power3.inOut', delay: 0.15, onComplete: () => void (intro.el.hidden = true) });
+  // the launch screen dissolves the way iOS hands over to an app: it fades, blurs and grows a touch
+  gsap.to(intro.el, { opacity: 0, filter: 'blur(14px)', scale: 1.04, duration: 0.45, ease: 'power2.out', delay: 0.15, onComplete: () => void (intro.el.hidden = true) });
 }
 $('[data-intro-skip]').addEventListener('click', closeIntro);
 onTick((dt) => {
   if (intro.done) return;
   intro.shown += (intro.target - intro.shown) * Math.min(1, dt * 6);
   intro.pct.textContent = `${Math.round(intro.shown * 100)}%`;
+  intro.el.style.setProperty('--p', intro.shown.toFixed(3));
 });
 introTo(0.12);
 
@@ -851,7 +854,7 @@ function renderReview() {
   const v = t !== null ? verdicts[t] : null;
   const errors = verdicts.filter((x) => x && (x.grade === 'mistake' || x.grade === 'blunder')).length;
   ui.reviewCap.innerHTML = v
-    ? sentenceHtml(`Momenti kyç: lëvizja ${Math.floor(t! / 2) + 1}, [[${v.san}]]${v.symbol}. Shanset e tua ranë nga ${Math.round(v.winBefore)}% në ${Math.round(v.winAfter)}%. Vijat portokalli janë gabimet (${errors}).`)
+    ? sentenceHtml(`Momenti kyç: lëvizja ${Math.floor(t! / 2) + 1}, [[${v.san}]]${v.symbol}. Shanset e tua ranë nga ${Math.round(v.winBefore)}% në ${Math.round(v.winAfter)}%. Vijat e kuqe janë gabimet (${errors}).`)
     : 'Asnjë lëvizje nuk e ndryshoi lojën shumë. Pjesa e çelët tregon shanset e të bardhave.';
   ui.turning.hidden = t === null;
 }

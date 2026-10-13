@@ -22,21 +22,21 @@ import '../styles/play.css';
           <a href="/luaj/" class="guide__row">
             <span class="guide__time tabular">Tani</span>
             <span class="guide__what"><b data-game-title>Lojë me trajner</b><span data-game-line>Niveli 2, i lehtë. Ti me të bardhat.</span></span>
-            <Fragment set:html={icon('arrowRight')} />
+            <Fragment set:html={icon('caretRight')} />
           </a>
         </li>
         <li>
           <a href="/ushtrime/" class="guide__row" data-puzzle-link>
             <span class="guide__time tabular">+5 min</span>
             <span class="guide__what"><b data-puzzle-title>Ushtrime</b><span data-puzzle-line>Vlerësimi yt: 900</span></span>
-            <Fragment set:html={icon('arrowRight')} />
+            <Fragment set:html={icon('caretRight')} />
           </a>
         </li>
         <li>
           <a href={`/mesime/${LESSONS[0].slug}/`} class="guide__row" data-lesson-link>
             <span class="guide__time tabular">+10 min</span>
             <span class="guide__what"><b>Mësimi</b><span data-lesson-line>{LESSONS[0].title}</span></span>
-            <Fragment set:html={icon('arrowRight')} />
+            <Fragment set:html={icon('caretRight')} />
           </a>
         </li>
       </ol>
@@ -61,35 +61,38 @@ import '../styles/play.css';
 </App>
 
 <style>
-  .home { --inset-top: 14rem; --inset-bottom: 15.5rem; }
+  .home { --inset-top: 16rem; --inset-bottom: 17rem; }
   .home .board { pointer-events: none; }
   .home__title {
-    position: absolute; z-index: 2; left: var(--gutter); right: var(--gutter); top: 1rem;
-    display: grid; justify-items: start; gap: 0.75rem;
+    position: absolute; z-index: 2; left: var(--gutter); right: var(--gutter); top: 1.5rem;
+    display: grid; justify-items: start; gap: 0.875rem;
   }
+  /* the name the way the Lock Screen sets its clock: rounded, heavy, a little translucent over the table */
   .home__mark {
-    font-size: clamp(6rem, 1rem + 30vw, 22rem); color: var(--stone); margin-inline-start: -0.05em;
-    text-shadow: 0 0.03em 0.12em rgb(0 0 0 / 0.45);
+    font-family: var(--font-rounded); font-size: clamp(5rem, 2rem + 17vw, 9.5rem); font-weight: 800;
+    letter-spacing: -0.04em; line-height: 0.92; color: rgb(255 255 255 / 0.9);
+    text-shadow: 0 2px 30px rgb(0 0 0 / 0.35);
   }
-  .home__line { max-width: 30ch; color: var(--stone); font-weight: 600; font-size: 1.0625rem; line-height: 1.35; text-shadow: 0 1px 8px rgb(0 0 0 / 0.6); }
-  .home__go { min-height: 52px; padding-inline: 1.25rem; font-size: 0.9375rem; }
-  .home__guide { width: auto; }
-  .guide { display: grid; width: 100%; background: rgb(17 14 11 / 0.94); }
-  .guide li + li { border-top: 1px solid rgb(230 229 225 / 0.12); }
+  .home__line { max-width: 28ch; color: rgb(255 255 255 / 0.82); font-weight: 500; font-size: var(--t-body); line-height: 1.32; text-shadow: 0 1px 12px rgb(0 0 0 / 0.5); }
+  .home__go { min-height: 50px; padding-inline: 1.5rem; font-size: var(--t-body); }
+  .home__guide { padding: 0.25rem 0; gap: 0; }
+  .guide { display: grid; width: 100%; }
+  .guide li + li::before { content: ""; display: block; height: 0.5px; margin-inline-start: 5.25rem; background: var(--sep); }
   .guide__row {
-    display: grid; grid-template-columns: 4.25rem minmax(0, 1fr) auto; align-items: center; gap: 0.75rem;
-    min-height: 56px; padding: 0.5rem 0.75rem; color: var(--stone); text-decoration: none;
-    transition: background-color var(--dur-ui) ease;
+    display: grid; grid-template-columns: 3.5rem minmax(0, 1fr) auto; align-items: center; gap: 0.75rem;
+    min-height: 3.5rem; padding: 0.5rem 1rem; color: var(--label); text-decoration: none; border-radius: 1.25rem;
+    transition: background-color 120ms ease;
   }
-  .guide__time { font-variation-settings: 'wdth' 118; font-weight: 820; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--pointer-ink); }
+  .guide__row > .icon { width: 0.875rem; height: 0.875rem; color: var(--label-3); }
+  .guide__time { font-weight: 600; font-size: var(--t-foot); color: var(--tint-ink); }
   .guide__what { display: grid; }
-  .guide__what b { font-variation-settings: 'wdth' 118; font-weight: 820; text-transform: uppercase; letter-spacing: 0.02em; font-size: 0.9375rem; }
-  .guide__what span { font-size: 0.875rem; color: rgb(230 229 225 / 0.72); }
-  .guide__row:active { background: rgb(230 229 225 / 0.08); }
-  @media (hover: hover) and (pointer: fine) { .guide__row:hover { background: rgb(230 229 225 / 0.08); } }
+  .guide__what b { font-weight: 600; font-size: var(--t-body); }
+  .guide__what span { font-size: var(--t-foot); color: var(--label-2); }
+  .guide__row:active { background: var(--glass-press); }
+  @media (hover: hover) and (pointer: fine) { .guide__row:hover { background: var(--glass-press); } }
   @media (min-width: 1024px) {
-    .home { --inset-top: 6rem; --inset-bottom: 4rem; --inset-left: 22rem; --inset-right: 28rem; }
-    .home__title { left: 2rem; top: 1.5rem; }
-    .home__guide { left: auto; right: 1.5rem; width: 26rem; top: auto; bottom: calc(var(--ticker-h) + 1.25rem); }
+    .home { --inset-top: 6rem; --inset-bottom: 5rem; --inset-left: 22rem; --inset-right: 28rem; }
+    .home__title { left: 2rem; top: 1.75rem; }
+    .home__guide { left: auto; right: 1.5rem; width: 26rem; top: auto; bottom: calc(1rem + var(--acc-h) + 0.75rem); }
   }
 </style>

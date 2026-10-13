@@ -5,39 +5,39 @@ import { icon } from '../lib/icons';
 
 <App title="Progresi · Shah" description="Lojërat, ushtrimet dhe gabimet e tua më të shpeshta, të ruajtura vetëm në këtë pajisje." tab="progresi">
   <div class="page progress">
-    <h1 class="page-title poster" style="--chars: 8">Progresi</h1>
+    <h1 class="page-title poster">Progresi</h1>
     <p class="lede">Gjithçka ruhet vetëm në këtë shfletues. Askush tjetër nuk e sheh.</p>
 
-    <section class="progress__block" aria-labelledby="sum-title">
-      <h2 class="progress__h wide" id="sum-title">Përmbledhja</h2>
-      <dl class="sheet-rows" data-summary>
+    <section aria-labelledby="sum-title">
+      <h2 class="group-h" id="sum-title">Përmbledhja</h2>
+      <dl class="group sheet-rows" data-summary>
         {['Lojëra', 'Saktësia mesatare', 'Vlerësimi në ushtrime', 'Ushtrime të zgjidhura pa ndihmë', 'Mësime të kryera'].map((k) => <div><dt>{k}</dt><dd>&nbsp;</dd></div>)}
       </dl>
     </section>
 
-    <section class="progress__block" aria-labelledby="err-title">
-      <h2 class="progress__h wide" id="err-title">Gabimet që përsërit</h2>
-      <p class="progress__note">Trajneri i numëron sipas llojit. Mësimi në të djathtë e trajton atë gabim.</p>
-      <ol class="mistakes" data-mistakes><li class="empty">&nbsp;</li></ol>
+    <section aria-labelledby="err-title">
+      <h2 class="group-h" id="err-title">Gabimet që përsërit</h2>
+      <p class="group-note">Trajneri i numëron sipas llojit. Lidhja poshtë secilit të çon te mësimi që e trajton.</p>
+      <ol class="group mistakes" data-mistakes><li class="empty">&nbsp;</li></ol>
     </section>
 
-    <section class="progress__block" aria-labelledby="games-title">
-      <h2 class="progress__h wide" id="games-title">Lojërat e fundit</h2>
-      <ol class="games" data-games><li class="empty">&nbsp;</li></ol>
+    <section aria-labelledby="games-title">
+      <h2 class="group-h" id="games-title">Lojërat e fundit</h2>
+      <ol class="group games" data-games><li class="empty">&nbsp;</li></ol>
     </section>
 
-    <section class="progress__block about" aria-labelledby="about-title">
-      <h2 class="progress__h wide" id="about-title">Rreth aplikacionit</h2>
-      <p class="progress__note">
+    <section aria-labelledby="about-title">
+      <h2 class="group-h" id="about-title">Rreth aplikacionit</h2>
+      <p class="group about">
         Shah është softuer i lirë me licencën GPL-3.0. Motori është <a href="https://stockfishchess.org/">Stockfish</a>, që punon
         brenda shfletuesit tënd. Ushtrimet vijnë nga baza e hapur e <a href="https://database.lichess.org/#puzzles">Lichess</a>.
         Kodi burimor: <a href="https://github.com/lucacomino61-prog/shah">github.com/lucacomino61-prog/shah</a>.
       </p>
     </section>
 
-    <section class="progress__block">
-      <button type="button" class="btn" data-reset><Fragment set:html={icon('x')} /><span data-label>Fshi progresin</span></button>
-    </section>
+    <div class="group progress__reset">
+      <button type="button" class="row reset" data-reset><span data-label>Fshi progresin</span><Fragment set:html={icon('x')} /></button>
+    </div>
   </div>
   <script>
     import '../scripts/progress';
@@ -45,25 +45,29 @@ import { icon } from '../lib/icons';
 </App>
 
 <style>
-  .progress { max-width: 56rem; margin-inline: auto; }
-  .progress__block { margin-top: var(--space-xl); }
-  .progress__h { font-size: var(--step-title); font-weight: 820; padding-bottom: 0.5rem; border-bottom: 2px solid var(--text); }
-  .progress__note { margin-top: 0.5rem; color: var(--text-2); max-width: 52ch; }
-  .about a { color: var(--text); text-underline-offset: 0.2em; }
-  .progress :global(.sheet-rows) { display: grid; }
-  .progress :global(.sheet-rows > div) { display: flex; justify-content: space-between; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--rule); }
-  .progress :global(.sheet-rows dt) { color: var(--text-2); }
-  .progress :global(.sheet-rows dd) { font-weight: 760; font-variant-numeric: tabular-nums; text-align: end; }
-  .progress :global(.mistakes li), .progress :global(.games li) {
-    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.25rem 1rem; align-items: center;
-    padding: 0.85rem 0; border-bottom: 1px solid var(--rule);
+  .progress { max-width: 46rem; margin-inline: auto; }
+  .about { padding: 0.875rem 1rem; color: var(--label-2); font-size: var(--t-sub); line-height: 1.45; }
+  .about a { color: var(--tint-ink); text-decoration: none; }
+  .about a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+  .progress__reset { margin-top: var(--space-l); }
+  .reset { width: 100%; text-align: start; color: var(--red-ink); font-size: var(--t-body); }
+  .reset .icon { width: 1rem; height: 1rem; }
+  .progress :global(.sheet-rows > div) { display: flex; justify-content: space-between; align-items: center; gap: 1rem; min-height: 2.875rem; padding: 0.625rem 1rem; }
+  .progress :global(.sheet-rows > div + div) { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
+  .progress :global(.sheet-rows > div)::before { display: none; }
+  .progress :global(.sheet-rows dd) { color: var(--label-2); font-variant-numeric: tabular-nums; text-align: end; }
+  .progress :global(.mistakes li:not(.empty)), .progress :global(.games li:not(.empty)) {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.125rem 1rem; align-items: center;
+    padding: 0.75rem 1rem;
   }
-  .progress :global(.mistakes b) { font-variation-settings: 'wdth' 112; font-weight: 780; }
-  .progress :global(.mistakes .n) { font-variation-settings: 'wdth' 125; font-weight: 880; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
-  .progress :global(.mistakes a) { grid-column: 1 / -1; justify-self: start; color: var(--pointer-ink); font-weight: 680; text-underline-offset: 0.2em; }
-  .progress :global(.games .res) { font-variation-settings: 'wdth' 118; font-weight: 820; text-transform: uppercase; font-size: 0.875rem; letter-spacing: 0.03em; }
-  .progress :global(.games .res[data-r="win"]) { color: var(--pointer-ink); }
+  .progress :global(.mistakes > li + li::before), .progress :global(.games > li + li::before) { display: none; }
+  .progress :global(.mistakes > li + li), .progress :global(.games > li + li) { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
+  .progress :global(.mistakes b) { font-weight: 600; }
+  .progress :global(.mistakes .n) { font-weight: 700; font-size: var(--t-title3); font-variant-numeric: tabular-nums; color: var(--label-2); }
+  .progress :global(.mistakes a) { grid-column: 1 / -1; justify-self: start; display: inline-flex; align-items: center; min-height: 44px; color: var(--tint-ink); font-weight: 500; font-size: var(--t-sub); text-decoration: none; }
+  .progress :global(.games .res) { font-weight: 700; font-size: var(--t-foot); padding: 0.125rem 0.625rem; border-radius: 999px; background: var(--fill-2); }
+  .progress :global(.games .res[data-r="win"]) { color: var(--green-ink); background: color-mix(in srgb, var(--green) 18%, transparent); }
+  .progress :global(.games .res[data-r="loss"]) { color: var(--red-ink); background: color-mix(in srgb, var(--red) 14%, transparent); }
   .progress :global(.games .meta) { grid-column: 1 / -1; }
-  .progress :global(.empty a) { display: inline-flex; align-items: center; min-height: 44px; color: var(--pointer-ink); font-weight: 700; }
-  .progress :global(.mistakes a) { min-height: 44px; display: inline-flex; align-items: center; }
+  .progress :global(.empty a) { color: var(--tint-ink); font-weight: 600; text-decoration: none; }
 </style>

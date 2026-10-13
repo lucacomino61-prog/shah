@@ -1,6 +1,4 @@
 ---
-import '@fontsource-variable/mona-sans/standard.css';
-import fontUrl from '@fontsource-variable/mona-sans/files/mona-sans-latin-standard-normal.woff2?url';
 import '../styles/app.css';
 import { icon } from '../lib/icons';
 import { pieceSprite } from '../lib/chess/silhouette';
@@ -50,8 +48,8 @@ const tabs = [
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
-    {stage ? <meta name="theme-color" content="#070908" /> : <meta name="theme-color" content="#e6e5e1" media="(prefers-color-scheme: light)" />}
-    {!stage && <meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)" />}
+    {stage ? <meta name="theme-color" content="#090d0a" /> : <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)" />}
+    {!stage && <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Shah" />
     <meta property="og:locale" content="sq_AL" />
@@ -67,7 +65,6 @@ const tabs = [
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     {home && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
-    <link rel="preload" href={fontUrl} as="font" type="font/woff2" crossorigin />
     <style is:inline>@view-transition{navigation:auto}</style>
     <script is:inline>
       try {

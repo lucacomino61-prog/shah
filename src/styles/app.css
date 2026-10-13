@@ -1,5 +1,7 @@
-/* Shah: the commentary room. Two colours (stone and ink), one lacquer pointer, one family (Mona Sans) whose width
-   axis carries rank. Reset and motion policy from the awwwards-blueprints starter. */
+/* Shah in the iOS 27 idiom (Luca, 2026-10-13: "make now everything more like iOS 27 theme"). The system font, the
+   system colours in light and dark, Liquid Glass for everything that floats over the table, tuned the way iOS 27
+   tuned it: it diffuses what lies behind it more and stands further off it. Capsule controls, inset-grouped lists,
+   a floating tab bar. The wooden board stays an object on the table, in its own colours. */
 
 /* ------------------------------------------------------------------ reset */
 *, *::before, *::after { box-sizing: border-box; }
@@ -7,7 +9,7 @@
 @media (prefers-reduced-motion: no-preference) {
   html { interpolate-size: allow-keywords; }
 }
-body { line-height: 1.5; -webkit-font-smoothing: antialiased; }
+body { line-height: 1.4; -webkit-font-smoothing: antialiased; }
 img, picture, video, canvas, svg { display: block; max-width: 100%; }
 input, button, textarea, select { font: inherit; color: inherit; }
 p, h1, h2, h3, h4 { overflow-wrap: break-word; }
@@ -19,21 +21,60 @@ a { color: inherit; }
 
 /* ------------------------------------------------------------------ tokens */
 :root {
-  --stone: #e6e5e1;
-  --ink: #111214;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-rounded: ui-rounded, 'SF Pro Rounded', -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI Variable Display', 'Segoe UI', Roboto, sans-serif;
 
-  --ground: var(--stone);
-  --text: var(--ink);
-  --text-2: color-mix(in srgb, var(--ink) 66%, var(--stone));
-  --rule: color-mix(in srgb, var(--ink) 16%, var(--stone));
-  --rule-strong: color-mix(in srgb, var(--ink) 40%, var(--stone));
-  --well: color-mix(in srgb, var(--ink) 6%, var(--stone));
-  /* the commentator's pointer: arrows, the chosen square, the live verdict */
-  --pointer: #e65719;
-  /* the same lacquer dark enough for small text */
-  --pointer-ink: #a83707;
+  /* iOS system colours, light appearance */
+  --bg: #f2f2f7;
+  --cell: #ffffff;
+  --cell-press: #e5e5ea;
+  --label: #000000;
+  /* a step darker than iOS ships, so secondary text clears 4.5:1 on the grouped background */
+  --label-2: rgb(60 60 67 / 0.78);
+  --label-3: rgb(60 60 67 / 0.36);
+  --sep: rgb(60 60 67 / 0.29);
+  --fill: rgb(120 120 128 / 0.2);
+  --fill-2: rgb(118 118 128 / 0.12);
+  --seg-thumb: #ffffff;
+  --tint: #007aff;
+  /* the last move on the board: the warm highlight chess players expect, in both appearances */
+  --last: #ffd60a;
+  /* filled controls carry white text, so their blue and red sit a shade deeper than the system tint (AA) */
+  --tint-fill: #0066d6;
+  --red-fill: #d70015;
+  /* the tint and the status colours dark enough for small text on white */
+  --tint-ink: #0066d6;
+  --red: #ff3b30;
+  --red-ink: #d70015;
+  --orange: #ff9500;
+  --orange-ink: #c93400;
+  --green: #34c759;
+  --green-ink: #248a3d;
 
-  /* the flat board keeps its own tones in both themes: it is an object on the table */
+  /* Liquid Glass: a tinted, heavily diffused layer, a lit top rim, a hairline, and a soft shadow that lifts it off
+     what it floats over */
+  --glass: rgb(248 248 250 / 0.7);
+  --glass-strong: rgb(248 248 250 / 0.86);
+  --glass-sheen: rgb(255 255 255 / 0.5);
+  --glass-hi: rgb(255 255 255 / 0.95);
+  --glass-rim: rgb(0 0 0 / 0.07);
+  --glass-depth: 0 12px 32px -10px rgb(0 0 0 / 0.22), 0 2px 6px rgb(0 0 0 / 0.07);
+  --glass-press: rgb(0 0 0 / 0.06);
+  --blur: blur(28px) saturate(190%);
+
+  /* older names, kept for the pages and scripts that use them */
+  --ground: var(--bg);
+  --text: var(--label);
+  --text-2: var(--label-2);
+  --rule: var(--sep);
+  --rule-strong: var(--label-3);
+  --well: var(--fill-2);
+  --pointer: var(--tint);
+  --pointer-ink: var(--tint-ink);
+  --stone: #f2f2f7;
+  --ink: #000000;
+
+  /* the flat board keeps its own tones in both appearances: it is an object on the table */
   --sq-light: #e4c99a;
   --sq-dark: #84532f;
   --piece-fill-w: #f6f4ee;
@@ -41,56 +82,119 @@ a { color: inherit; }
   --piece-fill-b: #17181b;
   --piece-edge-b: #f1efe9;
 
-  --font: 'Mona Sans Variable', 'Mona Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-
-  --step-0: 1rem;
-  --step-small: 0.8125rem;
-  --step-title: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);
-  --step-giant: clamp(5.5rem, 2rem + 26vw, 24rem);
+  /* the iOS text styles */
+  --t-large: 2.125rem;
+  --t-title1: 1.75rem;
+  --t-title2: 1.375rem;
+  --t-title3: 1.25rem;
+  --t-body: 1.0625rem;
+  --t-callout: 1rem;
+  --t-sub: 0.9375rem;
+  --t-foot: 0.8125rem;
+  --t-cap: 0.75rem;
+  --t-cap2: 0.6875rem;
+  --step-0: var(--t-body);
+  --step-small: var(--t-foot);
+  --step-title: var(--t-title2);
 
   --space-2xs: 0.375rem;
   --space-xs: 0.625rem;
   --space-s: 1rem;
   --space-m: 1.5rem;
   --space-l: 2.25rem;
-  --space-xl: 3.5rem;
+  --space-xl: 3rem;
   --gutter: 1rem;
 
-  --dur-press: 110ms;
-  --dur-ui: 200ms;
+  /* the two symbols lists draw with CSS masks: Phosphor check (bold) and caret-right */
+  --check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z'/%3E%3C/svg%3E");
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z'/%3E%3C/svg%3E");
+
+  --r-card: 1.625rem;
+  --r-list: 1.375rem;
+  --r-chip: 0.75rem;
+
+  --dur-press: 120ms;
+  --dur-ui: 220ms;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  /* the iOS sheet curve: quick off the mark, a long soft landing */
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
 
-  --mast-h: 3.5rem;
-  --tab-h: 4rem;
+  --mast-h: 3.25rem;
+  --tab-h: 3.875rem;
+  --tab-gap: max(env(safe-area-inset-bottom), 0.75rem);
+  /* the band at the foot of a phone screen that the floating tab bar holds */
+  --chrome-bottom: calc(var(--tab-h) + var(--tab-gap) + 0.5rem);
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --ground: var(--ink);
-    --text: var(--stone);
-    --text-2: color-mix(in srgb, var(--stone) 70%, var(--ink));
-    --rule: color-mix(in srgb, var(--stone) 15%, var(--ink));
-    --rule-strong: color-mix(in srgb, var(--stone) 38%, var(--ink));
-    --well: color-mix(in srgb, var(--stone) 6%, var(--ink));
-    --pointer: #f27636;
-    --pointer-ink: #f7904b;
+    --bg: #000000;
+    --cell: #1c1c1e;
+    --cell-press: #2c2c2e;
+    --label: #ffffff;
+    --label-2: rgb(235 235 245 / 0.62);
+    --label-3: rgb(235 235 245 / 0.32);
+    --sep: rgb(84 84 88 / 0.65);
+    --fill: rgb(120 120 128 / 0.36);
+    --fill-2: rgb(118 118 128 / 0.24);
+    --seg-thumb: #636366;
+    --tint: #0a84ff;
+    --tint-ink: #409cff;
+    --red: #ff453a;
+    --red-ink: #ff6961;
+    --orange: #ff9f0a;
+    --orange-ink: #ffb340;
+    --green: #30d158;
+    --green-ink: #30d158;
+    --glass: rgb(38 38 42 / 0.62);
+    --glass-strong: rgb(38 38 42 / 0.84);
+    --glass-sheen: rgb(255 255 255 / 0.08);
+    --glass-hi: rgb(255 255 255 / 0.2);
+    --glass-rim: rgb(255 255 255 / 0.09);
+    --glass-depth: 0 16px 38px -12px rgb(0 0 0 / 0.62), 0 2px 8px rgb(0 0 0 / 0.3);
+    --glass-press: rgb(255 255 255 / 0.1);
     color-scheme: dark;
   }
 }
 
-/* the play page is the lit table in a dark room, in either system theme */
+/* the table pages are the board under a lamp in a dark room, so their glass is the dark glass in either appearance */
 html[data-stage] {
-  --ground: #070908;
-  --text: var(--stone);
-  --text-2: color-mix(in srgb, var(--stone) 70%, #0b0907);
-  --rule: color-mix(in srgb, var(--stone) 16%, #0b0907);
-  --rule-strong: color-mix(in srgb, var(--stone) 38%, #0b0907);
-  --well: color-mix(in srgb, var(--stone) 7%, #0b0907);
-  --pointer: #f06a2c;
-  --pointer-ink: #f7904b;
+  --bg: #000000;
+  --cell: #1c1c1e;
+  --cell-press: #2c2c2e;
+  --label: #ffffff;
+  --label-2: rgb(235 235 245 / 0.66);
+  --label-3: rgb(235 235 245 / 0.34);
+  --sep: rgb(84 84 88 / 0.65);
+  --fill: rgb(120 120 128 / 0.36);
+  --fill-2: rgb(118 118 128 / 0.24);
+  --seg-thumb: #636366;
+  --tint: #0a84ff;
+  --tint-ink: #409cff;
+  --red: #ff453a;
+  --red-ink: #ff6961;
+  --orange: #ff9f0a;
+  --orange-ink: #ffb340;
+  --green: #30d158;
+  --green-ink: #30d158;
+  --glass: rgb(30 32 34 / 0.6);
+  --glass-strong: rgb(30 32 34 / 0.86);
+  --glass-sheen: rgb(255 255 255 / 0.08);
+  --glass-hi: rgb(255 255 255 / 0.22);
+  --glass-rim: rgb(255 255 255 / 0.1);
+  --glass-depth: 0 16px 38px -12px rgb(0 0 0 / 0.66), 0 2px 8px rgb(0 0 0 / 0.32);
+  --glass-press: rgb(255 255 255 / 0.12);
   color-scheme: dark;
+}
+
+/* the system's own settings for glass: less transparency makes it frosted solid, more contrast draws its edge */
+@media (prefers-reduced-transparency: reduce) {
+  :root, html[data-stage] { --glass: var(--cell); --glass-strong: var(--cell); --blur: none; }
+}
+@media (prefers-contrast: more) {
+  :root, html[data-stage] { --glass-rim: var(--label-2); --glass: var(--glass-strong); }
 }
 
 /* ------------------------------------------------------------------ document */
@@ -98,23 +202,23 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-padding-top: calc(var(--mast-h) + 0.5rem);
-  background: var(--ground);
+  background: var(--bg);
+  scrollbar-color: var(--label-3) transparent;
 }
 body {
   min-height: 100svh;
-  background: var(--ground);
-  color: var(--text);
+  background: var(--bg);
+  color: var(--label);
   font-family: var(--font);
-  font-size: var(--step-0);
-  font-variation-settings: 'wdth' 100;
-  font-weight: 430;
-  padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom));
+  font-size: var(--t-body);
+  letter-spacing: -0.012em;
+  padding-bottom: calc(var(--chrome-bottom) + 1rem);
+  caret-color: var(--tint);
 }
-::selection { background: var(--pointer); color: var(--ink); }
+::selection { background: color-mix(in srgb, var(--tint) 32%, transparent); }
 :focus-visible {
-  outline: 2px solid var(--pointer);
-  outline-offset: 3px;
-  box-shadow: 0 0 0 6px var(--ground);
+  outline: 3px solid color-mix(in srgb, var(--tint) 75%, transparent);
+  outline-offset: 2px;
 }
 :focus:not(:focus-visible) { outline: none; }
 a, button, input, label, select, summary, [role="button"] { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
@@ -125,22 +229,27 @@ input, select { font-size: max(16px, 1em); }
 }
 .skip-link {
   position: absolute; inset-inline-start: var(--gutter); top: 0.5rem; z-index: 100;
-  display: inline-flex; align-items: center; min-block-size: 44px; padding: 0 1rem;
-  background: var(--text); color: var(--ground); font-weight: 650; text-decoration: none;
+  display: inline-flex; align-items: center; min-block-size: 44px; padding: 0 1.125rem; border-radius: 999px;
+  background: var(--tint-fill); color: #fff; font-weight: 600; text-decoration: none;
   transform: translateY(-200%);
 }
 .skip-link:focus-visible { transform: none; }
 .icon { width: 1.25rem; height: 1.25rem; flex: none; }
 
-/* one display voice: the family at full width and weight */
-.poster {
-  font-variation-settings: 'wdth' 125;
-  font-weight: 880;
-  letter-spacing: -0.045em;
-  line-height: 0.86;
-}
-.wide { font-variation-settings: 'wdth' 118; }
+/* the large title, and the bold display voice the coach's headline borrows */
+.poster { font-weight: 700; letter-spacing: -0.022em; line-height: 1.08; }
+.wide { font-weight: 700; }
 .tabular { font-variant-numeric: tabular-nums; }
+
+/* one recipe for every floating surface */
+.glass,
+.mast__nav, .tabs, .motion-switch {
+  background-color: var(--glass);
+  background-image: linear-gradient(180deg, var(--glass-sheen), transparent 46%);
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
+  box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 0.5px var(--glass-rim), var(--glass-depth);
+}
 
 /* ------------------------------------------------------------------ motion policy */
 @media (prefers-reduced-motion: reduce) {
@@ -154,82 +263,89 @@ html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="
   transition-duration: 0s !important; transition-delay: 0s !important; scroll-behavior: auto !important;
 }
 
-/* ------------------------------------------------------------------ masthead and tabs */
+/* ------------------------------------------------------------------ navigation bar and tab bar */
 .mast {
   position: sticky; top: 0; z-index: 30;
   display: flex; align-items: center; gap: var(--space-s);
   height: var(--mast-h); padding-inline: var(--gutter);
-  background: var(--ground);
-  border-bottom: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
 }
 .mast__mark {
-  font-variation-settings: 'wdth' 125; font-weight: 900; font-size: 1.375rem; letter-spacing: -0.04em;
+  font-family: var(--font-rounded); font-weight: 700; font-size: var(--t-body); letter-spacing: -0.01em;
   text-decoration: none; line-height: 1; margin-inline-end: auto;
-  display: inline-flex; align-items: center; min-height: 44px;
+  display: inline-flex; align-items: center; min-height: 44px; min-width: 44px;
 }
 .mast__nav { display: none; }
 .motion-switch {
-  display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; padding-inline: 0.25rem;
-  font-size: var(--step-small); font-weight: 600; color: var(--text-2);
+  display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; padding: 0 1rem; border-radius: 999px;
+  font-size: var(--t-foot); font-weight: 600; color: var(--label);
+  transition: transform var(--dur-press) var(--ease-out);
 }
-.motion-switch .icon { width: 1rem; height: 1rem; }
+.motion-switch:active { transform: scale(0.95); }
+.motion-switch .icon { width: 1rem; height: 1rem; color: var(--tint-ink); }
 .motion-switch [data-when] { display: none; }
 html:not([data-motion="off"]) .motion-switch [data-when="on"],
-html[data-motion="off"] .motion-switch [data-when="off"] { display: inline-flex; align-items: center; gap: 0.5rem; }
+html[data-motion="off"] .motion-switch [data-when="off"] { display: inline-flex; align-items: center; gap: 0.4rem; }
 
+/* the floating tab bar: a capsule of glass over the content, the chosen tab in a lighter lens */
 .tabs {
-  position: fixed; inset-inline: 0; bottom: 0; z-index: 30;
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
-  height: calc(var(--tab-h) + env(safe-area-inset-bottom));
-  padding-bottom: env(safe-area-inset-bottom);
-  background: var(--ground);
-  border-top: 1px solid var(--rule);
+  position: fixed; left: 0; right: 0; bottom: var(--tab-gap); z-index: 30;
+  width: min(calc(100% - 1.5rem), 30rem); margin-inline: auto;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.125rem;
+  height: var(--tab-h); padding: 0.25rem; border-radius: 999px;
 }
 .tabs a {
   position: relative;
-  display: grid; place-items: center; align-content: center; gap: 0.25rem;
-  font-size: var(--step-small); font-weight: 560; color: var(--text-2); text-decoration: none;
+  display: grid; place-items: center; align-content: center; gap: 0.125rem; border-radius: 999px;
+  font-size: var(--t-cap2); font-weight: 600; letter-spacing: 0; color: var(--label);
+  text-decoration: none;
+  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-ui) ease;
 }
-.tabs a .icon { width: 1.5rem; height: 1.5rem; }
-.tabs a[aria-current="page"] { color: var(--text); font-weight: 760; }
-.tabs a[aria-current="page"]::before {
-  content: ""; position: absolute; top: -1px; inset-inline: 22%; height: 2px; background: var(--text);
-}
-.tabs a:active { transform: scale(0.97); transition: transform var(--dur-press) var(--ease-out); }
+.tabs a .icon { width: 1.625rem; height: 1.625rem; }
+.tabs a[aria-current="page"] { color: var(--tint-ink); background: var(--glass-press); }
+.tabs a:active { transform: scale(0.94); }
 
 @media (min-width: 1024px) {
   body { padding-bottom: 0; }
-  :root { --mast-h: 4rem; --gutter: 2rem; }
+  :root { --mast-h: 4.25rem; --gutter: 2rem; --chrome-bottom: 1rem; }
   .tabs { display: none; }
-  .mast__nav { display: flex; gap: 0.25rem; margin-inline-end: var(--space-m); }
-  .mast__nav a {
-    display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; padding-inline: 0.875rem;
-    font-weight: 560; color: var(--text-2); text-decoration: none;
+  /* the iPad idiom: the tabs float as one capsule at the top, in the middle */
+  .mast__nav {
+    position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+    display: flex; gap: 0.125rem; padding: 0.25rem; border-radius: 999px;
   }
-  .mast__nav a[aria-current="page"] { color: var(--text); font-weight: 760; box-shadow: inset 0 -2px 0 var(--text); }
-  .mast__mark { margin-inline-end: var(--space-l); }
-  .mast__nav { margin-inline-end: auto; }
+  .mast__nav a {
+    display: inline-flex; align-items: center; gap: 0.45rem; min-height: 40px; padding-inline: 1rem; border-radius: 999px;
+    font-size: var(--t-sub); font-weight: 600; color: var(--label); text-decoration: none;
+    transition: background-color var(--dur-ui) ease;
+  }
+  .mast__nav a .icon { width: 1.125rem; height: 1.125rem; }
+  .mast__nav a[aria-current="page"] { color: var(--tint-ink); background: var(--glass-press); }
+  .mast__mark { font-size: var(--t-title3); }
 }
 @media (hover: hover) and (pointer: fine) {
-  .mast__nav a:hover, .tabs a:hover { color: var(--text); }
+  .mast__nav a:not([aria-current="page"]):hover { background: var(--fill-2); }
 }
 
-/* ------------------------------------------------------------------ buttons */
+/* ------------------------------------------------------------------ buttons: capsules */
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
-  min-height: 48px; padding: 0 1.125rem;
-  font-weight: 680; font-variation-settings: 'wdth' 108; line-height: 1.1; text-decoration: none;
-  border: 1.5px solid var(--text); color: var(--text); background: transparent;
-  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-ui) ease, color var(--dur-ui) ease;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+  min-height: 50px; padding: 0 1.375rem; border-radius: 999px;
+  font-size: var(--t-body); font-weight: 600; line-height: 1.1; text-decoration: none;
+  background: var(--fill-2); color: var(--tint-ink);
+  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-ui) ease, filter var(--dur-ui) ease;
   white-space: nowrap;
 }
-.btn:active { transform: scale(0.97); }
-.btn--solid { background: var(--text); color: var(--ground); }
-.btn--quiet { border-color: transparent; padding-inline: 0.625rem; }
-.btn[aria-disabled="true"], .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn:active { transform: scale(0.96); }
+.btn--solid { background: var(--tint-fill); color: #fff; }
+.btn--quiet { background: transparent; padding-inline: 0.75rem; }
+.btn--danger { color: var(--red-ink); }
+.btn[aria-disabled="true"], .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 @media (hover: hover) and (pointer: fine) {
-  .btn:not(.btn--solid):not(:disabled):hover { background: var(--well); }
-  .btn--solid:not(:disabled):hover { background: color-mix(in srgb, var(--text) 86%, var(--ground)); }
+  .btn:not(.btn--solid):not(:disabled):hover { background: var(--fill); }
+  .btn--solid:not(:disabled):hover { filter: brightness(1.08); }
 }
 
 /* ------------------------------------------------------------------ the board */
@@ -247,9 +363,8 @@ html[data-motion="off"] .motion-switch [data-when="off"] { display: inline-flex;
 .board-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .board-plate {
   position: absolute; top: 0.5rem; inset-inline-start: 0.5rem; z-index: 2;
-  padding: 0.25rem 0.625rem 0.375rem;
-  background: var(--pointer); color: var(--ink);
-  font-variation-settings: 'wdth' 125; font-weight: 880; letter-spacing: 0.02em; font-size: 1.125rem; line-height: 1;
+  padding: 0.3rem 0.75rem; border-radius: 999px;
+  background: var(--tint-fill); color: #fff; font-weight: 700; font-size: var(--t-foot); line-height: 1.2;
   pointer-events: none;
 }
 .board-plate[hidden] { display: none; }
@@ -257,40 +372,55 @@ html[data-motion="off"] .motion-switch [data-when="off"] { display: inline-flex;
 /* flat board */
 .sq-l { fill: var(--sq-light); }
 .sq-d { fill: var(--sq-dark); }
-.board-coords text { font: 680 22px var(--font); font-variation-settings: 'wdth' 112; fill: #ecd6aa; pointer-events: none; }
+.board-coords text { font: 600 22px var(--font); fill: #ecd6aa; pointer-events: none; }
 .frame-wood { fill: #4b2213; stroke: #2a1006; stroke-width: 4; }
 .frame-string { fill: none; stroke: #e9d3a4; stroke-width: 3.5; }
-.pc { transition: transform 210ms var(--ease-out), opacity 200ms ease; will-change: transform; }
+.pc { transition: transform 240ms var(--ease-out), opacity 200ms ease; will-change: transform; }
 .pc use { pointer-events: none; }
 .pc.is-held { transition: none; filter: drop-shadow(0 8px 6px rgb(0 0 0 / 0.28)); }
 .pc.is-taken { opacity: 0; }
 .pc.is-arriving { opacity: 0; }
-.mk-last { fill: var(--pointer); opacity: 0.2; }
-.mk-check { fill: var(--pointer); opacity: 0.42; }
+.mk-last { fill: var(--last); opacity: 0.4; }
+.mk-check { fill: var(--red); opacity: 0.5; }
 .mk-focus { fill: none; stroke: var(--pointer); stroke-width: 7; }
-.mk-cursor { fill: none; stroke: var(--ink); stroke-width: 5; stroke-dasharray: 10 8; }
-.mk-chosen { fill: var(--pointer); opacity: 0.26; }
+.mk-cursor { fill: none; stroke: #000; stroke-width: 5; stroke-dasharray: 10 8; }
+.mk-chosen { fill: var(--pointer); opacity: 0.3; }
 .mk-dot { fill: var(--pointer); opacity: 0.85; pointer-events: none; }
 .mk-take { fill: none; stroke: var(--pointer); stroke-width: 7; opacity: 0.85; pointer-events: none; }
 .board-arrows { pointer-events: none; }
-.ar-shaft { fill: none; stroke: var(--pointer); stroke-width: 17; stroke-linejoin: miter; opacity: 0.88; }
+.ar-shaft { fill: none; stroke: var(--pointer); stroke-width: 17; stroke-linejoin: round; stroke-linecap: round; opacity: 0.88; }
 .ar-head { fill: var(--pointer); opacity: 0.88; }
-.ar-quiet .ar-shaft, .ar-quiet .ar-head { opacity: 0.68; }
+.ar-quiet .ar-shaft, .ar-quiet .ar-head { opacity: 0.66; }
 .ar-badge { fill: var(--pointer); }
-.ar-num { fill: var(--ink); font: 820 22px var(--font); }
+.ar-num { fill: #fff; font: 700 22px var(--font); }
 
 /* pieces as inline glyphs in text: figurine notation */
 .fig { display: inline-block; width: 0.95em; height: 0.95em; vertical-align: -0.12em; margin-inline-end: 0.04em; }
-.san { white-space: nowrap; font-weight: 700; font-variant-numeric: tabular-nums; }
+.san { white-space: nowrap; font-weight: 600; font-variant-numeric: tabular-nums; }
 
-/* ------------------------------------------------------------------ shared page bits */
+/* ------------------------------------------------------------------ pages: large title, inset-grouped lists */
 .page { padding: 0 var(--gutter) var(--space-xl); container-type: inline-size; }
-/* sized from its own letter count so the longest word always fits the column: never broken mid-word */
-.page-title {
-  font-size: min(var(--step-giant), calc(100cqi / (var(--chars, 6) * 0.74)));
-  margin: var(--space-m) 0 var(--space-s); margin-inline-start: -0.04em; white-space: nowrap;
+.page-title { font-size: var(--t-large); margin: var(--space-s) 0 var(--space-2xs); }
+@media (min-width: 768px) { .page-title { font-size: 2.75rem; margin-top: var(--space-m); } }
+.lede { max-width: 46ch; color: var(--label-2); font-size: var(--t-sub); }
+.meta { font-size: var(--t-foot); color: var(--label-2); }
+.empty { padding: 0.875rem 1rem; color: var(--label-2); max-width: 46ch; }
+
+/* a section header in the iOS 26 manner: title-case, bold, at the size of a title */
+.group-h { font-size: var(--t-title3); font-weight: 700; margin: var(--space-l) 0 var(--space-2xs); padding-inline: 0.25rem; }
+.group-note { margin: 0 0 var(--space-xs); padding-inline: 0.25rem; font-size: var(--t-foot); color: var(--label-2); max-width: 60ch; }
+.group {
+  background: var(--cell); border-radius: var(--r-list); overflow: hidden;
 }
-.lede { max-width: 42ch; color: var(--text-2); }
-.rule-top { border-top: 1px solid var(--rule); }
-.meta { font-size: var(--step-small); color: var(--text-2); }
-.empty { padding: var(--space-m) 0; color: var(--text-2); max-width: 42ch; }
+/* separators inset from the leading edge, as in a Settings list */
+.group > li + li::before, .group > div + div::before {
+  content: ""; display: block; height: 0.5px; margin-inline-start: var(--sep-inset, 1rem); background: var(--sep);
+}
+.row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0.75rem;
+  min-height: 2.875rem; padding: 0.6875rem 1rem; color: inherit; text-decoration: none;
+  transition: background-color 120ms ease;
+}
+a.row:active, button.row:active, label.row:active { background: var(--cell-press); }
+@media (hover: hover) and (pointer: fine) { a.row:hover, button.row:hover, label.row:hover { background: color-mix(in srgb, var(--cell-press) 55%, var(--cell)); } }
+.chev { width: 0.9rem; height: 0.9rem; color: var(--label-3); }
