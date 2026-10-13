@@ -15,7 +15,7 @@ function walk(dir) {
 }
 const files = walk(dist)
   .map((p) => '/' + relative(dist, p).split(sep).join('/'))
-  .filter((u) => !u.endsWith('.map') && u !== '/sw.js' && !u.endsWith('COPYING.txt') && u !== '/og.png');
+  .filter((u) => !u.endsWith('.map') && u !== '/sw.js' && u !== '/_headers' && u !== '/_redirects' && !u.endsWith('COPYING.txt') && u !== '/og.png');
 // pages are cached by their folder URL, the way they are visited
 const urls = files.map((u) => (u.endsWith('/index.html') ? u.slice(0, -'index.html'.length) : u));
 const hash = createHash('sha256');
