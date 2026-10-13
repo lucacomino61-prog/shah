@@ -68,6 +68,7 @@ import '../styles/play.css';
     <h2 class="record__title wide" id="themes-title">Zgjidh temën</h2>
     <p class="record__opening">Ushtrimet vijnë nga baza e hapur e Lichess (CC0), me vlerësime nga lojtarë të vërtetë. Zgjidhja e çdonjërit është kontrolluar me motorin.</p>
     <div class="themes" data-themes role="radiogroup" aria-label="Tema">
+      <label class="theme"><input type="radio" name="theme" value="mine" /><span><b>Gabimet e tua</b><span data-count="mine"></span></span></label>
       <label class="theme"><input type="radio" name="theme" value="all" checked /><span><b>Të gjitha</b><span data-count="all"></span></span></label>
       {THEMES.map((t) => (
         <label class="theme"><input type="radio" name="theme" value={t.id} /><span><b>{t.name}</b><span data-count={t.id}></span></span></label>

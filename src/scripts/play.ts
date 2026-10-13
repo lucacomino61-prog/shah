@@ -3,13 +3,13 @@
 // engine now threatens. "Shiko pse" leaves the game and plays the line on the board, then the pieces fly back.
 
 import { Chess, type Square } from 'chess.js';
-import { GRADES, TAG_NAMES, afterReply, gameAccuracy, judge, passTurn, threatWarning, uciSan, type Grade, type Verdict } from '../lib/coach.ts';
+import { GRADES, TAG_NAMES, afterReply, gameAccuracy, judge, passTurn, threatWarning, uciSan, winChance, type Grade, type Verdict } from '../lib/coach.ts';
 import { Engine, type Analysis } from '../lib/engine.ts';
 import { LEVELS, levelOf, pickMove, type Level } from '../lib/levels.ts';
 import { icon } from '../lib/icons.ts';
 import { sanHtml, sentenceHtml, sentenceText } from '../lib/notation.ts';
 import { openingOf } from '../lib/openings.ts';
-import { load, loadGame, saveGame, update, type Progress } from '../lib/store.ts';
+import { addCard, load, loadGame, saveGame, update, type Progress } from '../lib/store.ts';
 import { createBoard, followBroadcast, keyboard, type BoardView } from './board/index.ts';
 import type { Arrow, Side, Sq } from './board/types.ts';
 import { gsap, motionOn, onMotion, onTick } from './shell.ts';
@@ -41,6 +41,10 @@ const ui = {
   back: $<HTMLButtonElement>('[data-back]'),
   sheet: $('[data-sheet]'),
   setup: $<HTMLFormElement>('[data-setup]'),
+  review: $<HTMLDetailsElement>('[data-review-box]'),
+  reviewSvg: $<SVGSVGElement>('[data-review-svg]'),
+  reviewCap: $('[data-review-cap]'),
+  turning: $<HTMLButtonElement>('[data-turning]'),
   setupDialog: $<HTMLDialogElement>('[data-setup-dialog]'),
   tag: $('[data-tag]'),
   liveTag: $('[data-live-tag]'),
@@ -78,6 +82,29 @@ let result: 'win' | 'loss' | 'draw' | 'resigned' | null = null;
 let board: BoardView;
 let lastVerdict: Verdict | null = null;
 let boardReady = false;
+/** the position's value after each move, centipawns for white (mate is +-1000) */
+let evals: (number | null)[] = [];
+interface Clock {
+  base: number;
+  inc: number;
+  w: number;
+  b: number;
+}
+let clock: Clock | null = null;
+const CLOCKS: Record<string, [number, number] | null> = { none: null, '10+0': [10, 0], '5+3': [5, 3], '3+2': [3, 2] };
+const makeClock = (key: string): Clock | null => {
+  const c = CLOCKS[key];
+  return c ? { base: c[0] * 60000, inc: c[1] * 1000, w: c[0] * 60000, b: c[0] * 60000 } : null;
+};
+/** A search's value in centipawns for white. */
+function whiteCp(a: Analysis, fenAt: string): number | null {
+  const l = a.lines[0];
+  if (!l) return null;
+  const s = l.mate !== undefined ? (l.mate > 0 ? 1000 : -1000) : Math.max(-1000, Math.min(1000, l.cp ?? 0));
+  return fenAt.split(' ')[1] === 'w' ? s : -s;
+}
+/** After the game ends on the board: the value of the final position. */
+const finalCp = () => (chess.isCheckmate() ? (chess.turn() === 'w' ? -1000 : 1000) : 0);
 
 // the intro covers the table while the board and the engine load; it can be skipped at once
 const intro = {
@@ -180,14 +207,16 @@ function rebuild() {
 }
 
 function persist() {
-  saveGame(result ? null : { fens, sans, ucis, side, level: level.n, verdicts });
+  saveGame(result ? null : { fens, sans, ucis, side, level: level.n, verdicts, evals, clock });
 }
 
-function newGame(s: Side, lv: Level) {
+function newGame(s: Side, lv: Level, clk: string = prefs.clock) {
   gen++;
   engine.newGame();
   side = s;
   level = lv;
+  clock = makeClock(clk);
+  evals = [];
   orientation = s;
   board.setOrientation(s);
   chess = new Chess();
@@ -201,8 +230,10 @@ function newGame(s: Side, lv: Level) {
   board.setPosition(START, true);
   marks();
   ui.end.hidden = true;
+  ui.review.open = false;
   showIntro();
   renderSheet();
+  renderClock();
   persist();
   if (side === 'b') void engineMove();
   else userTurn();
@@ -229,6 +260,15 @@ function userTurn() {
       });
   }
   pre = { fen: at, done: engine.analyse(at, { depth: 13, movetime: 2500, multipv: 2 }) };
+  // the same look is the value of the engine's last move, for the graph
+  const ply = ucis.length - 1;
+  if (ply >= 0)
+    pre.done.then((a) => {
+      if (g !== gen || evals[ply] != null || !a.lines.length) return;
+      evals[ply] = whiteCp(a, at);
+      renderReview();
+      persist();
+    });
 }
 
 async function before(at: string): Promise<Analysis> {
@@ -281,6 +321,8 @@ async function userMove(from: Sq, to: Sq) {
   ucis.push(uci);
   sans.push(m.san);
   verdicts.push(null);
+  evals.push(null);
+  if (clock) clock[side] += clock.inc;
   warning = null;
   phase = 'thinking';
   board.setInteractive(false);
@@ -303,11 +345,15 @@ async function userMove(from: Sq, to: Sq) {
   if (g !== gen) return;
   const v = judge({ fen: fenBefore, uci, history, before: b, after });
   verdicts[verdicts.length - 1] = v;
+  evals[evals.length - 1] = over ? finalCp() : whiteCp(after, fen());
+  renderReview();
   lastVerdict = v;
   renderVerdict(v, true);
   renderSheet();
   persist();
   if (v.tags.length) update((p) => v.tags.forEach((t) => (p.tags[t] = (p.tags[t] ?? 0) + 1)));
+  // a mistake becomes a puzzle that comes back on a schedule
+  addCard(v);
   if (over) return endGame();
   await engineMove(after);
 }
@@ -335,6 +381,11 @@ async function engineMove(given?: Analysis) {
   ucis.push(uci);
   sans.push(m.san);
   verdicts.push(null);
+  evals.push(chess.isGameOver() ? finalCp() : null);
+  if (clock) {
+    const mover: Side = side === 'w' ? 'b' : 'w';
+    clock[mover] += clock.inc;
+  }
   if (!study) {
     board.setPosition(fen(), true);
     marks();
@@ -361,6 +412,7 @@ function takeBack(message: string) {
     ucis.pop();
     sans.pop();
     verdicts.pop();
+    evals.pop();
     rebuild();
     if (turn() === side) break;
   }
@@ -376,7 +428,7 @@ function takeBack(message: string) {
   else void engineMove();
 }
 
-function endGame(resigned = false) {
+function endGame(resigned = false, flagged: Side | null = null) {
   if (study) leaveStudy();
   phase = 'over';
   gen++;
@@ -389,6 +441,10 @@ function endGame(resigned = false) {
     res = 'resigned';
     headline = 'Dorëzim';
     line = 'U dorëzove. Rishiko lojën dhe gjej ku ndryshoi pozicioni.';
+  } else if (flagged) {
+    res = flagged === side ? 'loss' : 'win';
+    headline = res === 'win' ? 'Fitore' : 'Humbje';
+    line = res === 'win' ? 'Motorit i mbaroi koha.' : 'Të mbaroi koha. Me orë, edhe koha është material.';
   } else if (chess.isCheckmate()) {
     res = turn() === side ? 'loss' : 'win';
     headline = res === 'win' ? 'Fitore' : 'Humbje';
@@ -442,6 +498,9 @@ function endGame(resigned = false) {
   say(`${headline}. ${line}`);
   wipeIn();
   ticker();
+  renderClock();
+  renderReview();
+  ui.review.open = true;
 }
 
 // ------------------------------------------------------------------ the coach panel
@@ -728,7 +787,12 @@ function renderSheet() {
 ui.sheet.addEventListener('click', (e) => {
   const b = (e.target as Element).closest<HTMLButtonElement>('[data-ply]');
   if (!b) return;
-  const i = Number(b.dataset.ply);
+  openPly(Number(b.dataset.ply));
+});
+
+/** Show one move of the game on the board, with the coach's word on it. */
+function openPly(i: number) {
+  if (i < 0 || i >= ucis.length) return;
   const v = verdicts[i];
   if (v) {
     lastVerdict = v;
@@ -737,6 +801,107 @@ ui.sheet.addEventListener('click', (e) => {
   } else {
     enterStudy(fens[i], [ucis[i]], `Lëvizja ${Math.floor(i / 2) + 1}`);
   }
+  document.querySelector('.stage')?.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto', block: 'start' });
+}
+
+// ------------------------------------------------------------------ the graph of the game
+
+/** The learner's move that cost the most winning chances, if any cost at least a tenth. */
+function turning(): number | null {
+  let best: number | null = null;
+  let drop = 10;
+  verdicts.forEach((v, i) => {
+    if (!v) return;
+    const d = v.winBefore - v.winAfter;
+    if (d > drop) {
+      drop = d;
+      best = i;
+    }
+  });
+  return best;
+}
+
+function renderReview() {
+  const n = evals.length;
+  const svg = ui.reviewSvg;
+  if (n < 2) {
+    svg.innerHTML = '';
+    ui.reviewCap.textContent = 'Grafiku shfaqet pas disa lëvizjeve.';
+    ui.turning.hidden = true;
+    return;
+  }
+  // white's share of the chances, 0 (black wins) to 1 (white wins); a missing value repeats the last known
+  let last = 20;
+  const share = evals.map((e) => {
+    if (e != null) last = e;
+    return (winChance(last) + 1) / 2;
+  });
+  const pts = [[0, 0.52], ...share.map((v, i) => [((i + 1) / n) * 1000, v])];
+  const y = (v: number) => (196 - v * 192).toFixed(1);
+  const line = pts.map(([x, v]) => `${x.toFixed(1)} ${y(v)}`).join(' L');
+  const marks = verdicts
+    .map((v, i) => (v && (v.grade === 'mistake' || v.grade === 'blunder') ? `<line class="review__mark" x1="${(((i + 1) / n) * 1000).toFixed(1)}" x2="${(((i + 1) / n) * 1000).toFixed(1)}" y1="0" y2="200"/>` : ''))
+    .join('');
+  svg.innerHTML =
+    `<rect class="review__bg" width="1000" height="200"/>` +
+    `<path class="review__area" d="M0 200 L${line} L1000 200 Z"/>` +
+    `<line class="review__mid" x1="0" x2="1000" y1="100" y2="100"/>` +
+    marks;
+  const t = turning();
+  const v = t !== null ? verdicts[t] : null;
+  const errors = verdicts.filter((x) => x && (x.grade === 'mistake' || x.grade === 'blunder')).length;
+  ui.reviewCap.innerHTML = v
+    ? sentenceHtml(`Momenti kyç: lëvizja ${Math.floor(t! / 2) + 1}, [[${v.san}]]${v.symbol}. Shanset e tua ranë nga ${Math.round(v.winBefore)}% në ${Math.round(v.winAfter)}%. Vijat portokalli janë gabimet (${errors}).`)
+    : 'Asnjë lëvizje nuk e ndryshoi lojën shumë. Pjesa e çelët tregon shanset e të bardhave.';
+  ui.turning.hidden = t === null;
+}
+
+ui.reviewSvg.addEventListener('click', (e) => {
+  const r = ui.reviewSvg.getBoundingClientRect();
+  const n = evals.length;
+  if (!n) return;
+  const i = Math.round(((e.clientX - r.left) / r.width) * n) - 1;
+  openPly(Math.max(0, Math.min(n - 1, i)));
+});
+ui.turning.addEventListener('click', () => {
+  const t = turning();
+  if (t !== null) openPly(t);
+});
+
+// ------------------------------------------------------------------ the clock
+
+const fmt = (ms: number) => {
+  const s = Math.max(0, ms) / 1000;
+  if (s < 10) return s.toFixed(1);
+  const m = Math.floor(s / 60);
+  return `${m}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+};
+function renderClock() {
+  const rows: [HTMLElement, Side][] = [
+    [ui.you, side],
+    [ui.them, side === 'w' ? 'b' : 'w'],
+  ];
+  for (const [row, s] of rows) {
+    const el = row.querySelector<HTMLElement>('[data-clock]')!;
+    el.hidden = !clock;
+    if (!clock) continue;
+    const t = fmt(clock[s]);
+    if (el.textContent !== t) el.textContent = t;
+    el.toggleAttribute('data-low', clock[s] < 20000);
+  }
+}
+onTick((dt) => {
+  if (!clock || result || study || document.hidden) return;
+  if (phase !== 'user' && phase !== 'engine') return;
+  const mover = turn();
+  clock[mover] -= dt * 1000;
+  if (clock[mover] <= 0) {
+    clock[mover] = 0;
+    renderClock();
+    endGame(false, mover);
+    return;
+  }
+  renderClock();
 });
 
 function renderPlayers() {
@@ -772,6 +937,7 @@ function openSetup() {
   ui.setupDialog.showModal();
   ui.setup.querySelector<HTMLInputElement>(`input[name="side"][value="${prefs.side}"]`)!.checked = true;
   ui.setup.querySelector<HTMLInputElement>(`input[name="level"][value="${level.n}"]`)!.checked = true;
+  ui.setup.querySelector<HTMLInputElement>(`input[name="clock"][value="${prefs.clock}"]`)!.checked = true;
   ui.setup.querySelector<HTMLElement>('[data-setup-title]')?.focus();
 }
 ui.setupOpen.addEventListener('click', openSetup);
@@ -781,9 +947,11 @@ ui.setup.addEventListener('submit', (e) => {
   const data = new FormData(ui.setup);
   const s = String(data.get('side')) as Side | 'random';
   const n = Number(data.get('level'));
+  const clk = String(data.get('clock') ?? 'none');
   prefs = update((p) => {
     p.side = s;
     p.level = n;
+    p.clock = clk;
   });
   ui.setupDialog.close();
   newGame(s === 'random' ? (Math.random() < 0.5 ? 'w' : 'b') : s, levelOf(n));
@@ -830,9 +998,10 @@ ui.resign.addEventListener('click', () => {
 
 ui.end.querySelector('[data-again]')!.addEventListener('click', () => newGame(side, level));
 ui.end.querySelector('[data-review]')!.addEventListener('click', () => {
-  const first = verdicts.findIndex((v) => v && ['mistake', 'blunder'].includes(v.grade));
-  const i = first >= 0 ? first : verdicts.findIndex(Boolean);
-  ui.sheet.querySelector<HTMLButtonElement>(`[data-ply="${Math.max(0, i)}"]`)?.click();
+  ui.review.open = true;
+  ui.review.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto', block: 'start' });
+  const t = turning();
+  if (t !== null) openPly(t);
 });
 
 // ------------------------------------------------------------------ start
@@ -852,6 +1021,8 @@ keyboard(ui.host, () => board, () => orientation);
     ucis = saved.ucis;
     sans = saved.sans;
     verdicts = saved.verdicts as (Verdict | null)[];
+    evals = saved.evals ?? saved.ucis.map(() => null);
+    clock = saved.clock ?? null;
     rebuild();
   } else {
     side = prefs.side === 'b' ? 'b' : 'w';
@@ -862,6 +1033,8 @@ keyboard(ui.host, () => board, () => orientation);
   // the table is what the intro hides; the engine can finish loading behind it (the live bug says so)
   introTo(1);
   renderSheet();
+  renderReview();
+  renderClock();
   lastVerdict = [...verdicts].reverse().find(Boolean) ?? null;
   if (lastVerdict) renderVerdict(lastVerdict, false);
   else showIntro();

@@ -38,10 +38,12 @@ import '../styles/play.css';
       <div class="score__row" data-them>
         <span class="score__name" data-name>Motori</span>
         <span class="score__taken" data-taken></span>
+        <span class="score__clock tabular" data-clock hidden></span>
       </div>
       <div class="score__row" data-you>
         <span class="score__name">Ti</span>
         <span class="score__taken" data-taken></span>
+        <span class="score__clock tabular" data-clock hidden></span>
       </div>
     </div>
 
@@ -113,6 +115,14 @@ import '../styles/play.css';
   <section class="record" aria-labelledby="sheet-title">
     <h2 class="record__title wide" id="sheet-title">Fleta e lojës</h2>
     <p class="record__opening" data-opening hidden></p>
+    <details class="review" data-review-box>
+      <summary class="review__sum">Grafiku i lojës</summary>
+      <figure class="review__fig">
+        <svg class="review__svg" viewBox="0 0 1000 200" preserveAspectRatio="none" data-review-svg role="img" aria-labelledby="review-cap"></svg>
+        <figcaption class="review__cap" id="review-cap" data-review-cap>Grafiku shfaqet pas disa lëvizjeve.</figcaption>
+      </figure>
+      <button type="button" class="btn" data-turning hidden><Fragment set:html={icon('eye')} />Shiko momentin kyç</button>
+    </details>
     <ol class="sheet" data-sheet></ol>
     <div class="record__actions">
       <button type="button" class="btn" data-resign><Fragment set:html={icon('flag')} /><span data-label>Dorëzohu</span></button>
@@ -128,6 +138,15 @@ import '../styles/play.css';
           <label><input type="radio" name="side" value="w" checked /><span>Të bardhat</span></label>
           <label><input type="radio" name="side" value="b" /><span>Të zezat</span></label>
           <label><input type="radio" name="side" value="random" /><span>Rastësisht</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Ora</legend>
+        <div class="segmented segmented--4">
+          <label><input type="radio" name="clock" value="none" checked /><span>Pa orë</span></label>
+          <label><input type="radio" name="clock" value="10+0" /><span>10 min</span></label>
+          <label><input type="radio" name="clock" value="5+3" /><span>5+3</span></label>
+          <label><input type="radio" name="clock" value="3+2" /><span>3+2</span></label>
         </div>
       </fieldset>
       <fieldset>

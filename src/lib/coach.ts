@@ -176,6 +176,8 @@ export interface Verdict {
   reasons: string[];
   /** the better move when the played one was not the best */
   better: { uci: string; san: string } | null;
+  /** first moves of every line within a third of a pawn of the best: all of them solve this position */
+  goodMoves: string[];
   /** position before the move: both lines below start here */
   fen: string;
   /** the move played and the opponent's best answer to it: "why" */
@@ -316,6 +318,7 @@ export function judge(ctx: MoveContext): Verdict {
     title: GRADES[grade].title,
     reasons: reasons.slice(0, 3),
     better: bad ? { uci: bestUci, san: bestSan } : null,
+    goodMoves: ctx.before.lines.filter((l) => l.pv[0] && lineScore(best) - lineScore(l) <= 30).map((l) => l.pv[0]),
     fen: ctx.fen,
     refutation: [ctx.uci, ...(reply?.pv.slice(0, 3) ?? [])],
     bestLine: best?.pv.slice(0, 4) ?? [bestUci],

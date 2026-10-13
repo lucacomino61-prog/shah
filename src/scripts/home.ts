@@ -3,7 +3,7 @@
 
 import { LESSONS } from '../data/lessons.ts';
 import { levelOf } from '../lib/levels.ts';
-import { load, loadGame } from '../lib/store.ts';
+import { dueCards, load, loadGame } from '../lib/store.ts';
 import { createBoard } from './board/index.ts';
 import { motionOn, onMotion, onTick } from './shell.ts';
 
@@ -20,7 +20,14 @@ if (saved && saved.ucis.length) {
   const lv = levelOf(prefs.level);
   $('[data-game-line]').textContent = `Niveli ${lv.n}, ${lv.name.toLowerCase()}. Ti me ${prefs.side === 'b' ? 'të zezat' : 'të bardhat'}.`;
 }
-$('[data-puzzle-line]').textContent = prefs.puzzlesTried
+const due = dueCards(prefs).length;
+if (due) {
+  $<HTMLAnchorElement>('[data-puzzle-link]').href = '/ushtrime/?tema=gabimet';
+  $('[data-puzzle-title]').textContent = 'Gabimet e tua';
+}
+$('[data-puzzle-line]').textContent = due
+  ? `${due} gabime nga lojërat e tua presin sot.`
+  : prefs.puzzlesTried
   ? `Vlerësimi yt: ${prefs.puzzleRating}. Të zgjidhura: ${prefs.puzzlesSolved}.`
   : 'Fillo me ushtrimet e para: pirun, lidhje, mat.';
 const nextLesson = LESSONS.find((l) => !prefs.lessons.includes(l.slug)) ?? LESSONS[0];

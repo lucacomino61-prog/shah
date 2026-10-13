@@ -80,6 +80,10 @@ html[data-mode="study"] .bug__live::before { animation: none; }
 .cap { width: 1rem; height: 1rem; margin-inline-start: -0.3rem; --piece-edge-b: #8a8580; }
 .cap:first-child { margin-inline-start: 0; }
 .adv { margin-inline-start: 0.3rem; font-weight: 800; }
+.score__clock { min-width: 3.4rem; margin-inline-start: 0.5rem; text-align: end; font-weight: 820; font-size: 0.875rem; }
+.score__clock[hidden] { display: none; }
+.score__row[data-turn] .score__clock { color: #fff; }
+.score__clock[data-low] { color: var(--pointer-ink) !important; }
 
 /* tools, top right: one menu button on a phone, a row of icons on a wide screen */
 .tools { top: 0.5rem; right: 0.5rem; display: grid; justify-items: end; gap: 0.25rem; }
@@ -277,6 +281,7 @@ html[data-motion="off"] .ticker__track { animation: none; }
 .setup fieldset { border: 0; padding: 0; min-width: 0; }
 .setup legend { font-weight: 700; margin-bottom: var(--space-2xs); }
 .segmented { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1.5px solid var(--stone); }
+.segmented--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .segmented label { position: relative; display: grid; place-items: center; min-height: 48px; cursor: pointer; font-weight: 660; text-align: center; padding-inline: 0.25rem; }
 .segmented label + label { border-inline-start: 1.5px solid var(--stone); }
 .segmented input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
@@ -347,3 +352,23 @@ html[data-motion="off"] .ticker__track { animation: none; }
   .bug--sheet .n { color: rgb(230 229 225 / 0.55); font-variant-numeric: tabular-nums; }
   .bug--sheet .ann { color: var(--pointer-ink); font-weight: 800; }
 }
+
+/* the game's graph: white's share of the winning chances move by move; the learner's mistakes marked */
+.review { margin-top: var(--space-m); border-top: 1px solid var(--rule); }
+.review__sum {
+  display: flex; align-items: center; min-height: 48px; cursor: pointer; list-style: none;
+  font-variation-settings: 'wdth' 118; font-weight: 800; font-size: 1.0625rem;
+}
+.review__sum::-webkit-details-marker { display: none; }
+.review__sum::after { content: "+"; margin-inline-start: auto; font-weight: 700; }
+.review[open] .review__sum::after { content: "−"; }
+.review__fig { margin: 0 0 var(--space-s); }
+.review__svg { width: 100%; height: 9rem; cursor: pointer; touch-action: manipulation; }
+.review__bg { fill: #1d1915; }
+.review__area { fill: var(--stone); }
+.review__mid { stroke: rgb(230 229 225 / 0.35); stroke-width: 1; stroke-dasharray: 6 6; vector-effect: non-scaling-stroke; }
+.review__mark { stroke: var(--pointer); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+.review__now { stroke: var(--stone); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.review__cap { margin-top: 0.5rem; color: var(--text-2); max-width: 60ch; }
+.review [data-turning] { margin-bottom: var(--space-s); }
+.review [data-turning][hidden] { display: none; }

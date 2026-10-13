@@ -4,7 +4,7 @@
 import { Chess, type Square } from 'chess.js';
 import puzzles from '../data/puzzles.json';
 import { sanHtml, sentenceHtml, sentenceText } from '../lib/notation.ts';
-import { load, ratePuzzle, update } from '../lib/store.ts';
+import { DAYS, dueCards, load, ratePuzzle, reviewCard, update, type Card } from '../lib/store.ts';
 import { THEMES, themeOf } from '../lib/themes.ts';
 import { icon } from '../lib/icons.ts';
 import { createBoard, followBroadcast, keyboard, type BoardView } from './board/index.ts';
@@ -18,7 +18,11 @@ interface Puzzle {
   rating: number;
   theme: string;
   themes: string[];
+  /** one of the learner's own mistakes: no setup move, any of these first moves solves it */
+  card?: Card;
 }
+
+const fromCard = (c: Card): Puzzle => ({ id: c.id, fen: c.fen, moves: [c.good[0]], rating: 0, theme: 'mine', themes: [], card: c });
 const ALL = puzzles as Puzzle[];
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
@@ -91,7 +95,11 @@ function pool(): Puzzle[] {
   return theme === 'all' ? ALL : ALL.filter((p) => p.theme === theme || p.themes.includes(theme));
 }
 
-function pick(): Puzzle {
+function pick(): Puzzle | null {
+  if (theme === 'mine') {
+    const due = dueCards(prefs);
+    return due.length ? fromCard(due[0]) : null;
+  }
   const list = pool();
   const seen = new Set(prefs.seen);
   const fresh = list.filter((p) => !seen.has(p.id));
@@ -103,37 +111,73 @@ function pick(): Puzzle {
   return near[Math.floor(Math.random() * near.length)];
 }
 
-async function deal(p: Puzzle = pick()) {
+async function deal(next: Puzzle | null = pick()) {
   const g = ++gen;
+  if (!next) return noneDue();
+  const p = next;
   puzzle = p;
   chess = new Chess(p.fen);
-  step = 1;
+  const own = !!p.card;
+  step = own ? 0 : 1;
   failed = false;
   helped = false;
   done = false;
   hintStep = 0;
-  busy = true;
-  // the learner plays the side that moves after the opponent's setup move
-  side = chess.turn() === 'w' ? 'b' : 'w';
+  busy = !own;
+  // a Lichess puzzle: the learner plays the side that moves after the setup move; an own mistake: the side to move
+  side = own ? (chess.turn() as Side) : chess.turn() === 'w' ? 'b' : 'w';
   board.setOrientation(side);
   board.setInteractive(false);
   board.setPosition(p.fen, false);
   board.setMarks({});
-  const t = themeOf(p.theme);
-  ui.themeName.textContent = t.name;
-  ui.puzzleRating.textContent = String(p.rating);
+  if (own) {
+    const c = p.card!;
+    ui.themeName.textContent = 'Gabimi yt';
+    ui.puzzleRating.textContent = c.made.split('-').reverse().slice(0, 2).join('.');
+    setCoach('intro', 'Gjej më të mirën', side === 'w' ? 'Të bardhat lëvizin' : 'Të zezat lëvizin', ['Në një lojë tënde këtu luajte një lëvizje të gabuar. Gjej një më të mirë.']);
+  } else {
+    const t = themeOf(p.theme);
+    ui.themeName.textContent = t.name;
+    ui.puzzleRating.textContent = String(p.rating);
+    setCoach('intro', side === 'w' ? 'Të bardhat lëvizin' : 'Të zezat lëvizin', t.name, [t.task]);
+  }
   ui.myRating.textContent = String(prefs.puzzleRating);
   ratingLabel();
-  setCoach('intro', side === 'w' ? 'Të bardhat lëvizin' : 'Të zezat lëvizin', t.name, [t.task]);
   showButtons();
-  ui.status.textContent = 'Kundërshtari lëviz…';
+  ui.status.textContent = own ? 'Radha jote.' : 'Kundërshtari lëviz…';
   ticker();
-  await wait(650);
-  if (g !== gen) return;
-  play(p.moves[0]);
-  busy = false;
+  if (!own) {
+    await wait(650);
+    if (g !== gen) return;
+    play(p.moves[0]);
+    busy = false;
+  }
   board.setInteractive(true);
   ui.status.textContent = 'Radha jote.';
+}
+
+function noneDue() {
+  puzzle = null;
+  done = true;
+  board.setInteractive(false);
+  board.setMarks({});
+  const left = prefs.cards.filter((c) => c.box <= 4);
+  const next = left.map((c) => c.due).sort()[0];
+  setCoach(
+    'note',
+    'Asnjë për sot',
+    'Gabimet e tua',
+    [
+      left.length
+        ? `Ke ${left.length} gabime në radhë; i radhës kthehet më ${next.split('-').reverse().join('.')}. Zgjidh një temë tjetër ose luaj një lojë.`
+        : 'Kur bën një gabim në lojë, trajneri e ruan këtu si ushtrim dhe ta kthen derisa ta zgjidhësh pa gabuar.',
+    ],
+  );
+  ui.status.textContent = 'Asgjë për sot.';
+  ui.hint.hidden = true;
+  ui.solution.hidden = true;
+  ui.next.hidden = true;
+  ui.again.hidden = true;
 }
 
 // ------------------------------------------------------------------ the learner's move
@@ -174,7 +218,8 @@ async function onMove(from: Sq, to: Sq) {
     board.setPosition(fen(), true);
     return;
   }
-  const right = uci === expected || (!expected[4] && uci.slice(0, 4) === expected.slice(0, 4) && !promotion) || (mates && step === puzzle.moves.length - 1);
+  const same = (a: string) => a === uci || (!a[4] && uci.slice(0, 4) === a.slice(0, 4) && !promotion);
+  const right = same(expected) || (step === 0 && !!puzzle.card?.good.some(same)) || (mates && step === puzzle.moves.length - 1);
   busy = true;
   board.setInteractive(false);
   if (!right) {
@@ -210,6 +255,7 @@ function solved(lastSan: string) {
   done = true;
   busy = false;
   const clean = !failed && !helped;
+  if (puzzle.card) return solvedCard(puzzle.card, lastSan, clean);
   const before = prefs.puzzleRating;
   prefs = update((p) => {
     p.puzzlesTried++;
@@ -230,6 +276,19 @@ function solved(lastSan: string) {
     true,
   );
   say(`Saktë. ${t.idea}`);
+  ui.status.textContent = 'U zgjidh.';
+  showButtons();
+  countThemes();
+  ticker();
+}
+
+/** An own mistake solved: the card moves on its schedule; the puzzle rating is not touched. */
+function solvedCard(c: Card, san: string, clean: boolean) {
+  const after = reviewCard(c.id, clean);
+  prefs = load();
+  const when = !after ? '' : after.box > 4 ? 'E mësuar: nuk kthehet më.' : clean ? (DAYS[after.box] === 1 ? 'Kthehet nesër.' : `Kthehet pas ${DAYS[after.box]} ditësh.`) : 'Kthehet nesër.';
+  setCoach('solved', `${sanHtml(san)} Saktë`, when, [`Në lojë luajte [[${c.played}]]. ${c.reason}`], true);
+  say(`Saktë. ${when}`);
   ui.status.textContent = 'U zgjidh.';
   showButtons();
   countThemes();
@@ -311,7 +370,7 @@ function ticker() {
   const items = [
     prefs.puzzlesTried ? `Vlerësimi yt: ${prefs.puzzleRating}` : `Vlerësimi fillestar: ${prefs.puzzleRating}. Ndryshon me çdo ushtrim.`,
     `Të zgjidhura pa ndihmë: ${solvedCount}`,
-    puzzle ? `Ushtrimi ${puzzle.id} nga Lichess, vlerësimi ${puzzle.rating}` : '',
+    puzzle && !puzzle.card ? `Ushtrimi ${puzzle.id} nga Lichess, vlerësimi ${puzzle.rating}` : puzzle?.card ? `Gabim nga loja jote e ${puzzle.card.made.split("-").reverse().join(".")}` : '',
     ...THEMES.slice(0, 4).map((t) => `${t.name}: ${t.idea}`),
   ].filter(Boolean);
   const html = items.map((t) => `<span>${t.replace(/[<>&]/g, '')}</span>`).join('');
@@ -320,6 +379,12 @@ function ticker() {
 }
 
 function countThemes() {
+  const mine = ui.themes.querySelector('[data-count="mine"]');
+  if (mine) {
+    const due = dueCards(prefs).length;
+    const all = prefs.cards.filter((c) => c.box <= 4).length;
+    mine.textContent = all ? `${due} për sot, ${all} në radhë` : 'Bosh: mbushet kur gabon në lojë';
+  }
   const seen = new Set(prefs.seen);
   const count = (list: Puzzle[]) => `${list.filter((p) => seen.has(p.id)).length} nga ${list.length} të para`;
   ui.themes.querySelector('[data-count="all"]')!.textContent = count(ALL);
@@ -361,6 +426,11 @@ followBroadcast(ui.host, ui.coach, () => board);
 keyboard(ui.host, () => board, () => side);
 
 (async () => {
+  // /ushtrime/?tema=gabimet opens on the learner's own mistakes
+  if (new URLSearchParams(location.search).get('tema') === 'gabimet') {
+    theme = 'mine';
+    ui.themes.querySelector<HTMLInputElement>('input[value="mine"]')!.checked = true;
+  }
   await mount('2d');
   countThemes();
   ui.myRating.textContent = String(prefs.puzzleRating);
