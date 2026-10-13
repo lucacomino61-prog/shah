@@ -95,9 +95,9 @@
       ],
       "materials": [
         { "name": "felt", "type": "MeshStandard", "map": "noise around rgb(52 82 62), repeat 36", "roughness": 1, "envMapIntensity": 0.05 },
-        { "name": "mahogany-frame", "type": "MeshPhysical", "map": "grain on #4b2213", "roughness": 0.36, "clearcoat": 0.9, "clearcoatRoughness": 0.12, "envMapIntensity": 0.7, "geometry": "RoundedBox radius 0.06" },
+        { "name": "mahogany-frame", "type": "MeshPhysical", "map": "grain on #4b2213", "roughness": 0.78, "specularIntensity": 0.15, "envMapIntensity": 0.7, "geometry": "RoundedBox radius 0.06" },
         { "name": "boxwood-stringing", "type": "MeshStandard", "color": "#e9d3a4", "roughness": 0.45, "envMapIntensity": 0.5, "note": "two lines: round the squares (0.032) and near the outer edge (0.022)" },
-        { "name": "veneer-squares", "type": "MeshPhysical", "map": "per-leaf maple hsl(34 50% 66%) and walnut hsl(23 44% 37%), grain along the file on maple, across on walnut", "roughness": 0.48, "clearcoat": 0.55, "clearcoatRoughness": 0.2, "envMapIntensity": 0.55 },
+        { "name": "veneer-squares", "type": "MeshPhysical", "map": "per-leaf maple hsl(34 50% 66%) and walnut hsl(23 44% 37%), grain along the file on maple, across on walnut; matte, no reflections", "roughness": 0.88, "specularIntensity": 0.08, "envMapIntensity": 0.55 },
         { "name": "coordinate-inlay", "type": "MeshBasic, not tone mapped", "color": "rgba(236, 214, 170, 0.9)", "font": "600 Mona Sans" },
         { "name": "boxwood-pieces", "type": "MeshPhysical", "map": "light grain on #f7ecd4", "roughness": 0.4, "clearcoat": 0.5, "clearcoatRoughness": 0.18, "envMapIntensity": 0.85 },
         { "name": "ebony-pieces", "type": "MeshPhysical", "color": "#121214", "roughness": 0.26, "clearcoat": 1, "clearcoatRoughness": 0.05, "envMapIntensity": 1.25 },

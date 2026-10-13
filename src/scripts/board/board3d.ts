@@ -142,7 +142,7 @@ function turned(kind: Kind): BufferGeometry {
 }
 
 /** The playing field: maple and walnut veneer, the grain of each square turned across its neighbour's, fine
- *  seams between them, a satin lacquer over all. */
+ *  seams between them, an oiled matte finish that takes the lamp without mirroring it. */
 function woodSquares(size: number): CanvasTexture {
   const c = document.createElement('canvas');
   c.width = c.height = size;
@@ -439,7 +439,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
       room.traverse((obj) => {
         if ((obj as PointLight).isPointLight) (obj as PointLight).intensity *= dim;
       });
-      // a long softbox low behind the board: the band of light the polished squares mirror back
+      // a long softbox low behind the board: the band of light the pieces mirror back
       const strip = new Mesh(new PlaneGeometry(16, 1.1), new MeshBasicMaterial({ color: new Color(1, 1, 1).multiplyScalar(2.4) }));
       strip.position.set(0, Math.sin(0.62) * 9, -Math.cos(0.62) * 9);
       strip.lookAt(0, 0, 0);
@@ -479,8 +479,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
   key.shadow.normalBias = vsm ? 0 : 0.015;
   scene.add(key, key.target);
   const placeKey = () => {
-    // the lamp hangs over the player's left shoulder, whichever side they play, high and wide enough that its
-    // mirror image in the lacquer falls on the frame, not on the a1 corner, for a camera looking almost straight down
+    // the lamp hangs high over the player's left shoulder, whichever side they play
     const s = orientation === 'w' ? 1 : -1;
     key.position.set(-12 * s, 20, 9 * s);
   };
@@ -509,13 +508,13 @@ export function createBoard3d(o: BoardOptions): BoardView {
   const frameH = BOARD.top - BOARD.frameDrop;
   const grain = grainTexture(512, '#4b2213', 'rgba(22,6,1,A)', 'rgba(150,72,40,A)', 23);
   textures.push(grain);
-  const wood = own(new MeshPhysicalMaterial({ map: grain, roughness: 0.36, clearcoat: 0.9, clearcoatRoughness: 0.12, envMap: room, envMapIntensity: 0.7 }));
+  const wood = own(new MeshPhysicalMaterial({ map: grain, roughness: 0.78, specularIntensity: 0.15, envMap: room, envMapIntensity: 0.7 }));
   const frame = new Mesh(keep(new RoundedBoxGeometry(2 * F, frameH, 2 * F, 5, 0.06)), wood);
   frame.position.y = frameH / 2;
   frame.castShadow = frame.receiveShadow = true;
   board.add(frame);
   // boxwood stringing let into the mahogany: one line round the squares, one near the outer edge
-  const brass = own(new MeshStandardMaterial({ color: 0xe9d3a4, roughness: 0.45, envMap: room, envMapIntensity: 0.5 }));
+  const brass = own(new MeshStandardMaterial({ color: 0xe9d3a4, roughness: 0.85, envMap: room, envMapIntensity: 0.5 }));
   for (const [d, w] of [
     [BOARD.half + 0.075, 0.032],
     [F - 0.085, 0.022],
@@ -539,7 +538,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
   textures.push(fieldMap);
   const surface = new Mesh(
     keep(new PlaneGeometry(2 * BOARD.half, 2 * BOARD.half).rotateX(-Math.PI / 2)),
-    own(new MeshPhysicalMaterial({ map: fieldMap, roughness: 0.48, clearcoat: 0.55, clearcoatRoughness: 0.2, envMap: room, envMapIntensity: 0.55 })),
+    own(new MeshPhysicalMaterial({ map: fieldMap, roughness: 0.88, specularIntensity: 0.08, envMap: room, envMapIntensity: 0.55 })),
   );
   surface.position.y = BOARD.top + 0.0005;
   surface.receiveShadow = true;
