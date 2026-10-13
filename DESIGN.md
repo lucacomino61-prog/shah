@@ -231,7 +231,7 @@ Stone paper and ink, a lacquer pointer, and the warm materials of a wooden set u
 
 ### Tertiary: the table and the set
 - **Felt** (felt-pool to felt-dark): the radial pool of green felt under the lamp, falling to near-black at the edges; the stage background and the whole picture behind the flat board. A further vignette darkens the corners to 45% black.
-- **Maple and Walnut** (sq-light, sq-dark): the flat board's squares. The 3D squares are painted per leaf around the same hues (maple hsl 36 52% 76%, walnut hsl 22 47% 27%, each leaf shifted a shade).
+- **Maple and Walnut** (sq-light, sq-dark): the flat board's squares. The 3D squares are painted per leaf a step closer together (maple hsl 34 50% 66%, walnut hsl 23 44% 37%, each leaf shifted a shade), so the near-white boxwood pieces stand off the maple and the ebony off the walnut (Luca, 2026-10-13: "more contrasted so pieces can be viewed").
 - **Mahogany and Boxwood Stringing** (mahogany, mahogany-edge, boxwood-stringing, coord-inlay): the frame, its edge, the two pale inlaid lines, and the inlaid coordinates.
 - **Boxwood and Ebony** (boxwood, ebony): the 3D pieces. The flat pieces use piece-fill-w with an ink edge and piece-fill-b with a pale edge.
 

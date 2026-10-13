@@ -89,7 +89,7 @@
     "studio3d": {
       "renderer": { "clearColor": "#070908", "toneMapping": "NeutralToneMapping", "exposure": 1.04, "shadowMap": "VSM (PCF fallback)" },
       "lights": [
-        { "name": "lamp", "type": "SpotLight", "color": "#fff0dc", "intensity": 3.6, "angle": 0.5, "penumbra": 0.62, "position": "(-7, 15, 6) mirrored for black: over the player's left shoulder", "shadow": "1024 map, radius 5 VSM, bias -0.0006" },
+        { "name": "lamp", "type": "SpotLight", "color": "#fff0dc", "intensity": 3.6, "angle": 0.5, "penumbra": 0.62, "position": "(-12, 20, 9) mirrored for black (its reflection falls on the frame, not the a1 corner, under the near-overhead camera): over the player's left shoulder", "shadow": "1024 map, radius 5 VSM, bias -0.0006" },
         { "name": "fill", "type": "HemisphereLight", "sky": "#8fa596", "ground": "#0c140f", "intensity": 0.34 },
         { "name": "room", "type": "RoomEnvironment envMap per material", "intensity": 0.45 }
       ],
@@ -97,15 +97,15 @@
         { "name": "felt", "type": "MeshStandard", "map": "noise around rgb(52 82 62), repeat 36", "roughness": 1, "envMapIntensity": 0.05 },
         { "name": "mahogany-frame", "type": "MeshPhysical", "map": "grain on #4b2213", "roughness": 0.36, "clearcoat": 0.9, "clearcoatRoughness": 0.12, "envMapIntensity": 0.7, "geometry": "RoundedBox radius 0.06" },
         { "name": "boxwood-stringing", "type": "MeshStandard", "color": "#e9d3a4", "roughness": 0.45, "envMapIntensity": 0.5, "note": "two lines: round the squares (0.032) and near the outer edge (0.022)" },
-        { "name": "veneer-squares", "type": "MeshPhysical", "map": "per-leaf maple hsl(36 52% 76%) and walnut hsl(22 47% 27%), grain along the file on maple, across on walnut", "roughness": 0.48, "clearcoat": 0.55, "clearcoatRoughness": 0.2, "envMapIntensity": 0.55 },
+        { "name": "veneer-squares", "type": "MeshPhysical", "map": "per-leaf maple hsl(34 50% 66%) and walnut hsl(23 44% 37%), grain along the file on maple, across on walnut", "roughness": 0.48, "clearcoat": 0.55, "clearcoatRoughness": 0.2, "envMapIntensity": 0.55 },
         { "name": "coordinate-inlay", "type": "MeshBasic, not tone mapped", "color": "rgba(236, 214, 170, 0.9)", "font": "600 Mona Sans" },
-        { "name": "boxwood-pieces", "type": "MeshPhysical", "map": "grain on #ecd8ae", "roughness": 0.42, "clearcoat": 0.45, "clearcoatRoughness": 0.2, "envMapIntensity": 0.7 },
-        { "name": "ebony-pieces", "type": "MeshPhysical", "color": "#1a1a1d", "roughness": 0.28, "clearcoat": 1, "clearcoatRoughness": 0.06, "envMapIntensity": 1 },
+        { "name": "boxwood-pieces", "type": "MeshPhysical", "map": "light grain on #f7ecd4", "roughness": 0.4, "clearcoat": 0.5, "clearcoatRoughness": 0.18, "envMapIntensity": 0.85 },
+        { "name": "ebony-pieces", "type": "MeshPhysical", "color": "#121214", "roughness": 0.26, "clearcoat": 1, "clearcoatRoughness": 0.05, "envMapIntensity": 1.25 },
         { "name": "arrows", "type": "Shader, flat outline drawn on by share of length", "color": "var(--pointer)", "opacity": "0.92 (quiet 0.74)", "badge": "pointer disc with ink number, 800 Mona Sans" }
       ],
       "cameraAngles": [
-        { "name": "Si lojtar", "upright": { "el": 1.16, "az": 0, "dist": 12 }, "wide": { "el": 1.04, "az": 0, "dist": 13 }, "default": true },
-        { "name": "Nga lart", "upright": { "el": 1.4, "az": 0, "dist": 15 }, "wide": { "el": 1.32, "az": 0, "dist": 15 } },
+        { "name": "Si lojtar", "upright": { "el": 1.396, "az": 0, "dist": 13 }, "wide": { "el": 1.396, "az": 0, "dist": 13 }, "default": true },
+        { "name": "Nga lart", "upright": { "el": 1.54, "az": 0, "dist": 15 }, "wide": { "el": 1.54, "az": 0, "dist": 15 } },
         { "name": "Afër tabelës", "upright": { "el": 0.72, "az": -0.42, "dist": 15 }, "wide": { "el": 0.56, "az": -0.5, "dist": 15 } }
       ],
       "boardMarks2d": { "last": "pointer 0.2", "check": "pointer 0.42", "chosen": "pointer 0.26", "focus": "pointer stroke 7", "dot": "pointer 0.85", "take": "pointer ring 7 at 0.85", "cursor": "ink dashed 10 8, stroke 5", "arrowShaft": "pointer stroke 17 mitre at 0.88" }

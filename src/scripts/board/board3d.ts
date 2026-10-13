@@ -57,13 +57,13 @@ const token = (name: string) => getComputedStyle(document.documentElement).getPr
  *  a place, not a page colour. */
 const STUDIO = { room: 0.45, hemi: 0.34, lamp: 3.6, exposure: 1.04 };
 
-/** Where the camera stands. First, the player's own seat: straight behind your pieces, at the height of a seated
- *  player's eyes and as close, so the near ranks loom and the far ones recede the way they do across a real
- *  table. Then straight overhead, and the low three-quarter the home page orbits in. Each has a steeper version
- *  for an upright phone, so the far ranks keep their size. dist is from the middle of the board, in squares. */
+/** Where the camera stands. First, the player's own seat: straight behind your pieces and looking almost straight
+ *  down (80 degrees, Luca's "more up"), close enough that the near ranks still loom a little. Then straight
+ *  overhead, and the low three-quarter the home page orbits in, which has a steeper version for an upright phone.
+ *  dist is from the middle of the board, in squares. */
 export const ANGLES = [
-  { name: 'Si lojtar', upright: { el: 1.16, az: 0, dist: 12 }, wide: { el: 1.04, az: 0, dist: 13 } },
-  { name: 'Nga lart', upright: { el: 1.4, az: 0, dist: 15 }, wide: { el: 1.32, az: 0, dist: 15 } },
+  { name: 'Si lojtar', upright: { el: 1.396, az: 0, dist: 13 }, wide: { el: 1.396, az: 0, dist: 13 } },
+  { name: 'Nga lart', upright: { el: 1.54, az: 0, dist: 15 }, wide: { el: 1.54, az: 0, dist: 15 } },
   { name: 'Afër tabelës', upright: { el: 0.72, az: -0.42, dist: 15 }, wide: { el: 0.56, az: -0.5, dist: 15 } },
 ];
 
@@ -161,7 +161,7 @@ function woodSquares(size: number): CanvasTexture {
       g.clip();
       // each veneer leaf a shade apart
       const shift = (rnd() - 0.5) * 14;
-      g.fillStyle = light ? `hsl(${36 + shift * 0.2} 52% ${76 + shift * 0.25}%)` : `hsl(${22 + shift * 0.3} 47% ${27 + shift * 0.2}%)`;
+      g.fillStyle = light ? `hsl(${34 + shift * 0.2} 50% ${66 + shift * 0.25}%)` : `hsl(${23 + shift * 0.3} 44% ${37 + shift * 0.2}%)`;
       g.fillRect(x, y, cell, cell);
       // soft figure in the leaf
       for (let i = 0; i < 5; i++) {
@@ -479,9 +479,10 @@ export function createBoard3d(o: BoardOptions): BoardView {
   key.shadow.normalBias = vsm ? 0 : 0.015;
   scene.add(key, key.target);
   const placeKey = () => {
-    // the lamp hangs over the player's left shoulder, whichever side they play
+    // the lamp hangs over the player's left shoulder, whichever side they play, high and wide enough that its
+    // mirror image in the lacquer falls on the frame, not on the a1 corner, for a camera looking almost straight down
     const s = orientation === 'w' ? 1 : -1;
-    key.position.set(-7 * s, 15, 6 * s);
+    key.position.set(-12 * s, 20, 9 * s);
   };
   placeKey();
 
@@ -572,12 +573,12 @@ export function createBoard3d(o: BoardOptions): BoardView {
     return g;
   };
   // boxwood: a fine pale grain under a thin lacquer (the lathe's UVs run the grain up the piece)
-  const boxwood = grainTexture(256, '#ecd8ae', 'rgba(150,104,56,A)', 'rgba(255,240,205,A)', 41, 90);
+  const boxwood = grainTexture(256, '#f7ecd4', 'rgba(170,128,80,A)', 'rgba(255,248,230,A)', 41, 60);
   boxwood.rotation = Math.PI / 2;
   boxwood.repeat.set(3, 1);
   textures.push(boxwood);
-  const ivory = own(new MeshPhysicalMaterial({ map: boxwood, roughness: 0.42, clearcoat: 0.45, clearcoatRoughness: 0.2, envMap: room, envMapIntensity: 0.7 }));
-  const ebony = own(new MeshPhysicalMaterial({ color: 0x1a1a1d, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.06, envMap: room, envMapIntensity: 1 }));
+  const ivory = own(new MeshPhysicalMaterial({ map: boxwood, roughness: 0.4, clearcoat: 0.5, clearcoatRoughness: 0.18, envMap: room, envMapIntensity: 0.85 }));
+  const ebony = own(new MeshPhysicalMaterial({ color: 0x121214, roughness: 0.26, clearcoat: 1, clearcoatRoughness: 0.05, envMap: room, envMapIntensity: 1.25 }));
   const hitMat = own(new MeshBasicMaterial({ visible: false }));
   const hitGeo = new Map<Kind, BufferGeometry>();
   const hitOf = (k: Kind) => {
