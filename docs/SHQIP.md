@@ -57,10 +57,20 @@ players use.
 Luaj, Ushtrime, Mësime, Progresi · Shiko pse · Provo përsëri · Ndihmë · Kthehu te loja · Lojë e re ·
 Kthe lëvizjen · Rrotullo tabelën · Pamje e sheshtë / Pamje 3D · Këndi i kamerës · Ndal animacionet ·
 Dorëzohu / Konfirmo dorëzimin · Fillo lojën · Zgjidhja · Tjetri · Linja tjetër · Përsërit linjën ·
-Drejtpërdrejt · Transmetimi fillon · Kalo · Sot në program · Gabimet e tua · Vlerësimi fillestar ·
+Drejtpërdrejt · Po përgatitet tabela · Kalo · Sot në program · Gabimet e tua · Vlerësimi fillestar ·
 Kthehet nesër / Kthehet pas 3 ditësh · Grafiku i lojës · Momenti kyç · Pa orë.
 
 ## Changed after this list was written
 
 - "Ndal lëvizjet" became **"Ndal animacionet"**: in a chess app "lëvizjet" also means "the moves".
 - "pas 1 ditësh" became **"nesër"**.
+- The loader said "Transmetimi fillon" (the broadcast begins); with the TV look gone it says **"Po përgatitet
+  tabela"** (the board is being prepared).
+- The game graph's caption says **"Vijat e kuqe janë gabimet"**: the mistake lines are red now, not orange.
+- Progresi: "Mësimi në të djathtë e trajton atë gabim" pointed to the right, but the link sits under each mistake;
+  it now says **"Lidhja poshtë secilit të çon te mësimi që e trajton."**
+- New with the iOS look, please check: **Pamja** (appearance), **Xhami** (the glass), **I qartë / I ngjyrosur**
+  (clear / tinted), **Mesatar** (the middle setting, read aloud by screen readers), and the note under the slider:
+  "Sa shihet tabela përmes xhamit të menyve dhe kartave. Majtas më e qartë, djathtas më e lexueshme."
+- The status during a replay said "Analizë: loja pret." next to the tag "Analizë"; it now says **"Loja pret."**
+- The level is written one way everywhere: **"Niveli 2, i lehtë"** (it was also "Niveli 2: I lehtë").

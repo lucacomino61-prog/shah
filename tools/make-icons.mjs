@@ -34,7 +34,10 @@ await icon(180, 'apple-touch-icon.png');
 // the share image: the home page's first screen at 1200 x 630
 await page.setViewport({ width: 1200, height: 630, deviceScaleFactor: 1 });
 await page.goto(base + '/', { waitUntil: 'networkidle0' });
-await page.addStyleTag({ content: '.mast,.home__guide,.tabs{display:none!important}.stage{height:100vh!important}' });
+await page.addStyleTag({ content: '.mast,.home__guide,.tabs,.ticker{display:none!important}.stage{height:100vh!important}.home{--inset-top:1.5rem!important;--inset-bottom:1.5rem!important;--inset-left:27rem!important;--inset-right:1.5rem!important}' });
+// a resize makes the board frame itself in the share image's own margins
+await page.setViewport({ width: 1199, height: 630, deviceScaleFactor: 1 });
+await page.setViewport({ width: 1200, height: 630, deviceScaleFactor: 1 });
 await new Promise((r) => setTimeout(r, 4500));
 writeFileSync(join('public', 'og.png'), await page.screenshot({ type: 'png' }));
 console.log('og.png');

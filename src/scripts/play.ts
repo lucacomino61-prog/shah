@@ -188,7 +188,7 @@ async function mountBoard(kind: '3d' | '2d') {
   marks();
   board.setInteractive(phase === 'user');
   ui.viewToggle.querySelector('[data-label]')!.textContent = board.kind === '3d' ? 'Pamje e sheshtë' : 'Pamje 3D';
-  ui.viewToggle.querySelector('.tool__icon')!.innerHTML = board.kind === '3d' ? icon('square') : icon('cube');
+  ui.viewToggle.querySelector('.tool__icon')!.innerHTML = board.kind === '3d' ? icon('gridFour') : icon('cube');
   document.querySelector<HTMLButtonElement>('[data-angle]')!.hidden = board.kind !== '3d';
   ui.viewToggle.setAttribute('aria-pressed', board.kind === '2d' ? 'true' : 'false');
 }
@@ -514,7 +514,7 @@ function status() {
   else if (phase === 'over') t = 'Loja mbaroi.';
   else if (phase === 'thinking') t = 'Trajneri po e shikon lëvizjen…';
   else if (phase === 'engine') t = 'Kundërshtari po mendon…';
-  else if (phase === 'study') t = 'Analizë: loja pret.';
+  else if (phase === 'study') t = 'Loja pret.';
   else t = chess.inCheck() ? 'Shah! Radha jote.' : 'Radha jote.';
   ui.status.textContent = t;
   const op = openingOf(sans);
@@ -533,7 +533,7 @@ function showIntro() {
   ui.coach.dataset.state = 'intro';
   ui.coach.dataset.grade = '';
   ui.glyph.innerHTML = side === 'w' ? 'Radha jote' : 'Fillon motori';
-  ui.title.textContent = `Ti luan me ${side === 'w' ? 'të bardhat' : 'të zezat'}. Niveli ${level.n}: ${level.name}.`;
+  ui.title.textContent = `Ti luan me ${side === 'w' ? 'të bardhat' : 'të zezat'}. Niveli ${level.n}, ${level.name.toLowerCase()}.`;
   ui.reasons.innerHTML = `<li>Pas çdo lëvizjeje trajneri të thotë si ishte dhe pse. Prek një figurë, pastaj fushën ku do ta çosh.</li>`;
   showWarning();
 }
@@ -589,7 +589,7 @@ function ticker() {
   const items: string[] = [];
   const op = openingOf(sans);
   if (op) items.push(op.name);
-  items.push(`Niveli ${level.n}: ${level.name}`);
+  items.push(`Niveli ${level.n}, ${level.name.toLowerCase()}`);
   if (sans.length) items.push(`Lëvizja ${Math.ceil(sans.length / 2)}`);
   if (warning) items.push(sentenceText(warning));
   const v = [...verdicts].reverse().find(Boolean);
@@ -768,7 +768,7 @@ function renderSheet() {
     })
     .join('');
   ui.rail.innerHTML = rail;
-  ui.rail.style.setProperty('--slots', String(Math.max(80, verdicts.length)));
+  ui.rail.style.setProperty('--slots', String(Math.max(24, verdicts.length)));
   const bad = verdicts.filter((v) => v && BAD.includes(v.grade)).length;
   ui.rail.setAttribute('aria-label', `Rrjedha e lojës: ${sans.length} lëvizje, ${bad} gabime`);
   // the last moves as a scoresheet graphic beside the board (wide screens)

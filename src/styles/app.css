@@ -53,14 +53,16 @@ a { color: inherit; }
 
   /* Liquid Glass: a tinted, heavily diffused layer, a lit top rim, a hairline, and a soft shadow that lifts it off
      what it floats over */
-  --glass: rgb(248 248 250 / 0.7);
-  --glass-strong: rgb(248 248 250 / 0.86);
+  /* how tinted the glass is, 0 clear to 1 tinted: iOS 27 lets people choose, and so does Progresi > Pamja */
+  --glass-level: 0.5;
+  --glass: rgb(248 248 250 / calc(0.45 + var(--glass-level) * 0.5));
+  --glass-strong: rgb(248 248 250 / calc(0.7 + var(--glass-level) * 0.3));
   --glass-sheen: rgb(255 255 255 / 0.5);
   --glass-hi: rgb(255 255 255 / 0.95);
   --glass-rim: rgb(0 0 0 / 0.07);
   --glass-depth: 0 12px 32px -10px rgb(0 0 0 / 0.22), 0 2px 6px rgb(0 0 0 / 0.07);
   --glass-press: rgb(0 0 0 / 0.06);
-  --blur: blur(28px) saturate(190%);
+  --blur: blur(calc(16px + var(--glass-level) * 24px)) saturate(190%);
 
   /* older names, kept for the pages and scripts that use them */
   --ground: var(--bg);
@@ -148,8 +150,8 @@ a { color: inherit; }
     --orange-ink: #ffb340;
     --green: #30d158;
     --green-ink: #30d158;
-    --glass: rgb(38 38 42 / 0.62);
-    --glass-strong: rgb(38 38 42 / 0.84);
+    --glass: rgb(38 38 42 / calc(0.36 + var(--glass-level) * 0.52));
+    --glass-strong: rgb(38 38 42 / calc(0.7 + var(--glass-level) * 0.3));
     --glass-sheen: rgb(255 255 255 / 0.08);
     --glass-hi: rgb(255 255 255 / 0.2);
     --glass-rim: rgb(255 255 255 / 0.09);
@@ -179,8 +181,8 @@ html[data-stage] {
   --orange-ink: #ffb340;
   --green: #30d158;
   --green-ink: #30d158;
-  --glass: rgb(30 32 34 / 0.6);
-  --glass-strong: rgb(30 32 34 / 0.86);
+  --glass: rgb(30 32 34 / calc(0.34 + var(--glass-level) * 0.52));
+  --glass-strong: rgb(30 32 34 / calc(0.72 + var(--glass-level) * 0.28));
   --glass-sheen: rgb(255 255 255 / 0.08);
   --glass-hi: rgb(255 255 255 / 0.22);
   --glass-rim: rgb(255 255 255 / 0.1);
@@ -268,9 +270,16 @@ html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="
   position: sticky; top: 0; z-index: 30;
   display: flex; align-items: center; gap: var(--space-s);
   height: var(--mast-h); padding-inline: var(--gutter);
-  background: color-mix(in srgb, var(--bg) 72%, transparent);
-  -webkit-backdrop-filter: var(--blur);
-  backdrop-filter: var(--blur);
+  isolation: isolate;
+}
+/* the iOS 26 scroll edge: no bar, a soft blur that fades out below the controls where content passes under them */
+.mast::before {
+  content: ""; position: absolute; inset: 0 0 -1.25rem; z-index: -1; pointer-events: none;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 80%, transparent), transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent);
+  mask-image: linear-gradient(to bottom, #000 50%, transparent);
 }
 .mast__mark {
   font-family: var(--font-rounded); font-weight: 700; font-size: var(--t-body); letter-spacing: -0.01em;
@@ -288,6 +297,11 @@ html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="
 .motion-switch [data-when] { display: none; }
 html:not([data-motion="off"]) .motion-switch [data-when="on"],
 html[data-motion="off"] .motion-switch [data-when="off"] { display: inline-flex; align-items: center; gap: 0.4rem; }
+@media (max-width: 1023px) {
+  .motion-switch { width: 44px; padding: 0; justify-content: center; border-radius: 50%; }
+  .motion-switch .icon { width: 1.125rem; height: 1.125rem; }
+  .motion-switch__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
 
 /* the floating tab bar: a capsule of glass over the content, the chosen tab in a lighter lens */
 .tabs {

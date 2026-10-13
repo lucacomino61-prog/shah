@@ -60,12 +60,19 @@ coach speaks as a TV broadcast, not as a flat web widget.
   boxwood and ebony pieces, on a dark felt table under one lamp. On 2026-10-13 he asked for the view "like a 3d
   person": the camera defaults to the player's seat (straight behind your pieces), raised on his "more up" to 80 degrees,
   almost looking down, with overhead and a low three-quarter angle one button away.
-- The play, puzzle and lesson screens are a broadcast: the lit table fills the screen and the coach speaks in TV
-  graphics (live bug, score bug, lower third, ticker).
+- The look is the iOS 27 idiom (Luca, 2026-10-13: "make now everything more like iOS 27 theme"; it replaced the
+  TV-broadcast skin he had asked for on 2026-10-12). The system font, the iOS system colours in light and dark,
+  large titles, inset-grouped lists, capsule buttons, a floating capsule tab bar, and Liquid Glass as iOS 27 tuned it
+  (more diffusion, more depth) for everything that floats over the table, with the iOS 27 clear-to-tinted
+  slider on Progresi.
+- The play, puzzle and lesson screens keep their structure: the lit table fills the screen, a status capsule and a
+  score card sit at the top, the coach is one glass card with the verdict as a status pill, and the headlines run in
+  an accessory above the tab bar.
 - The board also has a flat 2D view (the default for puzzles and lessons). Its pieces are the side profiles of the
   turned pieces.
-- The award-site design vocabulary applies, as on Luca's other builds: poster-scale type, two colours, one
-  signature moment, a Stop-animations switch, and a loader with a skip.
+- Kept from the award-site vocabulary of Luca's other builds: one signature moment (the wooden board), a
+  Stop-animations switch, and a loader with a skip. Poster type, the two-colour rule and the broadcast graphics gave
+  way to the iOS look.
 
 ## Evidence on Hand
 

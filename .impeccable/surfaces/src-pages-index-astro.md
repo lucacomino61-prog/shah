@@ -1,31 +1,29 @@
 ---
-version: 1
+version: 2
 slug: "src-pages-index-astro"
 primary_target: "src/pages/index.astro"
-related_targets: ["src/pages/luaj.astro","src/pages/ushtrime.astro","src/pages/mesime"]
+related_targets: ["src/pages/luaj.astro","src/pages/ushtrime.astro","src/pages/mesime","src/pages/progresi.astro"]
 ---
 
-Scope: the whole app (home, play, puzzles, lessons, progress). Visitor mode: Operate (play, puzzles); lessons are Read inside the same world; home is the poster. Audience: one learner who knows the rules, on a phone, short sessions, Albanian.
+Scope: the whole app (home, play, puzzles, lessons, opening trainer, progress). Visitor mode: Operate (play, puzzles, trainer); lessons are Read inside the same world; home is the app's front screen. Audience: one learner who knows the rules, on a phone, short sessions, Albanian.
 
 ## Direction contract
 
-THESIS: The commentary room, broadcast. The lit table fills the screen, and a commentator speaks in TV graphics after every move: what it did, why, and the better line played on the board itself. Refused: the flat green-and-cream board widget with a grey eval bar and a sidebar of tabs.
+THESIS: A chess app that feels native on an iPhone running iOS 27. The lit wooden table fills the screen and everything else floats over it as Liquid Glass; away from the table the app is an inset-grouped iOS list. Refused: the flat green-and-cream board widget with a grey eval bar and a sidebar of tabs, and any web-dashboard chrome (cards in grids, hairline-bordered panels, uppercase captions).
 
-OWN-WORLD: A dark studio round one lamp: a classic wooden board (maple and walnut squares, mahogany frame, boxwood stringing, boxwood and ebony pieces) on dark green felt. Over it, broadcast bars in two colours, stone #E6E5E1 and ink #111214, square-cornered; one lacquer orange is the pointer: the tag, the arrows, the chosen square, the live verdict. Mona Sans throughout, expanded black caps for broadcast type, normal width for reading. Informant symbols (!! ! !? ?! ? ??) grade moves, set as type.
+PINNED BY LUCA: "make now everything more like iOS 27 theme" (2026-10-13). This replaces the TV-broadcast world he asked for on 2026-10-12 ("a little broadcast like news broadcast"). Still pinned from before: "whole page the table", the board "more classic high quality wood", the seat camera at 80 degrees ("more up"), the board matte ("make the light to not reflect on the board"), pieces contrasted against the squares.
 
-STORY: The learner plays, reads the verdict in the lower third, watches the better line replayed on the board, retries, and drills the pattern in puzzles and lessons; the home page lists today's programme.
+OWN-WORLD: iOS 27. The system font (SF Pro on Apple devices, the platform sans elsewhere), the iOS system colours in light and dark (grouped background #F2F2F7 / #000, cells #FFF / #1C1C1E, labels, separators, fills), the tint blue for actions and selection, red, orange and green only as status. Liquid Glass as iOS 27 tuned it: heavy diffusion (blur 28px, saturate 190%), a tinted base, a lit top rim, a hairline, and a soft shadow that lifts each surface off the table; solid under Reduce Transparency, and the learner sets it from clear to tinted on Progresi > Pamja (the iOS 27 slider; stored as shah.glass, applied in the page head before paint). The navigation bar is no bar: a soft blur fades out below its controls (the iOS 26 scroll edge), and on desktop table pages it floats over the table. The table pages always use the dark glass, because the table is a dark room. The board stays an object: maple and walnut, mahogany frame, boxwood and ebony pieces, a warm yellow on the last move.
 
-FIRST VIEWPORT: Phone: the table fills the screen above the tab bar; live bug and score bug top left, one tool menu top right; the board seen from the player's seat; the lower third (TRAJNERI tag, move plus verdict symbol at poster size, reasons, "Shiko pse" as the primary cue) above a crawling ticker. Desktop: the lower third stacks in a left column, the board fills the rest. Home: "Shah" at about 30vw over the board, "Luaj" as the one primary action, the programme guide below.
+STORY: The learner opens Shah, taps Luaj, plays; after each move the coach card names the move and its verdict in a status pill, says why, and offers "Shiko pse", which replays the better line on the board with numbered arrows. Own mistakes come back as puzzles; lessons and the opening trainer are lists one tab away; progress is a Settings-style summary.
 
-FORM: Commentary-room demonstration board, number 4 on the ordered list (1 Informant page, 2 tournament scoresheet, 3 chess clock, 4 commentary-room demonstration board, 5 Staunton box set, 6 Rinia park stone tables, 7 engine analysis screen). Seed 630509fc. Luca's own words then pinned the materials and the frame: "whole page the table", the coach as "a little broadcast like news broadcast", "more classic high quality wood". Signature moment, "Shiko pse": the tag switches to ANALIZË, the board plays the line while numbered arrows draw on, then the pieces fly back to the game.
-Raise from the data-sublime field: total two-colour commitment in the graphics; every neutral is stone or ink at a stated alpha.
-Raise from the metro tiles: the verdict word is the interface, no badges.
-Raise from the timetable rack: one body size; rank by weight and width.
-Raise from the acetate tab board: the game's extent as a rail of ticks over the ticker, one per move, marked by verdict.
+FIRST VIEWPORT: Phone: the table fills the screen; a status capsule (a red Live tag while a game runs) and a two-row score card top left, a round glass button top right that opens a glass menu; the board seen from the player's seat at 80 degrees; the coach as one glass card; the headlines in a glass accessory above the floating capsule tab bar. Desktop: the iPad idiom, the tab bar as a capsule in the middle of the navigation bar, the coach card in a left column, tools as a row of round glass buttons. Home: "Shah" in heavy rounded type like the Lock Screen clock, "Luaj" as the one filled button, today's programme as a glass list.
+
+FORM: The iOS app, rendered by the web. Components follow their iOS counterparts: tab bar with a bottom accessory, menu, sheet with a grabber, segmented control, inset-grouped list with chevrons and checkmarks, capsule buttons (filled for the one primary action, gray fill for the rest, plain tint text for the least), large title. Signature moment, kept: "Shiko pse", the board plays the line while numbered arrows draw on, then the pieces fly back to the game.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
 
 ## Unresolved
 
 - App name beyond the working wordmark "Shah".
-- Deploy target (none until Luca says deploy). Stockfish is GPL-3.0: a public deploy must offer the source.
+- The share image (public/og.png) is re-rendered from the iOS home (tools/make-icons.mjs). The app icons are the boxwood king on ink from public/favicon.svg; iOS rounds them itself.

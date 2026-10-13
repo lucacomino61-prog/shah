@@ -83,3 +83,25 @@ reset.addEventListener('click', () => {
   saveGame(null);
   location.reload();
 });
+
+// the glass, clear to tinted, the way iOS 27 lets people set it; the page head applies the stored level before paint
+const glass = $<HTMLInputElement>('[data-glass]');
+const GLASS_KEY = 'shah.glass';
+const glassWords = (v: number) => (v < 0.34 ? 'I qartë' : v > 0.66 ? 'I ngjyrosur' : 'Mesatar');
+const showGlass = (v: number) => {
+  glass.style.setProperty('--pct', `${v * 100}%`);
+  glass.setAttribute('aria-valuetext', glassWords(v));
+};
+try {
+  const stored = parseFloat(localStorage.getItem(GLASS_KEY) ?? '');
+  if (stored >= 0 && stored <= 1) glass.value = String(stored);
+} catch {}
+showGlass(Number(glass.value));
+glass.addEventListener('input', () => {
+  const v = Number(glass.value);
+  document.documentElement.style.setProperty('--glass-level', String(v));
+  showGlass(v);
+  try {
+    localStorage.setItem(GLASS_KEY, String(v));
+  } catch {}
+});

@@ -69,6 +69,8 @@ const tabs = [
     <script is:inline>
       try {
         if (localStorage.getItem('shah.motion') === 'off') document.documentElement.dataset.motion = 'off';
+        var g = parseFloat(localStorage.getItem('shah.glass'));
+        if (g >= 0 && g <= 1) document.documentElement.style.setProperty('--glass-level', String(g));
       } catch (e) {}
     </script>
   </head>
@@ -86,8 +88,8 @@ const tabs = [
         ))}
       </nav>
       <button class="motion-switch" type="button" data-motion-switch aria-pressed="false">
-        <span data-when="on"><Fragment set:html={icon('pause')} />Ndal animacionet</span>
-        <span data-when="off"><Fragment set:html={icon('play')} />Animacionet të ndalura</span>
+        <span data-when="on"><Fragment set:html={icon('pause')} /><span class="motion-switch__label">Ndal animacionet</span></span>
+        <span data-when="off"><Fragment set:html={icon('play')} /><span class="motion-switch__label">Animacionet të ndalura</span></span>
       </button>
     </header>
     <main id="main" tabindex="-1">

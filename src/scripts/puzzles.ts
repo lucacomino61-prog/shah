@@ -411,7 +411,7 @@ async function mount(k: '3d' | '2d') {
   ui.angle.hidden = board.kind !== '3d';
   ui.view.setAttribute('aria-pressed', board.kind === '3d' ? 'true' : 'false');
   ui.view.querySelector('[data-label]')!.textContent = board.kind === '3d' ? 'Pamje e sheshtë' : 'Pamje 3D';
-  ui.view.querySelector('.tool__icon')!.innerHTML = board.kind === '3d' ? icon('square') : icon('cube');
+  ui.view.querySelector('.tool__icon')!.innerHTML = board.kind === '3d' ? icon('gridFour') : icon('cube');
 }
 
 ui.view.addEventListener('click', () => void mount(kind === '3d' ? '2d' : '3d'));

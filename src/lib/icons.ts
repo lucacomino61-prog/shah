@@ -10,6 +10,7 @@ import caretRight from '@phosphor-icons/core/assets/regular/caret-right.svg?raw'
 import chartLineUp from '@phosphor-icons/core/assets/regular/chart-line-up.svg?raw';
 import check from '@phosphor-icons/core/assets/regular/check.svg?raw';
 import cube from '@phosphor-icons/core/assets/regular/cube.svg?raw';
+import gridFour from '@phosphor-icons/core/assets/regular/grid-four.svg?raw';
 import dotsThreeVertical from '@phosphor-icons/core/assets/regular/dots-three-vertical.svg?raw';
 import eye from '@phosphor-icons/core/assets/regular/eye.svg?raw';
 import flag from '@phosphor-icons/core/assets/regular/flag.svg?raw';
@@ -19,7 +20,6 @@ import pause from '@phosphor-icons/core/assets/fill/pause-fill.svg?raw';
 import play from '@phosphor-icons/core/assets/fill/play-fill.svg?raw';
 import plus from '@phosphor-icons/core/assets/regular/plus.svg?raw';
 import puzzlePiece from '@phosphor-icons/core/assets/regular/puzzle-piece.svg?raw';
-import square from '@phosphor-icons/core/assets/regular/square.svg?raw';
 import videoCamera from '@phosphor-icons/core/assets/regular/video-camera.svg?raw';
 import x from '@phosphor-icons/core/assets/regular/x.svg?raw';
 
@@ -43,7 +43,7 @@ const raw = {
   play,
   plus,
   puzzlePiece,
-  square,
+  gridFour,
   videoCamera,
   x,
 };
