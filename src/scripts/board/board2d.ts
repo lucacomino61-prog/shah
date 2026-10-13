@@ -25,6 +25,9 @@ export function createBoard2d(o: BoardOptions): BoardView {
   let interactive = true;
 
   const svg = el('svg', { viewBox: '-44 -44 888 888', class: 'board-svg', 'aria-hidden': 'true' });
+  // a phone: the squares run edge to edge, the frame's sides fall outside the picture and the rank numbers move onto
+  // the left-hand squares, as chess.com sets them
+  const phone = window.matchMedia('(max-width: 1023px)');
   const squaresG = el('g');
   const coordsG = el('g', { class: 'board-coords' });
   const marksG = el('g');
@@ -41,6 +44,8 @@ export function createBoard2d(o: BoardOptions): BoardView {
   };
 
   function drawSquares() {
+    const compact = phone.matches;
+    svg.setAttribute('viewBox', compact ? '0 -44 800 888' : '-44 -44 888 888');
     squaresG.replaceChildren();
     coordsG.replaceChildren();
     // the frame: mahogany, a boxwood line let in round the squares
@@ -61,12 +66,16 @@ export function createBoard2d(o: BoardOptions): BoardView {
       const t = el('text', { x: i * 100 + 50, y: 834, 'text-anchor': 'middle' });
       t.textContent = orientation === 'w' ? FILES[i] : FILES[7 - i];
       coordsG.append(t);
-      const n = el('text', { x: -30, y: i * 100 + 58, 'text-anchor': 'middle' });
+      // the left-hand column's far square is light in either orientation, so the colours alternate from light
+      const n = compact
+        ? el('text', { x: 7, y: i * 100 + 25, 'text-anchor': 'start', class: i % 2 === 0 ? 'on-l' : 'on-d' })
+        : el('text', { x: -30, y: i * 100 + 58, 'text-anchor': 'middle' });
       n.textContent = String(orientation === 'w' ? 8 - i : i + 1);
       coordsG.append(n);
     }
   }
   drawSquares();
+  phone.addEventListener('change', drawSquares);
 
   const pieces = new Map<Sq, Pc>();
   let current = new Map<Sq, Placed>();
@@ -381,6 +390,7 @@ export function createBoard2d(o: BoardOptions): BoardView {
       return performance.now() < busyUntil;
     },
     dispose() {
+      phone.removeEventListener('change', drawSquares);
       svg.remove();
       plate.remove();
     },

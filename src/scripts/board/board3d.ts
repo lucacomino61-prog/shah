@@ -269,7 +269,7 @@ function felt(size: number): CanvasTexture {
 }
 
 /** The file letters and rank numbers inlaid in the frame, turned to face whoever sits at the board. */
-function inlay(size: number, orientation: Side): CanvasTexture {
+function inlay(size: number, orientation: Side, ranks = true): CanvasTexture {
   const c = document.createElement('canvas');
   c.width = c.height = size;
   const g = c.getContext('2d')!;
@@ -294,7 +294,38 @@ function inlay(size: number, orientation: Side): CanvasTexture {
     const near = orientation === 'w' ? edge : -edge;
     put(FILES[i], i - 3.5, near);
     const side = orientation === 'w' ? -edge : edge;
-    put(String(i + 1), side, 3.5 - i);
+    if (ranks) put(String(i + 1), side, 3.5 - i);
+  }
+  const t = new CanvasTexture(c);
+  t.colorSpace = SRGBColorSpace;
+  return t;
+}
+
+/** Rank numbers inside the squares of the player's left-hand file, for a phone: there the board runs edge to edge
+ *  and the frame's own numbers fall off the screen, so they move onto the squares the way chess.com sets them, in
+ *  the colour of the other wood. */
+function rankLabels(size: number, orientation: Side): CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const g = c.getContext('2d')!;
+  const h = BOARD.half;
+  const k = size / (2 * h);
+  g.font = `700 ${Math.round(k * 0.22)}px -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif`;
+  g.textAlign = 'left';
+  g.textBaseline = 'top';
+  const white = orientation === 'w';
+  for (let i = 0; i < 8; i++) {
+    // i counts from the far side; the left-hand file is a for white, h for black, and its far square is light
+    const rank = white ? 8 - i : i + 1;
+    const zc = 4.5 - rank;
+    const x = white ? -h + 0.1 : h - 0.1;
+    const z = white ? zc - 0.5 + 0.08 : zc + 0.5 - 0.08;
+    g.fillStyle = i % 2 === 0 ? 'rgba(96, 56, 28, 0.92)' : 'rgba(240, 222, 186, 0.92)';
+    g.save();
+    g.translate((x + h) * k, (z + h) * k);
+    g.rotate(white ? 0 : Math.PI);
+    g.fillText(String(rank), 0, 0);
+    g.restore();
   }
   const t = new CanvasTexture(c);
   t.colorSpace = SRGBColorSpace;
@@ -466,6 +497,8 @@ export function createBoard3d(o: BoardOptions): BoardView {
   let portrait = true;
   const preset = () => (portrait ? ANGLES[angle].upright : ANGLES[angle].wide);
   const azimuthFor = () => (orientation === 'w' ? 0 : Math.PI) + preset().az;
+  /** a phone straight from the seat or overhead: the playing field edge to edge, the frame's sides off screen */
+  const tight = () => portrait && preset().az === 0;
   az = azimuthFor();
 
   const hemi = new HemisphereLight(0x8fa596, 0x0c140f, STUDIO.hemi);
@@ -553,11 +586,25 @@ export function createBoard3d(o: BoardOptions): BoardView {
   inlayPlane.position.y = frameH + 0.008;
   inlayPlane.renderOrder = 1;
   board.add(inlayPlane);
+  // on a phone the rank numbers move onto the edge squares (the frame's sides are off screen there)
+  const ranksMat = own(new MeshBasicMaterial({ transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
+  ranksMat.toneMapped = false;
+  const ranksPlane = new Mesh(keep(new PlaneGeometry(2 * BOARD.half, 2 * BOARD.half).rotateX(-Math.PI / 2)), ranksMat);
+  ranksPlane.position.y = BOARD.top + 0.002;
+  ranksPlane.renderOrder = 1;
+  ranksPlane.visible = false;
+  board.add(ranksPlane);
+  let ranksMap: CanvasTexture | null = null;
   let inlayMap: CanvasTexture | null = null;
   const drawInlay = () => {
     inlayMap?.dispose();
-    inlayMap = inlay(1024, orientation);
+    // edge to edge on a phone the numbers live on the squares, and the frame's would peek in at the screen edge
+    inlayMap = inlay(1024, orientation, !ranksPlane.visible);
     inlayMat.map = inlayMap;
+    ranksMap?.dispose();
+    ranksMap = rankLabels(1024, orientation);
+    ranksMat.map = ranksMap;
+    ranksMat.needsUpdate = true;
     inlayMat.needsUpdate = true;
   };
   // the face may still be loading: draw now, and again once it is in
@@ -1264,6 +1311,10 @@ export function createBoard3d(o: BoardOptions): BoardView {
     camera.position.set(...rig.camera);
     camera.lookAt(...rig.target);
     if (refit) {
+      if (ranksPlane.visible !== tight()) {
+        ranksPlane.visible = tight();
+        drawInlay();
+      }
       // the board sits in the part of the table the broadcast graphics leave free (CSS --inset-*)
       const cs = getComputedStyle(o.host);
       const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
@@ -1272,7 +1323,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
         return (parseFloat(v) || 0) * (v.endsWith('rem') ? rem : 1);
       };
       const box = { x: px('--inset-left'), y: px('--inset-top'), w: W - px('--inset-left') - px('--inset-right'), h: H - px('--inset-top') - px('--inset-bottom') };
-      const f = frameBounds(boardBounds(rigFor(azimuthFor(), elevation, preset().dist)), W, H, box.w > 50 && box.h > 50 ? box : undefined);
+      const f = frameBounds(boardBounds(rigFor(azimuthFor(), elevation, preset().dist), tight()), W, H, box.w > 50 && box.h > 50 ? box : undefined);
       lens.to = { fov: f.fov, ox: f.ox, oy: f.oy };
       // a resize or the first frame snaps; a change of the free space (the coach saying more) eases, like a
       // broadcast camera reframing
@@ -1559,6 +1610,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
       textures.forEach((t) => t.dispose());
       numbers.forEach((t) => t.dispose());
       inlayMap?.dispose();
+      ranksMap?.dispose();
       studios.forEach((m) => m.dispose());
       renderer.dispose();
       canvas.remove();

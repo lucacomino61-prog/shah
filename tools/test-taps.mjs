@@ -100,10 +100,11 @@ const rect = async (sq) =>
     const side = window.__puzzle.state().side;
     const f = 'abcdefgh'.indexOf(sq[0]);
     const rk = Number(sq[1]) - 1;
-    const size = Math.min(r.width, r.height);
-    const k = size / 888;
-    const x0 = r.left + (r.width - size) / 2 + 44 * k;
-    const y0 = r.top + (r.height - size) / 2 + 44 * k;
+    // the viewBox is cropped on a phone; read it rather than assume the framed 888-unit square
+    const vb = svg.viewBox.baseVal;
+    const k = Math.min(r.width / vb.width, r.height / vb.height);
+    const x0 = r.left + (r.width - vb.width * k) / 2 - vb.x * k;
+    const y0 = r.top + (r.height - vb.height * k) / 2 - vb.y * k;
     const cx = side === 'w' ? f : 7 - f;
     const cy = side === 'w' ? 7 - rk : rk;
     return { x: x0 + (cx + 0.5) * 100 * k, y: y0 + (cy + 0.5) * 100 * k };
