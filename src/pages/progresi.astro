@@ -164,7 +164,7 @@ const hours = Array.from({ length: 24 }, (_, h) => (h + 6) % 24);
   .pick { position: relative; display: inline-flex; align-items: center; gap: 0.25rem; color: var(--label-2); }
   .pick select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; color: inherit; font: inherit; font-variant-numeric: tabular-nums; min-height: 44px; padding: 0 1.25rem 0 0.75rem; margin-inline-end: -1.25rem; cursor: pointer; text-align: end; }
   .pick .icon { width: 0.875rem; height: 0.875rem; pointer-events: none; }
-  .pick select:focus-visible { outline: 2px solid var(--tint); outline-offset: 2px; border-radius: 6px; }
+  .pick select:focus-visible { outline: 2px solid var(--tint); outline-offset: 2px; border-radius: 999px; }
   .backup > * + * { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
   .backup .row { width: 100%; text-align: start; color: var(--tint-ink); }
   .backup .icon { width: 1.125rem; height: 1.125rem; }
