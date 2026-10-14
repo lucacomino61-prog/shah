@@ -11,7 +11,7 @@ import { openingOf } from '../lib/openings.ts';
 import { addCard, load, loadGame, saveGame, update, type Progress } from '../lib/store.ts';
 import { inDanger } from '../lib/threats.ts';
 import { moveSound, winSound } from '../lib/sound.ts';
-import { createBoard, followBroadcast, keyboard, type BoardView } from './board/index.ts';
+import { createBoard, keepBoardStill, keyboard, type BoardView } from './board/index.ts';
 import type { Arrow, Side, Sq } from './board/types.ts';
 import { gsap, motionOn, onMotion, onTick } from './shell.ts';
 
@@ -1118,7 +1118,7 @@ ui.end.querySelector('[data-review]')!.addEventListener('click', () => {
 
 onMotion((on) => board?.setMotion(on));
 onTick((dt) => board?.tick(dt));
-followBroadcast(ui.host, ui.coach, () => board);
+keepBoardStill(ui.host, ui.coach, () => board);
 keyboard(ui.host, () => board, () => orientation);
 
 (async () => {

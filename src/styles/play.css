@@ -425,6 +425,20 @@ html[data-motion="off"] .ticker__track { animation: none; }
 @media (max-width: 1023px) {
   .ticker { display: none; }
   .lower { bottom: calc(var(--chrome-bottom) + 0.25rem); gap: 0.25rem; padding: 0.6875rem 0.875rem 0.75rem; border-radius: 1.5rem; }
+  /* the card keeps to its band under the board (--card-max, from keepBoardStill) so the board never moves; when the
+     coach says more, the reasons scroll inside and the headline and buttons stay in view */
+  .lower { max-height: var(--card-max, none); grid-template-rows: auto minmax(0, 1fr); }
+  .lower__body { display: flex; flex-direction: column; min-height: 0; }
+  .lower__body > * { flex: none; }
+  /* when the band is short the words give way, never the buttons */
+  .lower__body > :is(.lower__reasons, .lines, .editor) { flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  /* the coach's reasons go first, then a replayed line or the end figures */
+  .lower__body > .lower__reasons { flex-shrink: 100; }
+  .lower[data-mode="study"] .study { display: flex; flex-direction: column; flex: 0 1 auto; min-height: 0; }
+  .lower[data-mode="study"] .study > * { flex: none; }
+  .lower[data-mode="study"] .study__line { flex: 0 1 auto; min-height: 0; overflow-y: auto; }
+  .end:not([hidden]) { display: flex; flex-direction: column; flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .lower[data-tight] .end > .lower__actions { order: -1; margin: 0 0 0.25rem; }
   .lower__glyph { font-size: var(--t-title2); }
   .lower[data-state="intro"] .lower__glyph,
   .lower[data-state="note"] .lower__glyph,

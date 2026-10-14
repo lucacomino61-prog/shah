@@ -7,7 +7,7 @@ import { repertoireOf } from '../data/repertoires.ts';
 import { sentenceHtml, sentenceText } from '../lib/notation.ts';
 import { openingOf } from '../lib/openings.ts';
 import { load, update } from '../lib/store.ts';
-import { createBoard, followBroadcast, keyboard, type BoardView } from './board/index.ts';
+import { createBoard, keepBoardStill, keyboard, type BoardView } from './board/index.ts';
 import type { Side, Sq } from './board/types.ts';
 import { gsap, motionOn, onMotion, onTick } from './shell.ts';
 import { missSound, moveSound, winSound } from '../lib/sound.ts';
@@ -253,7 +253,7 @@ ui.angle.addEventListener('click', () => {
 
 onMotion((on) => board?.setMotion(on));
 onTick((dt) => board?.tick(dt));
-followBroadcast(ui.host, ui.coach, () => board);
+keepBoardStill(ui.host, ui.coach, () => board);
 keyboard(ui.host, () => board, () => side);
 
 (async () => {

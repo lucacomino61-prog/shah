@@ -1427,8 +1427,6 @@ export function createBoard3d(o: BoardOptions): BoardView {
   let orbitT = 0;
   let frames = 0;
   let slow = 0;
-  let swayX = 0;
-  let swayVX = 0;
   function tick(seconds: number) {
     if (!visible) return;
     const dt = Math.min(seconds, 1 / 20);
@@ -1469,26 +1467,13 @@ export function createBoard3d(o: BoardOptions): BoardView {
       applyLens();
       moving = true;
     }
-    // a slow swing round the table (the home page), or a lean toward a mouse pointer (never on touch)
+    // a slow swing round the table on the home page; anywhere a game, lesson or puzzle is played the camera stays
+    // put (Luca, 2026-10-14: "make the board to not move")
     if (motionOn && orbitSpeed) {
       orbitT += orbitSpeed * dt;
       az = azimuthFor() + Math.sin(orbitT) * 0.32;
       placeCamera(false);
       moving = true;
-    } else if (motionOn && window.matchMedia('(hover: hover)').matches) {
-      let tx = 0;
-      if (pointer && !down) {
-        const r = o.host.getBoundingClientRect();
-        tx = Math.max(-1, Math.min(1, ((pointer.x - r.left) / r.width) * 2 - 1));
-      }
-      swayVX += (40 * (tx - swayX) - 12 * swayVX) * dt;
-      swayX += swayVX * dt;
-      const nAz = azimuthFor() - swayX * 0.03;
-      if (Math.abs(nAz - az) > 1e-5) {
-        az = nAz;
-        placeCamera(false);
-        moving = true;
-      }
     }
 
     if (moving || dirty) {

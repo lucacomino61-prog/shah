@@ -6,7 +6,7 @@ import puzzles from '../data/puzzles.json';
 import { sanHtml, sentenceHtml, sentenceText } from '../lib/notation.ts';
 import { DAYS, dueCards, load, ratePuzzle, reviewCard, solveDaily, streakNow, today, update, type Card } from '../lib/store.ts';
 import { THEMES, themeOf } from '../lib/themes.ts';
-import { createBoard, followBroadcast, keyboard, type BoardView } from './board/index.ts';
+import { createBoard, keepBoardStill, keyboard, type BoardView } from './board/index.ts';
 import type { Side, Sq } from './board/types.ts';
 import { gsap, motionOn, onMotion, onTick } from './shell.ts';
 import { missSound, moveSound, winSound } from '../lib/sound.ts';
@@ -606,7 +606,7 @@ ui.angle.addEventListener('click', () => {
 
 onMotion((on) => board?.setMotion(on));
 onTick((dt) => board?.tick(dt));
-followBroadcast(ui.host, ui.coach, () => board);
+keepBoardStill(ui.host, ui.coach, () => board);
 keyboard(ui.host, () => board, () => side);
 
 (async () => {

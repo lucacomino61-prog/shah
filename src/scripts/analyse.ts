@@ -9,7 +9,7 @@ import { sanHtml, sentenceHtml, sentenceText } from '../lib/notation.ts';
 import { openingOf } from '../lib/openings.ts';
 import { moveSound } from '../lib/sound.ts';
 import { addCard } from '../lib/store.ts';
-import { createBoard, followBroadcast, keyboard, type BoardView } from './board/index.ts';
+import { createBoard, keepBoardStill, keyboard, type BoardView } from './board/index.ts';
 import type { Arrow, Side, Sq } from './board/types.ts';
 import { motionOn, onMotion, onTick } from './shell.ts';
 
@@ -830,7 +830,7 @@ $('[data-angle]').addEventListener('click', () => {
 
 onMotion((on) => board?.setMotion(on));
 onTick((dt) => board?.tick(dt));
-followBroadcast(ui.host, ui.coach, () => board);
+keepBoardStill(ui.host, ui.coach, () => board);
 keyboard(ui.host, () => board, () => orientation);
 
 (async () => {
