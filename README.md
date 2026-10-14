@@ -14,7 +14,7 @@ A small server (`server/`, a Cloudflare Worker) carries only what needs more tha
 - sync between your phones, encrypted on the phone so the server cannot read it;
 - the daily reminder.
 
-Live: https://shah-trajneri.pages.dev
+Live: https://shah-trajneri.pages.dev (server: https://shah-server.lucacomino-old.workers.dev)
 
 ## Run
 
@@ -56,6 +56,7 @@ node tools/test-online.mjs                # a game between two browsers online (
 node tools/test-sync.mjs                  # sync between two browsers (dev server and server)
 node tools/test-remind.mjs                # the reminder end to end (a build with PUBLIC_SHAH_SERVER=http://127.0.0.1:8787 on 3772, and the server)
 node tools/test-offline.mjs [url]         # installed app offline (production preview or the live site)
+node tools/test-live.mjs [url]            # after a deploy: the opening, an online game, sync, on the live site and server
 node tools/shots.mjs                      # screenshots of every page in headless Chrome (dev server running)
 ```
 
@@ -75,8 +76,8 @@ npx wrangler deploy -c server/wrangler.jsonc
 npx wrangler secret put VAPID_PRIVATE -c server/wrangler.jsonc
 ```
 
-The second command asks for the value; it is in `server/.dev.vars`. Then put the Worker's URL in `.env.production`
-as `PUBLIC_SHAH_SERVER=https://shah-server.<account>.workers.dev`, and build and deploy the app as above.
+The second command asks for the value; it is in `server/.dev.vars`. The Worker's URL is in
+`.env.production` (`PUBLIC_SHAH_SERVER`), so `npm run build` points the app at it.
 
 ## Where things are
 
