@@ -1184,6 +1184,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
 
   function press(s: Sq) {
     if (!interactive) return;
+    if (o.onSquare?.(s)) return;
     const b = bySq.get(s) ?? null;
     if (chosen && chosen.sq && reaches(s)) {
       const from = chosen.sq;
@@ -1209,6 +1210,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
       return;
     }
     e.preventDefault();
+    if (o.onSquare?.(sq)) return;
     if (chosen && b !== chosen && reaches(sq)) {
       const from = chosen.sq!;
       choose(null);

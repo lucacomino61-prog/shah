@@ -253,6 +253,7 @@ export function createBoard2d(o: BoardOptions): BoardView {
 
   function press(s: Sq) {
     if (!interactive) return;
+    if (o.onSquare?.(s)) return;
     if (chosen && reaches(s)) {
       const from = chosen;
       choose(null);
@@ -287,6 +288,10 @@ export function createBoard2d(o: BoardOptions): BoardView {
     if (e.button !== 0 || !interactive || (e.target as Element).closest('[data-board-ui]')) return;
     const s = squareAt(e.clientX, e.clientY);
     if (!s) return;
+    if (o.onSquare?.(s)) {
+      e.preventDefault();
+      return;
+    }
     if (chosen && reaches(s)) {
       e.preventDefault();
       press(s);

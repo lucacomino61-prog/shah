@@ -306,8 +306,8 @@ html[data-motion="off"] .motion-switch [data-when="off"] { display: inline-flex;
 /* the floating tab bar: a capsule of glass over the content, the chosen tab in a lighter lens */
 .tabs {
   position: fixed; left: 0; right: 0; bottom: var(--tab-gap); z-index: 30;
-  width: min(calc(100% - 1.5rem), 30rem); margin-inline: auto;
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.125rem;
+  width: min(calc(100% - 1.25rem), 32rem); margin-inline: auto;
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.125rem;
   height: var(--tab-h); padding: 0.25rem; border-radius: 999px;
 }
 .tabs a {

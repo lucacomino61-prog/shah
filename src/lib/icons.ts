@@ -37,6 +37,7 @@ import users from '@phosphor-icons/core/assets/regular/users.svg?raw';
 import robot from '@phosphor-icons/core/assets/regular/robot.svg?raw';
 import shareNetwork from '@phosphor-icons/core/assets/regular/share-network.svg?raw';
 import copy from '@phosphor-icons/core/assets/regular/copy.svg?raw';
+import pencilSimple from '@phosphor-icons/core/assets/regular/pencil-simple.svg?raw';
 
 const raw = {
   arrowCounterClockwise,
@@ -76,6 +77,7 @@ const raw = {
   robot,
   shareNetwork,
   copy,
+  pencilSimple,
 };
 export type IconName = keyof typeof raw;
 

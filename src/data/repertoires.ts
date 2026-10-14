@@ -163,6 +163,72 @@ export const REPERTOIRES: Repertoire[] = [
       },
     ],
   },
+  {
+    slug: 'londra',
+    title: 'Me të bardhat: Sistemi i Londrës',
+    side: 'w',
+    lede: '1.d4 dhe 2.Bf4: një plan i vetëm, i lehtë për t’u mbajtur mend, kundër pothuajse çdo përgjigjeje.',
+    lines: [
+      {
+        name: 'Struktura e Londrës',
+        idea: 'Oficeri del në f4 para e3, pastaj c3, Nd2 dhe Bd3: një ngrehinë e fortë që luhet pothuajse kundër çdo gjëje.',
+        moves: 'd4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3 Nc6 Nbd2 Bd6 Bg3 O-O Bd3',
+      },
+      {
+        name: 'Kundër ...Bf5',
+        idea: 'Kur oficeri i zi del në f5, c4 dhe Nc3 godasin d5: e bardha luan si në gambitin e damës.',
+        moves: 'd4 d5 Bf4 Nf6 e3 Bf5 c4 e6 Nc3 c6 Nf3 Nbd7',
+      },
+      {
+        name: 'Kundër ...g6',
+        idea: 'Kundër Indianes së mbretit, h3 i ruan oficerit një fushë për t’u tërhequr, dhe rokada vjen pas zhvillimit.',
+        moves: 'd4 Nf6 Bf4 g6 e3 Bg7 Nf3 O-O Be2 d6 h3',
+      },
+      {
+        name: 'Kundër ...c5 herët',
+        idea: 'Kundër ...c5 mbaje d4 me c3; kali shkon në d2 që të mos e bllokojë ushtarin c.',
+        moves: 'd4 d5 Bf4 c5 e3 Nc6 c3 Nf6 Nd2 e6 Ngf3 Bd6 Bg3 O-O Bd3',
+      },
+      {
+        name: 'Kundër ...e6',
+        idea: 'Kundër ...e6 dhe ...c5 i njëjti plan: e3, c3, Nd2, Ngf3 dhe Bd3.',
+        moves: 'd4 Nf6 Bf4 e6 e3 c5 c3 Nc6 Nd2 d5 Ngf3 Bd6 Bg3 O-O Bd3',
+      },
+    ],
+  },
+  {
+    slug: 'karo-kani',
+    title: 'Me të zezat kundër 1.e4: Mbrojtja Karo-Kan',
+    side: 'b',
+    lede: '1...c6 dhe 2...d5: një mbrojtje e fortë, me oficerin jashtë zinxhirit të ushtarëve para ...e6.',
+    lines: [
+      {
+        name: 'Klasikja',
+        idea: 'Oficeri del në f5 para ...e6; kundër h4 përgjigju me ...h6 dhe mbaje oficerin te h7.',
+        moves: 'e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 h4 h6 Nf3 Nd7 h5 Bh7 Bd3 Bxd3 Qxd3 e6',
+      },
+      {
+        name: 'E avancuara',
+        idea: 'Kundër e5, oficeri del në f5, pastaj ...e6 dhe ...c5: godit bazën e zinxhirit të bardhë.',
+        moves: 'e4 c6 d4 d5 e5 Bf5 Nf3 e6 Be2 c5 O-O Nc6 c3 cxd4 cxd4 Nge7',
+      },
+      {
+        name: 'Shkëmbimi',
+        idea: 'Pas shkëmbimit: ...Nc6, ...Nf6 dhe ...Bg4. Zhvilloje oficerin para se ta mbyllësh me ...e6.',
+        moves: 'e4 c6 d4 d5 exd5 cxd5 Bd3 Nc6 c3 Nf6 Bf4 Bg4 Qb3 Qd7',
+      },
+      {
+        name: 'Dy kuajt',
+        idea: 'Kundër Nc3 dhe Nf3, ...Bg4 dhe ...Bxf3 i heqin të bardhës kalin; pastaj ...e6 dhe ...Nf6.',
+        moves: 'e4 c6 Nc3 d5 Nf3 Bg4 h3 Bxf3 Qxf3 e6 d4 Nf6 Bd3 dxe4 Nxe4 Nxe4 Qxe4 Nd7',
+      },
+      {
+        name: 'Sulmi Panov',
+        idea: 'Kundër c4: ...Nf6, ...e6 dhe ...Bb4 shtypin qendrën dhe ushtarin d5 që mbetet vetëm.',
+        moves: 'e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 e6 Nf3 Bb4',
+      },
+    ],
+  },
 ];
 
 export const repertoireOf = (slug: string) => REPERTOIRES.find((r) => r.slug === slug);

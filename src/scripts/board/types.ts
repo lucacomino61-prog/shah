@@ -37,6 +37,8 @@ export interface BoardOptions {
   /** a game keeps what was taken lying beside the board; a puzzle or a lesson that jumps to a new position puts
    *  the pieces it does not use away instead (default true) */
   keepTaken?: boolean;
+  /** a page that takes over taps on squares (setting up a position) returns true for the ones it handled */
+  onSquare?: (sq: Sq) => boolean;
 }
 
 export interface BoardView {

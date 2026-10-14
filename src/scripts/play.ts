@@ -1051,6 +1051,16 @@ ui.setup.querySelector('[data-levels]')!.innerHTML = LEVELS.map(
     `<label class="choice choice--bot"><input type="radio" name="level" value="${l.n}"><span class="bot" style="--hue: ${l.hue}" aria-hidden="true">${l.bot[0]}</span><span class="choice__body"><b>${l.bot}</b><span>Niveli ${l.n}, ${l.name.toLowerCase()}. ${l.note}</span></span></label>`,
 ).join('');
 
+// the game so far, opened on the analysis board
+$('[data-analyse]').addEventListener('click', () => {
+  try {
+    sessionStorage.setItem('shah.analyse', chess.pgn());
+  } catch {
+    /* blocked storage: the board opens empty */
+  }
+  location.href = '/analizo/';
+});
+
 const threatsBtn = $<HTMLButtonElement>('[data-threats]');
 threatsBtn.setAttribute('aria-pressed', String(prefs.threats));
 threatsBtn.addEventListener('click', () => {

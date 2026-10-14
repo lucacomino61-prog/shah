@@ -6,7 +6,7 @@ import { pieceSprite } from '../lib/chess/silhouette';
 interface Props {
   title: string;
   description: string;
-  tab: 'luaj' | 'ushtrime' | 'mesime' | 'progresi' | null;
+  tab: 'luaj' | 'ushtrime' | 'mesime' | 'analizo' | 'progresi' | null;
   /** the page is the lit table: dark studio throughout, whatever the system theme */
   stage?: boolean;
   /** kept out of search results (the 404) */
@@ -36,6 +36,7 @@ const tabs = [
   { id: 'luaj', href: '/luaj/', label: 'Luaj', icon: 'horse' },
   { id: 'ushtrime', href: '/ushtrime/', label: 'Ushtrime', icon: 'puzzlePiece' },
   { id: 'mesime', href: '/mesime/', label: 'Mësime', icon: 'bookOpenText' },
+  { id: 'analizo', href: '/analizo/', label: 'Analizo', icon: 'magnifyingGlass' },
   { id: 'progresi', href: '/progresi/', label: 'Progresi', icon: 'chartLineUp' },
 ] as const;
 ---

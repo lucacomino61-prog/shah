@@ -280,6 +280,38 @@ html[data-motion="off"] .ticker__track { animation: none; }
 .ticker__rail i[data-g="blunder"] { height: 11px; background: var(--red); }
 .ticker__rail i[data-now] { box-shadow: 0 -2px 0 var(--tint); }
 
+/* ------------------------------------------------------------------ the analysis board */
+/* the engine's best lines in the coach card: the value, then the moves; a tap plays the first */
+.lines { display: grid; gap: 0.125rem; }
+.lines:empty { display: none; }
+.lines li { display: block; }
+.line {
+  display: grid; grid-template-columns: 3.25rem minmax(0, 1fr); align-items: baseline; gap: 0.5rem; width: 100%;
+  min-height: 2.25rem; padding: 0.3125rem 0.5rem; border-radius: 0.75rem; text-align: start; color: var(--label);
+  font-size: var(--t-sub); transition: background-color 120ms ease;
+}
+.line:active { background: var(--glass-press); }
+@media (hover: hover) and (pointer: fine) { .line:hover { background: var(--glass-press); } }
+.line b { font-weight: 700; text-align: end; }
+.line span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--label-2); }
+.line:first-child span { color: var(--label); }
+/* the value as a bar inside the capsule: the white share of the chances */
+.evalmini { flex: 1 1 auto; min-width: 2rem; max-width: 4.5rem; height: 0.375rem; border-radius: 999px; background: #1c1c1e; box-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.25); overflow: hidden; }
+.evalmini i { display: block; height: 100%; width: var(--w, 50%); background: #f2f2f7; transition: width 400ms var(--ease-out); }
+/* setting up a position: the twelve pieces and an eraser */
+.editor { display: grid; gap: 0.5rem; }
+.editor[hidden] { display: none; }
+.editor__pieces { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.25rem; }
+.editor__pc {
+  display: grid; place-items: center; height: 2.75rem; border-radius: 0.75rem; background: var(--fill); color: var(--label);
+  transition: background-color 120ms ease, transform var(--dur-press) var(--ease-out);
+}
+.editor__pc svg { width: 1.75rem; height: 1.75rem; }
+.editor__pc[aria-pressed=true] { background: var(--tint-fill); }
+.editor__pc:active { transform: scale(0.94); }
+.editor__erase { grid-column: 7; grid-row: 1 / span 2; height: auto; }
+.editor__turn label { min-height: 2.25rem; font-size: var(--t-foot); }
+
 /* ------------------------------------------------------------------ the promotion choice over the board */
 .promo {
   position: absolute; inset: 0; z-index: 4;

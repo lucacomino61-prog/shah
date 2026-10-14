@@ -128,6 +128,39 @@ export const LESSONS: Lesson[] = [
     ],
   },
   {
+    slug: 'helli',
+    title: 'Helli',
+    lede: 'Si lidhja, por e kundërta: figura më e vlefshme qëndron përpara, largohet, dhe merret ajo pas saj.',
+    steps: [
+      {
+        title: 'Helli me torrë',
+        text: 'Mbreti i zi dhe mbretëresha qëndrojnë në të njëjtën kolonë. Jepi shah mbretit me torrë: ai duhet të largohet, dhe mbretëresha pas tij mbetet pa mbrojtje.',
+        fen: '4q3/8/8/4k3/8/8/8/R5K1 w - - 0 1',
+        arrows: [{ from: 'a1', to: 'e1' }],
+        task: { moves: ['a1e1', 'e5d4', 'e1e8'], done: 'Mbreti iku, dhe mbretëresha ra. Ky është helli.' },
+      },
+      practice('skewer', 0, 'Provo vetë', 'Kërko shahun që zbulon figurën e vlefshme pas mbretit.'),
+      practice('skewer', 2, 'Edhe një', 'Helli punon në vija të drejta: kolona, rreshta dhe diagonale.'),
+    ],
+  },
+  {
+    slug: 'sulmi-i-zbuluar',
+    title: 'Sulmi i zbuluar',
+    lede: 'Një figurë largohet dhe zbulon sulmin e një tjetre pas saj: dy kërcënime me një lëvizje.',
+    steps: [
+      {
+        title: 'Shahu i zbuluar',
+        text: 'Torra jote në e1 sulmon mbretin, por oficeri yt në e2 i qëndron përpara. Lëviz oficerin: torra jep shah, dhe oficeri merr mbretëreshën në të njëjtën lëvizje.',
+        fen: '4k3/8/q7/8/8/8/4B3/4R1K1 w - - 0 1',
+        arrows: [{ from: 'e1', to: 'e8' }],
+        focus: ['e2'],
+        task: { moves: ['e2a6'], done: 'Shah nga torra, dhe mbretëresha ra: dy kërcënime me një lëvizje.' },
+      },
+      practice('discoveredAttack', 0, 'Provo vetë', 'Lëviz figurën që qëndron përpara, dhe zbulo sulmin pas saj.'),
+      practice('discoveredAttack', 3, 'Edhe një', 'Kur figura që lëviz sulmon edhe vetë diçka, kundërshtari nuk shpëton dot nga të dyja.'),
+    ],
+  },
+  {
     slug: 'mat-ne-rreshtin-e-fundit',
     title: 'Mat në rreshtin e fundit',
     lede: 'Mbreti pas tre ushtarëve të vet është i sigurt, derisa një torrë hyn në rreshtin e fundit.',
@@ -222,6 +255,33 @@ export const LESSONS: Lesson[] = [
     ],
   },
 ];
+
+LESSONS.push({
+  slug: 'opozita',
+  title: 'Opozita',
+  lede: 'Në fund të lojës, mbreti që zë opozitën kalon përpara. Kjo vendos nëse ushtari bëhet mbretëreshë.',
+  steps: [
+    {
+      title: 'Mbretërit përballë',
+      text: 'Kur dy mbretërit qëndrojnë përballë me një fushë mes tyre, ai që duhet të lëvizë duhet t’i lërë rrugë tjetrit. Ai që nuk e ka radhën “ka opozitën”. Këtu radha është e të zezave: mbreti yt ka opozitën.',
+      fen: '8/8/3k4/8/3K4/8/3P4/8 b - - 0 1',
+      focus: ['d4', 'd6'],
+      side: 'w',
+    },
+    {
+      title: 'Zëre opozitën',
+      text: 'Ti e ke radhën. Çoje mbretin dy rreshta para ushtarit, përballë mbretit të zi, që radha të jetë e tij.',
+      fen: '8/8/3k4/8/8/3K4/3P4/8 w - - 0 1',
+      task: { moves: ['d3d4'], also: ['d3c4', 'd3e4'], done: 'Mbreti yt qëndron para ushtarit: tani mbreti i zi duhet t’i lërë rrugë.' },
+    },
+    {
+      title: 'Luaje deri në fund',
+      text: 'Tani luaje kundër motorit. Mbaje mbretin përpara ushtarit, zëre opozitën sa herë mundesh, dhe bëje ushtarin mbretëreshë.',
+      fen: '8/8/3k4/8/8/3K4/3P4/8 w - - 0 1',
+      playout: 'promote',
+    },
+  ],
+});
 
 LESSONS.push({
   slug: 'fundloja',
