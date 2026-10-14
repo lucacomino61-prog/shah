@@ -1,5 +1,7 @@
 // What every board view (the marble one in 3D, the flat one in SVG) offers the pages that drive it.
 
+import type { PieceSetId, WorldId } from './looks.ts';
+
 export type Sq = string;
 export type Side = 'w' | 'b';
 export type Kind = 'k' | 'q' | 'r' | 'b' | 'n' | 'p';
@@ -65,6 +67,8 @@ export interface BoardView {
   refit?(): void;
   /** the 3D board: one of the named camera angles */
   setAngle?(i: number): void;
+  /** the 3D board: the low photographic view of the home screen, its far side out of focus */
+  setCinema?(on: boolean): void;
   /** the 3D board: a slow swing of the camera round the table, radians of phase per second (0 stops it) */
   orbit?(speed: number): void;
   /** the 3D board: lie shut (the pieces put away in the case) or open, at once */
@@ -73,6 +77,10 @@ export interface BoardView {
   unbox?(fen: string, hooks: UnboxHooks): () => void;
   /** the 3D board: the king on `sq` goes over (mate), away from the square `from` */
   topple?(sq: Sq, from?: Sq): void;
+  /** the 3D board: move the table into another room (looks.ts); its files load first */
+  setWorld?(id: WorldId): void;
+  /** the 3D board: the pieces in another set */
+  setPieces?(id: PieceSetId): void;
   /** a word on the frame while the board is not showing the game (ANALIZË) */
   setPlate(text: string | null): void;
   /** a press on a square, from a tap or the keyboard: choose a piece, move it, or let go */

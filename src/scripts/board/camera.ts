@@ -41,16 +41,20 @@ export function project(rig: Rig, p: Vec3): [number, number] {
 
 /** What must stay in view: the frame at the floor and at the top, and room for tall pieces on every rank. Tight
  *  (a phone, straight from the seat or overhead): the playing field runs edge to edge across the screen and the
- *  frame's sides fall off it, as chess.com runs its board; the near and far frame stay. */
-export function boardBounds(rig: Rig, tight = false) {
+ *  frame's sides fall off it, as chess.com runs its board; the near and far frame stay. `crop` (the low photographic
+ *  view on a phone) keeps only that share of the board's width in view, so the board runs off both sides of the
+ *  screen as in a close photograph. */
+export function boardBounds(rig: Rig, tight = false, extra: Vec3[] = [], crop = 1) {
   const F = BOARD.half + BOARD.frame;
-  const X = tight ? BOARD.half + 0.04 : F;
+  const X = crop < 1 ? BOARD.half * crop : tight ? BOARD.half + 0.04 : F;
   const pts: Vec3[] = [];
   for (const x of [-X, X]) for (const z of [-F, F]) {
     pts.push([x, 0, z], [x, BOARD.top, z]);
     // a king standing on the corner square
     pts.push([x * 0.88, BOARD.top + 1.75, z * 0.88]);
   }
+  // anything else that must stay in view for a while (the chess box opening on the table, the pieces beside it)
+  pts.push(...extra);
   let u0 = Infinity;
   let u1 = -Infinity;
   let v0 = Infinity;

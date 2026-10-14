@@ -30,7 +30,7 @@ on the first try.
 ## Positioning
 
 The coach speaks Albanian and explains moves in words rather than numbers. It runs fully in the browser on a free
-engine: no account and no cost per question. The board is a classic wooden set in 3D under one lamp. A small server
+engine: no account and no cost per question. The board is a classic Staunton set in 3D, on a real table in a real room. A small server
 carries only what needs more than one phone: a game with a friend online, sync between the learner's own phones, and
 the daily reminder. It holds no accounts, and it cannot read the synced progress (encrypted on the phone).
 
@@ -66,7 +66,13 @@ the daily reminder. It holds no accounts, and it cannot read the synced progress
   high quality wood" with "a better angle". So: maple and walnut squares, a mahogany frame with boxwood stringing,
   boxwood and ebony pieces, on a dark felt table under one lamp. On 2026-10-13 he asked for the view "like a 3d
   person": the camera defaults to the player's seat (straight behind your pieces), raised on his "more up" to 80 degrees,
-  almost looking down, with overhead and a low three-quarter angle one button away.
+  almost looking down, with overhead and a low three-quarter angle one button away. On 2026-10-14 the seat came down to
+  60 degrees ("seen too much from above"), and after "the board look dull, make everything ultra realistic" and a look
+  at the best 3D chess games (Chess Ultra, Pure Chess), Luca asked for all of it with a switcher ("do all with theme
+  switcher"): four real rooms (a club library, a bright day room, by the fire, a desk at night), each with its own
+  table and things on it, and four sets (wood, lacquer, glass, metal) of one finely made Staunton ("pices need to be
+  more detailed"). The home screen and the opening are shot low with the far side out of focus, play stays higher and
+  sharp ("low on home, higher to play"). The opening is a real folding chess box.
 - The look is the iOS 27 idiom (Luca, 2026-10-13: "make now everything more like iOS 27 theme"; it replaced the
   TV-broadcast skin he had asked for on 2026-10-12). The system font, the iOS system colours in light and dark,
   large titles, inset-grouped lists, capsule buttons, a floating capsule tab bar, and Liquid Glass as iOS 27 tuned it

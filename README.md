@@ -49,7 +49,7 @@ node tools/test-flow.mjs                  # clock, blunder, graph, the blunder b
 node tools/test-trainer.mjs               # opening trainer and the endgame play-out (dev server)
 node tools/test-extras.mjs                # threats, sounds, puzzle of the day, race, backup, bots, two on one phone (dev)
 node tools/test-analyse.mjs               # the analysis board and game review (dev server)
-node tools/test-animations.mjs            # the case opening, the fallen king, the promotion, captured pieces, the streak (dev)
+node tools/test-animations.mjs            # the box opening, the fallen king, the promotion, captured pieces, the streak (dev)
 npm run server:check                      # the server's types (generates server/worker-configuration.d.ts first)
 node tools/test-server.mjs                # the server alone: rooms, clocks, sync vault, reminders (npm run server)
 node tools/test-online.mjs                # a game between two browsers online (dev server and server)
@@ -92,8 +92,15 @@ The second command asks for the value; it is in `server/.dev.vars`. The Worker's
 - `src/scripts/play.ts`: a game against the engine, or two people on one phone.
 - `src/scripts/online.ts`: a game online.
 - `src/scripts/analyse.ts`: the analysis board and game review.
-- `src/scripts/board/board3d.ts`: the wooden board in three.js: a folding board on a hinge (the case that opens on the
-  first visit of the day), camera angles, arrows, the replay, the mated king going over, promotions.
+- `src/scripts/board/board3d.ts`: the wooden board in three.js: a folding chess box (it opens on the first visit of the
+  day: lid, pieces out beside it, the box turned over, pieces set), camera angles, arrows, the replay, the mated king
+  going over, promotions; the room and the set change in place.
+- `src/scripts/board/looks.ts`: the four rooms (Biblioteka, Dritë dite, Pranë zjarrit, Natën) and the four sets (Dru,
+  Llak, Xham, Metal); `src/components/LookPicker.astro` and `src/scripts/look.ts`: the Pamja picker.
+- `src/scripts/board/staunton.ts`: the Staunton set, turned in the browser; the knight comes from `public/realism/knight.bin`.
+- `src/scripts/board/realism.ts`: the photographed materials, the rooms' light, the four finishes of the pieces.
+- `src/scripts/board/props.ts`: what stands on each room's table. `src/scripts/board/focus.ts`: the lens (depth of field)
+  of the home screen and the opening.
 - `src/scripts/celebrate.ts`: the streak's roll and the captured pieces popping in.
 - `src/scripts/board/board2d.ts`: the flat board, used only where WebGL fails (every page shows the 3D table).
 - `src/scripts/trainer.ts`, `src/data/repertoires.ts`: the opening trainer and its lines.
@@ -108,9 +115,24 @@ The second command asks for the value; it is in `server/.dev.vars`. The Worker's
   and robots.txt.
 - `docs/SHQIP.md`: the Albanian terms and sentences, for a native speaker to check.
 
+## Realism assets
+
+`public/realism/` is built, not hand-made:
+
+```bash
+node tools/build-realism.mjs <polyhaven-download-dir>   # veneers, table woods, velvet, the four rooms (HDRIs halved)
+node tools/knight-mesh.mjs <knight.glb> [18000] [0]     # the carved knight: simplified, scaled, occlusion baked in
+```
+
+The download dir holds the 1k files from api.polyhaven.com: white_maple_veneer, walnut_veneer_02, dark_wood,
+lacquered_cherry_wood, oak_veneer_01, smoked_walnut_veneer and velour_velvet (diffuse, nor_gl, rough), and the HDRIs
+billiard_hall, cayley_interior, fireplace and warm_restaurant_night. The knight's GLB was generated on Higgsfield
+(a GPT Image photograph of a boxwood Staunton knight, lifted to 3D with Hunyuan3D v3, geometry only).
+
 ## Licences
 
 - This app: GPL-3.0-or-later (`LICENSE`), because it ships Stockfish.
 - Stockfish.js (`public/engine/`): GPL-3.0; its licence is in `public/engine/COPYING.txt`.
 - Puzzle data: Lichess puzzle database, CC0.
 - Phosphor icons: MIT. chess.js: BSD-2-Clause. three.js: MIT. GSAP: its own standard licence (free).
+- Textures and room photographs: Poly Haven, CC0. The knight: generated for this app on Higgsfield (Luca's account).

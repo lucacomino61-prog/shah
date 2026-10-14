@@ -200,7 +200,7 @@ a.tool, a.cue { text-decoration: none; }
 .lower__body { display: grid; gap: 0.5rem; }
 .lower__reasons { display: grid; gap: 0.25rem; font-size: var(--t-sub); line-height: 1.38; max-width: 60ch; color: var(--label); }
 .lower__reasons:empty { display: none; }
-.lower__reasons .san { color: #fff; }
+.lower__reasons .san { color: var(--label); }
 .lower__warning { color: var(--orange-ink); font-weight: 600; font-size: var(--t-sub); line-height: 1.35; }
 .lower__warning[data-task] { color: var(--label); }
 .lower__warning[hidden] { display: none; }

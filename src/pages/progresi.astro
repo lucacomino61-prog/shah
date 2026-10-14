@@ -2,6 +2,7 @@
 import App from '../layouts/App.astro';
 import { icon } from '../lib/icons';
 import { hasServer } from '../lib/server';
+import LookPicker from '../components/LookPicker.astro';
 
 const hours = Array.from({ length: 24 }, (_, h) => (h + 6) % 24);
 ---
@@ -27,6 +28,12 @@ const hours = Array.from({ length: 24 }, (_, h) => (h + 6) % 24);
     <section aria-labelledby="games-title">
       <h2 class="group-h" id="games-title">Lojërat e fundit</h2>
       <ol class="group games" data-games><li class="empty">&nbsp;</li></ol>
+    </section>
+
+    <section aria-labelledby="pamja-title">
+      <h2 class="group-h" id="pamja-title">Pamja</h2>
+      <p class="group-note">Dhoma ku qëndron tabela dhe figurat me të cilat luan. Ndryshon menjëherë në çdo faqe me tabelë.</p>
+      <LookPicker />
     </section>
 
     <section aria-labelledby="look-title">

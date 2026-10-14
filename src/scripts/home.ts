@@ -82,7 +82,7 @@ function streakRoll() {
     label: 'Tabela',
   });
   board.setInteractive(false);
-  board.setAngle?.(2);
+  board.setCinema?.(true);
   board.orbit?.(motionOn() ? 0.12 : 0);
   const html = document.documentElement;
   const gate = $('[data-unbox]');

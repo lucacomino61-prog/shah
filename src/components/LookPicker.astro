@@ -1,0 +1,95 @@
+---
+// The room and the set of pieces (looks.ts), as two rows of swatches. On the table pages it opens as a sheet from the
+// board's palette button; in Progresi it stands in the settings. scripts/look.ts keeps the choice and moves the board.
+import { PIECE_SETS, WORLDS } from '../scripts/board/looks.ts';
+import { icon } from '../lib/icons.ts';
+
+interface Props {
+  /** a sheet over the table, or a section of the settings page */
+  sheet?: boolean;
+}
+const { sheet = false } = Astro.props;
+const worlds = Object.values(WORLDS);
+const sets = Object.values(PIECE_SETS);
+const swatch = (a: string, b: string) => `--a:${a};--b:${b}`;
+---
+
+{
+  sheet ? (
+    <dialog class="setup look-sheet" data-look-dialog aria-labelledby="pamja-title">
+      <form class="setup__form" method="dialog" data-look-picker>
+        <h2 class="setup__title" id="pamja-title" tabindex="-1">
+          Pamja
+        </h2>
+        <fieldset>
+          <legend>Dhoma</legend>
+          <div class="tiles">
+            {worlds.map((w) => (
+              <label class="tile">
+                <input type="radio" name="world" value={w.id} />
+                <span class="tile__swatch" style={swatch(...w.swatch)} />
+                <span class="tile__name">{w.name}</span>
+                <span class="tile__note">{w.note}</span>
+                <Fragment set:html={icon('check', 'icon tile__check')} />
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Figurat</legend>
+          <div class="tiles">
+            {sets.map((s) => (
+              <label class="tile">
+                <input type="radio" name="pieces" value={s.id} />
+                <span class="tile__swatch tile__swatch--set" style={swatch(...s.swatch)} />
+                <span class="tile__name">{s.name}</span>
+                <span class="tile__note">{s.note}</span>
+                <Fragment set:html={icon('check', 'icon tile__check')} />
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <div class="setup__actions">
+          <button type="submit" class="btn btn--solid" value="done">
+            Mbaro
+          </button>
+        </div>
+      </form>
+    </dialog>
+  ) : (
+    <div class="look-picker" data-look-picker>
+      <fieldset>
+        <legend class="group-h">Dhoma</legend>
+        <div class="tiles">
+          {worlds.map((w) => (
+            <label class="tile">
+              <input type="radio" name="world" value={w.id} />
+              <span class="tile__swatch" style={swatch(...w.swatch)} />
+              <span class="tile__name">{w.name}</span>
+              <span class="tile__note">{w.note}</span>
+              <Fragment set:html={icon('check', 'icon tile__check')} />
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend class="group-h">Figurat</legend>
+        <div class="tiles">
+          {sets.map((s) => (
+            <label class="tile">
+              <input type="radio" name="pieces" value={s.id} />
+              <span class="tile__swatch tile__swatch--set" style={swatch(...s.swatch)} />
+              <span class="tile__name">{s.name}</span>
+              <span class="tile__note">{s.note}</span>
+              <Fragment set:html={icon('check', 'icon tile__check')} />
+            </label>
+          ))}
+        </div>
+      </fieldset>
+    </div>
+  )
+}
+
+<script>
+  import '../scripts/look';
+</script>

@@ -10,8 +10,8 @@ export type Kind = 'k' | 'q' | 'r' | 'b' | 'n' | 'p';
 export const BOARD = {
   /** half the playing surface */
   half: 4,
-  /** height of the playing surface above the floor */
-  top: 0.24,
+  /** height of the playing surface above the table: the board is one half of a folding box, about 3 cm deep */
+  top: 0.55,
   /** the wooden frame around the squares: its width, and how far it stands below the marble */
   frame: 0.46,
   frameDrop: 0.035,

@@ -38,20 +38,30 @@ await page.waitForFunction(() => window.__board, { timeout: 30000 });
 await sleep(600);
 let f = await fx(page);
 const risen = () => page.evaluate(() => [...document.querySelectorAll('[data-rise]')].map((e) => getComputedStyle(e).opacity));
-ok((await gate(page)) && f.leaf > 3.1 && f.visible === 0, 'first visit of the day: the board lies shut, no pieces out', JSON.stringify(f));
+ok((await gate(page)) && f.box === 'shut' && f.visible === 0, 'first visit of the day: the box lies shut, no pieces out', JSON.stringify(f));
 ok((await risen()).every((o) => o === '0'), 'the rest of the page waits');
 const cue = await page.$eval('[data-unbox-open]', (b) => b.textContent.trim());
 ok(cue === 'Prek për ta hapur', 'a tap opens it', cue);
 await page.evaluate(() => document.querySelector('[data-unbox-open]').click());
-await sleep(800);
+await sleep(500);
 f = await fx(page);
-ok(f.unboxing && f.leaf > 0.3 && f.leaf < 3, 'the leaf turns on its hinge', String(f.leaf));
+ok(f.unboxing && f.box === 'moving' && f.phase === 'open', 'the lid swings open on its hinge', JSON.stringify(f));
+const seen = new Set();
+for (let i = 0; i < 60 && (await fx(page)).unboxing; i++) {
+  seen.add((await fx(page)).phase);
+  await sleep(150);
+}
+ok(
+  ['unpack', 'turn', 'place'].every((p) => seen.has(p)),
+  'the pieces come out, the box is turned over, the pieces are set',
+  [...seen].join(' > '),
+);
 const t0 = Date.now();
-await page.waitForFunction(() => !('hasUnbox' in document.documentElement.dataset), { timeout: 12000 }).catch(() => {});
-const took = Date.now() - t0 + 800;
+await page.waitForFunction(() => !('hasUnbox' in document.documentElement.dataset), { timeout: 20000 }).catch(() => {});
+const took = Date.now() - t0 + 500;
 f = await fx(page);
 const pieces = await page.evaluate(() => window.__board.state().pieces.length);
-ok(!f.unboxing && f.leaf === 0 && pieces === 32, 'it lies open with all 32 pieces on their squares', `${pieces} pieces, ${took} ms`);
+ok(!f.unboxing && f.box === 'play' && pieces === 32, 'it lies open with all 32 pieces on their squares', `${pieces} pieces, ${took} ms`);
 await sleep(900);
 ok((await risen()).every((o) => o === '1'), 'and the page has risen in');
 ok((await page.evaluate(() => localStorage.getItem('shah.unboxed'))) === (await page.evaluate(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })), 'today is remembered');
@@ -59,7 +69,7 @@ await page.reload({ waitUntil: 'networkidle0' });
 await page.waitForFunction(() => window.__board, { timeout: 30000 });
 await sleep(400);
 f = await fx(page);
-ok(!(await gate(page)) && f.leaf === 0 && (await page.evaluate(() => window.__board.state().pieces.length)) === 32, 'a second visit the same day: the board is set at once');
+ok(!(await gate(page)) && f.box === 'play' && (await page.evaluate(() => window.__board.state().pieces.length)) === 32, 'a second visit the same day: the board is set at once');
 
 // Skip, before and during the opening
 await page.evaluate(() => localStorage.removeItem('shah.unboxed'));
@@ -67,7 +77,7 @@ await page.reload({ waitUntil: 'networkidle0' });
 await page.waitForFunction(() => window.__board, { timeout: 30000 });
 await page.evaluate(() => document.querySelector('[data-unbox-skip]').click());
 await sleep(300);
-ok(!(await gate(page)) && (await page.evaluate(() => window.__board.state().pieces.length)) === 32 && (await fx(page)).leaf === 0, 'Kalo before the tap: open and set at once');
+ok(!(await gate(page)) && (await page.evaluate(() => window.__board.state().pieces.length)) === 32 && (await fx(page)).box === 'play', 'Kalo before the tap: open and set at once');
 await page.evaluate(() => localStorage.removeItem('shah.unboxed'));
 await page.reload({ waitUntil: 'networkidle0' });
 await page.waitForFunction(() => window.__board, { timeout: 30000 });
@@ -85,7 +95,7 @@ await page.evaluate(() => {
 await page.reload({ waitUntil: 'networkidle0' });
 await page.waitForFunction(() => window.__board, { timeout: 30000 });
 await sleep(300);
-ok(!(await gate(page)) && (await fx(page)).leaf === 0, 'with animations stopped the board is simply open');
+ok(!(await gate(page)) && (await fx(page)).box === 'play', 'with animations stopped the board is simply open');
 await page.evaluate(() => localStorage.removeItem('shah.motion'));
 
 // ------------------------------------------------------------------ mate, capture, promotion (two players on one phone)

@@ -39,6 +39,7 @@ const tabs = [
   { id: 'analizo', href: '/analizo/', label: 'Analizo', icon: 'magnifyingGlass' },
   { id: 'progresi', href: '/progresi/', label: 'Progresi', icon: 'chartLineUp' },
 ] as const;
+import LookPicker from '../components/LookPicker.astro';
 ---
 
 <!doctype html>
@@ -72,6 +73,8 @@ const tabs = [
         if (localStorage.getItem('shah.motion') === 'off') document.documentElement.dataset.motion = 'off';
         var g = parseFloat(localStorage.getItem('shah.glass'));
         if (g >= 0 && g <= 1) document.documentElement.style.setProperty('--glass-level', String(g));
+        // the bright room takes the light glass before the page paints (looks.ts keeps it in step afterwards)
+        if (localStorage.getItem('shah.world') === 'day') document.documentElement.dataset.worldTone = 'light';
       } catch (e) {}
     </script>
   </head>
@@ -96,6 +99,7 @@ const tabs = [
     <main id="main" tabindex="-1">
       <slot />
     </main>
+    {stage && <LookPicker sheet />}
     <nav class="tabs" aria-label="Kryesore">
       {tabs.map((t) => (
         <a href={t.href} aria-current={tab === t.id ? 'page' : undefined}>

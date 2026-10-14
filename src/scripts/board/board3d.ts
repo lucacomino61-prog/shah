@@ -48,10 +48,14 @@ import {
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { BOARD, GIRTH, HEIGHT, KING_CROSS, KNIGHT_HEAD, PROFILES, QUEEN_CROWN, ROOK_MERLONS, knightOutline } from '../../lib/chess/model.ts';
+import { BOARD, GIRTH, HEIGHT, KING_CROSS, KNIGHT_HEAD, PROFILES, QUEEN_CROWN, ROOK_MERLONS, knightOutline, type Vec3 } from '../../lib/chess/model.ts';
 import { boardBounds, frameBounds, rigFor } from './camera.ts';
 import { FILES, planMoves, readFen, type Arrow, type BoardOptions, type BoardView, type Kind, type Marks, type Placed, type Side, type Sq, type UnboxHooks } from './types.ts';
 import { caseSound, fallSound, pieceDownSound, promoteSound } from '../../lib/sound.ts';
+import { boxUV, loadRoom, photo, pieceMaterial, roomLight, squareMaps, type Realism, type Room } from './realism.ts';
+import { createFocus, type Focus } from './focus.ts';
+import { bankersLamp, books, candle, chessClock, coffeeCup, deskLamp, mug, notebook, phone, tumbler, type Kit } from './props.ts';
+import { DEFAULT_WORLD, WORLDS, chosenSet, type PieceSetId, type PropId, type WorldDef, type WorldId } from './looks.ts';
 
 const token = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#000';
 
@@ -59,15 +63,20 @@ const token = (name: string) => getComputedStyle(document.documentElement).getPr
  *  a place, not a page colour. */
 const STUDIO = { room: 0.45, hemi: 0.34, lamp: 3.6, exposure: 1.04 };
 
-/** Where the camera stands. First, the player's own seat: straight behind your pieces and looking almost straight
- *  down (80 degrees, Luca's "more up"), close enough that the near ranks still loom a little. Then straight
- *  overhead, and the low three-quarter the home page orbits in, which has a steeper version for an upright phone.
- *  dist is from the middle of the board, in squares. */
+/** Where the camera stands. First, the player's own seat: straight behind your pieces, looking down at about 60
+ *  degrees, as someone sitting at the table sees the board (Luca, 2026-10-14: 80 degrees was "seen too much from
+ *  above"; the room shows beyond the far edge of the table). Then straight overhead, and the low three-quarter the
+ *  home page orbits in, which has a steeper version for an upright phone. dist is from the middle of the board, in
+ *  squares. */
 export const ANGLES = [
-  { name: 'Si lojtar', upright: { el: 1.396, az: 0, dist: 13 }, wide: { el: 1.396, az: 0, dist: 13 } },
+  { name: 'Si lojtar', upright: { el: 1.05, az: 0, dist: 14 }, wide: { el: 1.0, az: 0, dist: 14 } },
   { name: 'Nga lart', upright: { el: 1.54, az: 0, dist: 15 }, wide: { el: 1.54, az: 0, dist: 15 } },
   { name: 'Afër tabelës', upright: { el: 0.72, az: -0.42, dist: 15 }, wide: { el: 0.56, az: -0.5, dist: 15 } },
 ];
+
+/** The home screen and the opening: a low three-quarter view, close, as the photographs in Chess Ultra and Pure Chess
+ *  are taken, with the far side of the table out of focus (focus.ts). Luca, 2026-10-14: low on home, higher to play. */
+export const CINEMA = { upright: { el: 0.42, az: -0.45, dist: 12 }, wide: { el: 0.34, az: -0.5, dist: 12 } };
 
 /** How high a piece rides: under the pointer, chosen, in the hand. */
 const LIFT = { hover: 0.05, chosen: 0.24, carry: 0.6 };
@@ -76,7 +85,7 @@ const REST = { k: 170, c: 19 };
 const CARRY = { k: 560, c: 42 };
 const TILT = { k: 210, c: 17 };
 
-type Mode = 'rest' | 'carry' | 'flight' | 'off';
+type Mode = 'rest' | 'carry' | 'flight' | 'off' | 'stand';
 
 interface Flight {
   t: number;
@@ -449,7 +458,7 @@ function along(geo: BufferGeometry, path: Vector2[]) {
 
 // ---------------------------------------------------------------- the view
 
-export function createBoard3d(o: BoardOptions): BoardView {
+export function createBoard3d(o: BoardOptions, realism: Realism | null = null): BoardView {
   const canvas = document.createElement('canvas');
   canvas.className = 'board-canvas';
   canvas.setAttribute('aria-hidden', 'true');
@@ -500,7 +509,10 @@ export function createBoard3d(o: BoardOptions): BoardView {
   let el = elevation;
   let angle = 0;
   let portrait = true;
-  const preset = () => (portrait ? ANGLES[angle].upright : ANGLES[angle].wide);
+  let cinema = false;
+  // the photograph's lens, made the first time the cinema view is asked for
+  let lensFx: Focus | null = null;
+  const preset = () => (cinema ? (portrait ? CINEMA.upright : CINEMA.wide) : portrait ? ANGLES[angle].upright : ANGLES[angle].wide);
   const azimuthFor = () => (orientation === 'w' ? 0 : Math.PI) + preset().az;
   /** a phone straight from the seat or overhead: the playing field edge to edge, the frame's sides off screen */
   const tight = () => portrait && preset().az === 0;
@@ -519,12 +531,12 @@ export function createBoard3d(o: BoardOptions): BoardView {
   key.shadow.bias = vsm ? -0.0006 : -0.0003;
   key.shadow.normalBias = vsm ? 0 : 0.015;
   scene.add(key, key.target);
+  /** the lamp hangs where the room has it (high over the player's left shoulder, in most), whichever side they play */
   const placeKey = () => {
-    // the lamp hangs high over the player's left shoulder, whichever side they play
     const s = orientation === 'w' ? 1 : -1;
-    key.position.set(-12 * s, 20, 9 * s);
+    const at = realism ? world.lamp.at : [-12, 20, 9];
+    key.position.set(at[0] * s, at[1], at[2] * s);
   };
-  placeKey();
 
   const geometries: BufferGeometry[] = [];
   const materials: Material[] = [];
@@ -532,35 +544,79 @@ export function createBoard3d(o: BoardOptions): BoardView {
   const keep = <T extends BufferGeometry>(g: T) => (geometries.push(g), g);
   const own = <T extends Material>(m: T) => (materials.push(m), m);
 
-  // reflections come from a studio map set on each material (scene.environment would light the table evenly)
-  const room = studioFor(STUDIO.room);
-  const cloth = felt(256);
-  cloth.repeat.set(90, 90);
-  cloth.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-  textures.push(cloth);
-  const table = new Mesh(keep(new PlaneGeometry(160, 160).rotateX(-Math.PI / 2)), own(new MeshStandardMaterial({ map: cloth, roughness: 1, envMap: room, envMapIntensity: 0.05 })));
+  // reflections come from the room's photograph set on each material (scene.environment would light the table
+  // evenly); the room is the one chosen in Pamja (looks.ts) and can change while the board is out
+  const aniso = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  let world: WorldDef = WORLDS[realism?.room.world ?? DEFAULT_WORLD];
+  let room = realism ? roomLight(renderer, realism.room) : studioFor(STUDIO.room);
+  realism?.room.hdr.dispose();
+  if (realism) {
+    // the room around the table, out of focus as in a photograph of the board
+    scene.fog = null;
+    scene.background = room;
+  }
+  let table: Mesh;
+  let tableMat: MeshPhysicalMaterial | null = null;
+  let tableMaps: Texture[] = [];
+  if (realism) {
+    // the room's own table, large enough that a low camera finds its far edge and the room beyond
+    const top = keep(boxUV(new RoundedBoxGeometry(23, 0.9, 17, 4, 0.32), 7));
+    tableMat = own(new MeshPhysicalMaterial({ envMap: room, envMapIntensity: 0.55 }));
+    table = new Mesh(top, tableMat);
+    table.position.y = -0.45;
+  } else {
+    const cloth = felt(256);
+    cloth.repeat.set(90, 90);
+    cloth.anisotropy = aniso;
+    textures.push(cloth);
+    table = new Mesh(keep(new PlaneGeometry(160, 160).rotateX(-Math.PI / 2)), own(new MeshStandardMaterial({ map: cloth, roughness: 1, envMap: room, envMapIntensity: 0.05 })));
+  }
   table.receiveShadow = true;
   scene.add(table);
+  /** The table in the room's wood: its colour and roughness photographs, its finish. */
+  function dressTable(r: Room) {
+    if (!tableMat) return;
+    tableMaps.forEach((t) => t.dispose());
+    const t = world.table;
+    const map = photo(r.table, true, aniso);
+    const rough = photo(r.tableR, false, aniso);
+    // the table's UVs are cut at 7 squares to the photograph; each wood has its own grain size
+    const k = 7 / t.unit;
+    map.repeat.set(k, k);
+    rough.repeat.set(k, k);
+    tableMaps = [map, rough];
+    tableMat.map = map;
+    tableMat.roughnessMap = rough;
+    tableMat.bumpMap = rough;
+    tableMat.roughness = t.rough;
+    tableMat.bumpScale = t.bump;
+    tableMat.clearcoat = t.coat;
+    tableMat.clearcoatRoughness = t.coatRough;
+    tableMat.color.set(t.tint);
+    tableMat.needsUpdate = true;
+  }
+  if (realism) dressTable(realism.room);
 
   // ---------------------------------------------------------------- the board
-  // A folding board, as the wooden cases are: two leaves meeting on a hinge across the middle (between the 4th and
-  // 5th ranks). The far leaf turns on that hinge, so the board can lie shut with its squares inside and open on the
-  // first visit of the day; the rest of the time it lies open and the seam is a fine line in the frame.
+  // A folding chess box, as the wooden ones are made: two hollow halves hinged under the middle (between the 4th and
+  // 5th ranks). Each half is a top plate carrying its four ranks of squares, four walls under it and a velvet lining
+  // inside, where the pieces travel. In play the box lies open and turned squares-up, the seam a fine line across the
+  // frame; on the first visit of the day it lies shut on the table (see "the case" below).
   const board = new Group();
   scene.add(board);
   const F = BOARD.half + BOARD.frame;
   const frameH = BOARD.top - BOARD.frameDrop;
-  const leaf = new Group();
-  leaf.position.set(0, BOARD.top, 0);
-  board.add(leaf);
-  /** add a part of the board to the leaf it lies on: z < 0 is the far leaf, which turns on the hinge */
+  /** the two halves: [0] the near one in play (ranks 1-4), [1] the far one (ranks 5-8) */
+  const halves = [new Group(), new Group()];
+  board.add(...halves);
+  /** add a part of the board to its half; positions are given as the box lies open in play */
   const mount = (m: Mesh, far: boolean) => {
-    if (far) {
-      m.position.y -= BOARD.top;
-      leaf.add(m);
-    } else board.add(m);
+    halves[far ? 1 : 0].add(m);
     return m;
   };
+  /** the top plate's thickness and the walls' */
+  const PLATE = 0.13;
+  const WALL = 0.22;
   /** a flat plane over the board cut at the hinge: one leaf's half, with that half of the texture */
   const halfPlane = (w: number, d: number, far: boolean) => {
     const g = new PlaneGeometry(w, d / 2).rotateX(-Math.PI / 2).translate(0, 0, far ? -d / 4 : d / 4);
@@ -570,12 +626,78 @@ export function createBoard3d(o: BoardOptions): BoardView {
   };
   const grain = grainTexture(512, '#4b2213', 'rgba(22,6,1,A)', 'rgba(150,72,40,A)', 23);
   textures.push(grain);
-  const wood = own(new MeshPhysicalMaterial({ map: grain, roughness: 0.78, specularIntensity: 0.15, envMap: room, envMapIntensity: 0.7 }));
+  let wood: MeshPhysicalMaterial;
+  if (realism) {
+    const mahogany = photo(realism.mahogany, true, aniso);
+    const mahoganyR = photo(realism.mahoganyR, false, aniso);
+    textures.push(mahogany, mahoganyR);
+    // French-polished mahogany: a satin shine in the wood, a thin clear coat over it
+    wood = own(
+      new MeshPhysicalMaterial({
+        map: mahogany,
+        roughnessMap: mahoganyR,
+        roughness: 0.85,
+        bumpMap: mahoganyR,
+        bumpScale: 0.35,
+        clearcoat: 0.35,
+        clearcoatRoughness: 0.28,
+        specularIntensity: 0.4,
+        envMap: room,
+        envMapIntensity: 0.3,
+      }),
+    );
+  } else wood = own(new MeshPhysicalMaterial({ map: grain, roughness: 0.78, specularIntensity: 0.15, envMap: room, envMapIntensity: 0.7 }));
+  /** wood grain on a box-like part: real mahogany wants box-projected UVs at its own scale */
+  const woody = <T extends BufferGeometry>(g: T) => (realism ? boxUV(g, 5.5) : g);
+  // inside each half: velvet, wine red as in a good chess case
+  let lining: Material;
+  if (realism) {
+    const nap = photo(realism.velvetN, false, aniso);
+    const cloth = photo(realism.velvet, true, aniso);
+    nap.repeat.set(5, 3);
+    cloth.repeat.set(5, 3);
+    textures.push(nap, cloth);
+    lining = own(
+      new MeshPhysicalMaterial({
+        map: cloth,
+        color: 0xb04050,
+        roughness: 0.95,
+        sheen: 1,
+        sheenRoughness: 0.55,
+        sheenColor: new Color(0xd06070),
+        normalMap: nap,
+        normalScale: new Vector2(0.5, 0.5),
+        envMap: room,
+        envMapIntensity: 0.2,
+      }),
+    );
+  } else lining = own(new MeshStandardMaterial({ color: 0x5a1520, roughness: 1 }));
+  const wallH = frameH - PLATE + 0.01;
   for (const far of [false, true]) {
-    const half = new Mesh(keep(new RoundedBoxGeometry(2 * F, frameH, F, 5, 0.06)), wood);
-    half.position.set(0, frameH / 2, far ? -F / 2 : F / 2);
-    half.castShadow = half.receiveShadow = true;
-    mount(half, far);
+    const zc = far ? -F / 2 : F / 2;
+    const sgn = far ? -1 : 1;
+    // the top plate, its rounded edge the line where the lid would meet its walls
+    const plate = new Mesh(keep(woody(new RoundedBoxGeometry(2 * F, PLATE, F, 4, 0.045))), wood);
+    plate.position.set(0, frameH - PLATE / 2, zc);
+    plate.castShadow = plate.receiveShadow = true;
+    mount(plate, far);
+    // four walls under it: the outer edge, the hinge edge and the two sides
+    const walls: [number, number, number, number][] = [
+      [2 * F, F - WALL / 2, 0, WALL],
+      [2 * F, WALL / 2, 0, WALL],
+      [WALL, F / 2, F - WALL / 2, F - 2 * WALL + 0.02],
+      [WALL, F / 2, -(F - WALL / 2), F - 2 * WALL + 0.02],
+    ];
+    for (const [w, z, x, d] of walls) {
+      const wall = new Mesh(keep(woody(new RoundedBoxGeometry(w, wallH, d, 3, 0.03))), wood);
+      wall.position.set(x, wallH / 2, sgn * z);
+      wall.castShadow = wall.receiveShadow = true;
+      mount(wall, far);
+    }
+    // the velvet lining on the inside of the plate
+    const felt = new Mesh(keep(new PlaneGeometry(2 * F - 2 * WALL, F - 2 * WALL).rotateX(Math.PI / 2)), lining);
+    felt.position.set(0, frameH - PLATE - 0.002, zc);
+    mount(felt, far);
   }
   // boxwood stringing let into the mahogany: one line round the squares, one near the outer edge; the lines that run
   // across the hinge are cut in two
@@ -599,25 +721,49 @@ export function createBoard3d(o: BoardOptions): BoardView {
         mount(bar, far);
       }
   }
-  // the case's clasp: a brass plate on the front edge of each leaf, meeting when the board is shut
-  const claspGeo = keep(new BoxGeometry(0.42, 0.11, 0.035));
+  // the case's clasp: a brass plate low on the outer wall of each half; shut, the two meet at the front
+  const claspMat = own(new MeshPhysicalMaterial({ color: 0xc9a24a, metalness: 1, roughness: 0.3, envMap: room, envMapIntensity: 0.9 }));
+  const claspGeo = keep(new BoxGeometry(0.46, 0.12, 0.035));
   for (const far of [false, true]) {
-    const clasp = new Mesh(claspGeo, brass);
-    clasp.position.set(0, frameH - 0.075, far ? -F - 0.017 : F + 0.017);
+    const clasp = new Mesh(claspGeo, claspMat);
+    clasp.position.set(0, 0.11, far ? -F - 0.017 : F + 0.017);
     clasp.castShadow = true;
     mount(clasp, far);
   }
-  const slabMat = own(new MeshStandardMaterial({ color: 0xd9d4ca, roughness: 0.3 }));
+  // the bed the squares are laid on: dark, so no pale line shows between the squares and the frame
+  const slabMat = own(new MeshStandardMaterial({ color: 0x1c120b, roughness: 0.8 }));
   for (const far of [false, true]) {
     const slab = new Mesh(keep(new BoxGeometry(2 * BOARD.half, 0.06, BOARD.half)), slabMat);
     slab.position.set(0, BOARD.top - 0.031, far ? -BOARD.half / 2 : BOARD.half / 2);
     slab.receiveShadow = true;
     mount(slab, far);
   }
-  const fieldMap = woodSquares(Math.min(2048, renderer.capabilities.maxTextureSize));
-  fieldMap.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-  textures.push(fieldMap);
-  const fieldMat = own(new MeshPhysicalMaterial({ map: fieldMap, roughness: 0.88, specularIntensity: 0.08, envMap: room, envMapIntensity: 0.55 }));
+  let fieldMat: MeshPhysicalMaterial;
+  if (realism) {
+    const { map, rough } = squareMaps(realism, Math.min(2048, renderer.capabilities.maxTextureSize));
+    map.anisotropy = rough.anisotropy = aniso;
+    textures.push(map, rough);
+    // an inlaid board under a satin finish: the grain shows in the sheen, the lamp does not glare off it
+    fieldMat = own(
+      new MeshPhysicalMaterial({
+        map,
+        roughnessMap: rough,
+        roughness: 1,
+        bumpMap: rough,
+        bumpScale: 0.25,
+        specularIntensity: 0.35,
+        clearcoat: 0.18,
+        clearcoatRoughness: 0.45,
+        envMap: room,
+        envMapIntensity: 0.32,
+      }),
+    );
+  } else {
+    const fieldMap = woodSquares(Math.min(2048, renderer.capabilities.maxTextureSize));
+    fieldMap.anisotropy = aniso;
+    textures.push(fieldMap);
+    fieldMat = own(new MeshPhysicalMaterial({ map: fieldMap, roughness: 0.88, specularIntensity: 0.08, envMap: room, envMapIntensity: 0.55 }));
+  }
   for (const far of [false, true]) {
     const surface = new Mesh(halfPlane(2 * BOARD.half, 2 * BOARD.half, far), fieldMat);
     surface.position.y = BOARD.top + 0.0005;
@@ -672,13 +818,78 @@ export function createBoard3d(o: BoardOptions): BoardView {
     dirty = true;
   });
 
+  // ---------------------------------------------------------------- on the table: what the room keeps there
+  // across the board from the player, so it shows beyond the far edge: a clock and a cup, books and a lamp, a mug and
+  // a notebook... each room its own (looks.ts), made again when the room changes
+  const props = new Group();
+  scene.add(props);
+  let propParts: { geos: BufferGeometry[]; mats: Material[]; texs: Texture[] } = { geos: [], mats: [], texs: [] };
+  const makeProp = (id: PropId, kit: Kit): Group => {
+    switch (id) {
+      case 'clock':
+        return chessClock(kit);
+      case 'cup':
+        return coffeeCup(kit);
+      case 'books':
+        return books(kit);
+      case 'lamp':
+        return bankersLamp(kit);
+      case 'mug':
+        return mug(kit, world.id === 'night' ? 0x1f2b3c : 0xe6e2da);
+      case 'notebook':
+        return notebook(kit, world.id === 'night' ? 0x1a1a1a : 0xa07a4e);
+      case 'tumbler':
+        return tumbler(kit);
+      case 'deskLamp':
+        return deskLamp(kit);
+      case 'phone':
+        return phone(kit);
+      case 'candle':
+        return candle(kit);
+    }
+  };
+  function buildProps() {
+    props.clear();
+    propParts.geos.forEach((g) => g.dispose());
+    propParts.mats.forEach((m) => m.dispose());
+    propParts.texs.forEach((t) => t.dispose());
+    const parts: typeof propParts = { geos: [], mats: [], texs: [] };
+    propParts = parts;
+    if (!realism) return;
+    const kit: Kit = { wood, env: room, woody, keep: (g) => (parts.geos.push(g), g), own: (m) => (parts.mats.push(m), m), textures: parts.texs };
+    for (const [id, x, z, turn] of world.props) {
+      const p = makeProp(id, kit);
+      p.position.set(x, 0, z);
+      p.rotation.y = turn;
+      props.add(p);
+    }
+  }
+  /** the props stand across from whoever plays, on the far side of the table */
+  const placeProps = () => {
+    props.rotation.y = orientation === 'w' ? 0 : Math.PI;
+  };
+  placeProps();
+
   // ---------------------------------------------------------------- the pieces
   const shapes = new Map<Kind, BufferGeometry>();
   const shapeOf = (k: Kind) => {
     let g = shapes.get(k);
-    if (!g) shapes.set(k, (g = keep(turned(k))));
+    if (!g) shapes.set(k, (g = keep(realism ? realism.pieces[k].geometry : turned(k))));
     return g;
   };
+  /** the widest radius and the height of a piece as drawn here */
+  const girthOf = (k: Kind) => (realism ? realism.pieces[k].girth : GIRTH[k]);
+  const heightOf = (k: Kind) => (realism ? realism.pieces[k].height : HEIGHT[k]);
+  // the set chosen in Pamja: every piece its own material (its own figure of grain), made again when the set changes
+  let pieceSet: PieceSetId = chosenSet();
+  let turnedWood: ((side: Side) => Material) | null = null;
+  if (realism) {
+    const maple = photo(realism.maple, true, aniso);
+    const walnut = photo(realism.walnut, true, aniso);
+    textures.push(maple, walnut);
+    let n = 0;
+    turnedWood = (side) => lit(pieceMaterial(pieceSet, side, { maple, walnut, env: room, grain: new Vector2(((n * 0.618) % 1) * 3, ((n++ * 0.382) % 1) * 3) }));
+  }
   // boxwood: a fine pale grain under a thin lacquer (the lathe's UVs run the grain up the piece)
   const boxwood = grainTexture(256, '#f7ecd4', 'rgba(170,128,80,A)', 'rgba(255,248,230,A)', 41, 60);
   boxwood.rotation = Math.PI / 2;
@@ -690,7 +901,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
   const hitGeo = new Map<Kind, BufferGeometry>();
   const hitOf = (k: Kind) => {
     let g = hitGeo.get(k);
-    if (!g) hitGeo.set(k, (g = keep(new CylinderGeometry(0.44, 0.44, HEIGHT[k] + 0.12, 12).translate(0, (HEIGHT[k] + 0.12) / 2, 0))));
+    if (!g) hitGeo.set(k, (g = keep(new CylinderGeometry(0.44, 0.44, heightOf(k) + 0.12, 12).translate(0, (heightOf(k) + 0.12) / 2, 0))));
     return g;
   };
 
@@ -699,7 +910,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
   const upright = new Quaternion();
   const lying = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -Math.PI / 2);
   // knights turn their profile to the player, looking a little up the board, so the head reads from above
-  const knightYaw = (side: Side) => (side === 'w' ? Math.PI - 0.5 : -0.5);
+  const knightYaw = (side: Side) => (side === 'w' ? -0.5 : Math.PI - 0.5);
 
   function setShape(b: Body, kind: Kind) {
     b.kind = kind;
@@ -710,7 +921,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
 
   function makeBody(side: Side, kind: Kind): Body {
     const group = new Group();
-    const mesh = new Mesh(shapeOf(kind), side === 'w' ? ivory : ebony);
+    const mesh = new Mesh(shapeOf(kind), turnedWood ? turnedWood(side) : side === 'w' ? ivory : ebony);
     mesh.castShadow = mesh.receiveShadow = true;
     const hit = new Mesh(hitOf(kind), hitMat);
     group.add(mesh, hit);
@@ -755,7 +966,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
     // seen straight from the seat on an upright phone, the felt beside the board is out of frame: lay them well
     // clear of the edge rather than cut in half by it (the score bug counts them)
     const gap = portrait && preset().az === 0 ? 4.2 : 1.05;
-    return new Vector3((F + gap + row * 0.95) * toward, GIRTH[kind], toward * near * (0.9 + (i % 4) * 0.85));
+    return new Vector3((F + gap + row * 0.95) * toward, girthOf(kind), toward * near * (0.9 + (i % 4) * 0.85));
   };
   /** Lay the taken pieces again after the framing changes (a turned phone, another camera angle). */
   const relay = () => {
@@ -1047,124 +1258,271 @@ export function createBoard3d(o: BoardOptions): BoardView {
   }
 
   // ---------------------------------------------------------------- the case, the fallen king, the promotion
-  /** the far leaf on its hinge: 0 lies open, PI lies shut over the near leaf */
-  const setLeaf = (a: number) => {
-    leaf.rotation.x = a;
+  // The ritual of a real folding chess box. Shut, it lies on the table with the near half of the board on its lid.
+  // Opened, the lid swings over on its hinge and both halves lie velvet-up with the pieces lying in them; the pieces
+  // come out one by one and stand on the table beside the box (White on the right, Black on the left); the box is
+  // lifted and turned over, squares up; and each piece is set on its square.
+  const X_AXIS = new Vector3(1, 0, 0);
+  const T = BOARD.top;
+  /** a half's pose: turned by `angle` about the x axis (its hinge line through its origin), its origin at (0, y, z) */
+  const setPose = (k: number, angle: number, y: number, z: number) => {
+    halves[k].quaternion.setFromAxisAngle(X_AXIS, angle);
+    halves[k].position.set(0, y, z);
     shadowsStale = true;
     dirty = true;
   };
+  /** in play: both halves as built */
+  const poseOpen = () => {
+    setPose(0, 0, 0, 0);
+    setPose(1, 0, 0, 0);
+  };
+  /** shut: the far half lies velvet-up, the near half (the lid) closed down on it, squares up */
+  const poseShut = () => {
+    setPose(1, Math.PI, T, 0);
+    setPose(0, 0, T, 0);
+  };
+  /** the lid opening: phi from PI (shut) to 0 (lying open beside, velvet up) */
+  const poseLid = (phi: number) => setPose(0, phi + Math.PI, T, 0);
+  /** both halves turned over together: psi from 0 (velvet up) to PI (squares up), lifted clear of the table */
+  const poseTurn = (psi: number) => {
+    const lift = (F - T / 2 + 0.35) * Math.sin(psi);
+    for (const k of [0, 1]) setPose(k, psi + Math.PI, T / 2 + (T / 2) * Math.cos(psi) + lift, (T / 2) * Math.sin(psi));
+  };
+
+  interface Packed {
+    b: Body;
+    sq: Sq;
+    /** lying in the velvet, as the box lies open velvet-up */
+    slot: { p: Vector3; q: Quaternion };
+    /** riding in the lid while it opens (Black's pieces): the slot in the lid's own frame */
+    local: { p: Vector3; q: Quaternion } | null;
+    /** standing on the table beside the box */
+    stand: Vector3;
+  }
   interface Unboxing {
     t: number;
+    phase: 'open' | 'unpack' | 'turn' | 'place' | 'end';
+    /** when the current phase began */
+    at: number;
     landed: boolean;
     hooks: UnboxHooks;
-    /** the pieces still to come out, in order, with the time each leaves the seam */
-    queue: { sq: Sq; p: Placed; at: number }[];
-    total: number;
+    packed: Packed[];
+    /** the order the pieces come out and go in */
+    order: Packed[];
+    next: number;
     flying: number;
-    end: number;
+    placed: number;
   }
   let unboxing: Unboxing | null = null;
-  /** the lift to upright, then the fall onto the felt, then a small rebound of the wood */
+  /** the extra points the camera keeps in view while the case is out: the pieces beside it, the box turned over */
+  let caseView: Vec3[] = [];
   const LIFT_S = 0.72;
   const DROP_S = 0.4;
   const REBOUND_S = 0.3;
-  /** how the pieces of a set come out: rooks, knights, bishops, queens, kings, then the pawns, file by file */
+  const TURN_S = 1.0;
+  /** how the pieces of a set come out and go in: rooks, knights, bishops, queens, kings, then the pawns, file by file */
   const ORDER: Record<Kind, number> = { r: 0, n: 1, b: 2, q: 3, k: 4, p: 5 };
 
   function fold(shut: boolean) {
     unboxing = null;
-    setLeaf(shut ? Math.PI : 0);
+    caseView = [];
     if (shut) {
+      poseShut();
       // the pieces are in the case
       for (const b of bodies) retire(b);
       bySq.clear();
       current = new Map();
-    }
+    } else poseOpen();
+    placeCamera(true);
   }
 
-  /** Open the shut board and bring the pieces of `fen` out of the seam one by one onto their squares. */
+  /** Open the shut box and set out the pieces of `fen`; returns Skip. */
   function unbox(fen: string, hooks: UnboxHooks): () => void {
     fold(true);
     const next = readFen(fen);
     current = next;
-    const queue = [...next.entries()]
-      .sort(([a, pa], [b, pb]) => ORDER[pa.kind] - ORDER[pb.kind] || FILES.indexOf(a[0]) - FILES.indexOf(b[0]) || (pa.side === 'w' ? -1 : 1))
-      .map(([sq, p], i) => ({ sq, p, at: LIFT_S + DROP_S + 0.16 + i * 0.07 }));
-    unboxing = { t: 0, landed: false, hooks, queue, total: queue.length, flying: 0, end: Infinity };
+    const floor = BOARD.frameDrop + PLATE + 0.004;
+    const packed: Packed[] = [];
+    for (const side of ['w', 'b'] as Side[]) {
+      const mine = [...next.entries()].filter(([, p]) => p.side === side);
+      const big = mine.filter(([, p]) => p.kind !== 'p').sort((a, b) => FILES.indexOf(a[0][0]) - FILES.indexOf(b[0][0]));
+      const pawns = mine.filter(([, p]) => p.kind === 'p').sort((a, b) => FILES.indexOf(a[0][0]) - FILES.indexOf(b[0][0]));
+      // White's pieces lie in the near tray, Black's in the lid's; each piece's head towards the hinge
+      const s = side === 'w' ? 1 : -1;
+      const lie = new Quaternion().setFromAxisAngle(X_AXIS, -s * (Math.PI / 2));
+      [big, pawns].forEach((row, r) =>
+        row.forEach(([sq, p], i) => {
+          const b = spare(p.side, p.kind);
+          const L = heightOf(p.kind);
+          const zc = s * (r === 0 ? 1.35 : 3.2);
+          const slotP = new Vector3(i - (row.length - 1) / 2, floor + girthOf(p.kind), zc + (s * L) / 2);
+          const local = side === 'b' ? { p: new Vector3(slotP.x, T - slotP.y, -slotP.z), q: new Quaternion().setFromAxisAngle(X_AXIS, -Math.PI).multiply(lie) } : null;
+          // standing on the table: White to the right of the box, Black to the left, pawns in the outer file
+          const stand = new Vector3(s * (F + (r === 0 ? 1.2 : 2.1)), 0, (i - (row.length - 1) / 2) * 0.95 * -s);
+          packed.push({ b, sq, slot: { p: slotP, q: lie.clone() }, local, stand });
+          b.mode = 'stand';
+          b.sq = null;
+          b.group.visible = true;
+          b.pos.copy(slotP);
+          b.group.position.copy(slotP);
+          b.group.quaternion.copy(lie);
+        }),
+      );
+    }
+    const order = [...packed].sort((a, b) => {
+      const pa = next.get(a.sq)!;
+      const pb = next.get(b.sq)!;
+      return ORDER[pa.kind] - ORDER[pb.kind] || FILES.indexOf(a.sq[0]) - FILES.indexOf(b.sq[0]) || (pa.side === 'w' ? -1 : 1);
+    });
+    unboxing = { t: 0, phase: 'open', at: 0, landed: false, hooks, packed, order, next: 0, flying: 0, placed: 0 };
+    // the camera stands back far enough to see the pieces set out beside the box and the lid as it opens
+    const W2 = F + 2.6;
+    caseView = [
+      [W2, 0, 4.2],
+      [-W2, 0, 4.2],
+      [W2, 1.7, -4.2],
+      [-W2, 1.7, -4.2],
+      [0, T + F, 0],
+    ];
+    placeCamera(true);
+    stepUnbox(0);
     caseSound('creak');
-    dirty = true;
     return finishUnbox;
   }
 
-  /** Skip: the board lies open with every piece in place. */
+  /** Skip: the box lies open squares-up with every piece in place. */
   function finishUnbox() {
     const u = unboxing;
     if (!u) return;
     unboxing = null;
-    setLeaf(0);
-    for (const { sq, p } of u.queue) {
-      const b = spare(p.side, p.kind);
-      place(b, sq);
-      bySq.set(sq, b);
+    caseView = [];
+    poseOpen();
+    for (const k of u.packed) {
+      place(k.b, k.sq);
+      bySq.set(k.sq, k.b);
     }
-    for (const b of bodies) if (b.flight && b.sq) place(b, b.sq);
+    placeCamera(true);
     shadowsStale = true;
     dirty = true;
     u.hooks.done?.();
   }
 
+  const tmpQ = new Quaternion();
   function stepUnbox(dt: number) {
     const u = unboxing!;
     u.t += dt;
-    const t = u.t;
-    let a: number;
-    if (t < LIFT_S) {
-      // lifted from shut to upright, easing in and out like a hand turning it
-      const e = t / LIFT_S;
-      a = Math.PI - (Math.PI / 2) * (0.5 - Math.cos(Math.PI * e) / 2);
-    } else if (t < LIFT_S + DROP_S) {
-      // past upright it falls open under its own weight
-      const e = (t - LIFT_S) / DROP_S;
-      a = (Math.PI / 2) * (1 - e * e);
-    } else {
-      if (!u.landed) {
-        u.landed = true;
-        caseSound('land');
-        u.hooks.opened?.();
+    const t = u.t - u.at;
+    if (u.phase === 'open') {
+      let phi: number;
+      if (t < LIFT_S) {
+        // the lid lifted from shut to upright, a hand turning it
+        phi = Math.PI - (Math.PI / 2) * (0.5 - Math.cos((Math.PI * t) / LIFT_S) / 2);
+      } else if (t < LIFT_S + DROP_S) {
+        // past upright it falls open under its own weight
+        const e = (t - LIFT_S) / DROP_S;
+        phi = (Math.PI / 2) * (1 - e * e);
+      } else {
+        if (!u.landed) {
+          u.landed = true;
+          caseSound('land');
+          u.hooks.opened?.();
+        }
+        const e = (t - LIFT_S - DROP_S) / REBOUND_S;
+        phi = e < 1 ? 0.05 * Math.sin(Math.PI * e) * (1 - e) : 0;
       }
-      const e = (t - LIFT_S - DROP_S) / REBOUND_S;
-      a = e < 1 ? 0.06 * Math.sin(Math.PI * e) * (1 - e) : 0;
+      poseLid(phi);
+      // Black's pieces ride in the lid
+      tmpQ.setFromAxisAngle(X_AXIS, phi + Math.PI);
+      for (const k of u.packed)
+        if (k.local) {
+          k.b.pos.copy(k.local.p).applyQuaternion(tmpQ).add(halves[0].position);
+          k.b.group.position.copy(k.b.pos);
+          k.b.group.quaternion.copy(tmpQ).multiply(k.local.q);
+        }
+      if (t >= LIFT_S + DROP_S + REBOUND_S + 0.2) {
+        u.phase = 'unpack';
+        u.at = u.t;
+      }
+      return;
     }
-    if (leaf.rotation.x !== a) setLeaf(a);
-    // the pieces: each rises out of the seam lying down, turns upright in the air and lands on its square
-    while (u.queue.length && u.queue[0].at <= t) {
-      const { sq, p } = u.queue.shift()!;
-      const b = spare(p.side, p.kind);
-      const dest = square(sq);
-      b.pos.set(dest.x, BOARD.top - 0.55, 0);
-      b.group.position.copy(b.pos);
-      b.group.quaternion.copy(lying);
-      b.group.visible = true;
-      b.sq = sq;
-      bySq.set(sq, b);
-      const n = u.total - u.queue.length - 1;
-      u.flying++;
-      fly(b, dest, upright, {
-        arc: 0.75 + Math.abs(dest.z) * 0.08,
-        dur: 0.5 + Math.abs(dest.z) * 0.025,
-        end: () => {
-          b.mode = 'rest';
-          b.target.copy(dest);
-          b.vel.set(0, -1.1, 0);
-          u.flying--;
-          pieceDownSound(n);
-          u.hooks.piece?.(n);
-          if (!u.queue.length && !u.flying) u.end = u.t + 0.35;
-        },
-      });
+    if (u.phase === 'unpack') {
+      // out of the velvet one at a time, White's tray first, each set standing beside the box
+      while (u.next < u.packed.length && t >= u.next * 0.042) {
+        const k = u.packed[u.next++];
+        u.flying++;
+        fly(k.b, k.stand, upright, {
+          arc: 0.7,
+          dur: 0.42,
+          end: () => {
+            k.b.mode = 'stand';
+            k.b.flight = null;
+            k.b.pos.copy(k.stand);
+            k.b.group.position.copy(k.stand);
+            k.b.group.quaternion.copy(upright);
+            u.flying--;
+            pieceDownSound(u.next, true);
+          },
+        });
+      }
+      if (u.next >= u.packed.length && !u.flying) {
+        u.phase = 'turn';
+        u.at = u.t;
+        // the camera stands back while the box is lifted and turned over
+        caseView = [...caseView, [0, T / 2 + 2 * F + 0.3, 0]];
+        placeCamera(true);
+      }
+      return;
     }
-    if (u.t >= u.end) {
+    if (u.phase === 'turn') {
+      const wait = 0.25;
+      const e = Math.max(0, Math.min(1, (t - wait) / TURN_S));
+      // eased in and out, as hands lift it, turn it and set it down
+      poseTurn(Math.PI * (e < 0.5 ? 4 * e * e * e : 1 - Math.pow(-2 * e + 2, 3) / 2));
+      if (e >= 1) {
+        caseSound('land');
+        poseOpen();
+        u.phase = 'place';
+        u.at = u.t;
+        u.next = 0;
+        caseView = caseView.slice(0, -1);
+        placeCamera(true);
+      }
+      return;
+    }
+    if (u.phase === 'place') {
+      const start = 0.2;
+      while (u.next < u.order.length && t >= start + u.next * 0.05) {
+        const k = u.order[u.next++];
+        const n = u.next - 1;
+        const dest = square(k.sq);
+        k.b.mode = 'rest';
+        k.b.sq = k.sq;
+        bySq.set(k.sq, k.b);
+        u.flying++;
+        fly(k.b, dest, upright, {
+          arc: 0.75,
+          dur: 0.42,
+          end: () => {
+            k.b.mode = 'rest';
+            k.b.target.copy(dest);
+            k.b.vel.set(0, -1.1, 0);
+            u.flying--;
+            u.placed++;
+            pieceDownSound(n);
+            u.hooks.piece?.(n);
+          },
+        });
+      }
+      if (u.placed >= u.order.length) {
+        u.phase = 'end';
+        u.at = u.t;
+      }
+      return;
+    }
+    if (t >= 0.35) {
       unboxing = null;
+      caseView = [];
+      placeCamera(true);
       u.hooks.done?.();
     }
   }
@@ -1179,7 +1537,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
     want.normalize();
     // of sixteen directions round the square, the one nearest that keeps the fallen piece on the board (a king on the
     // edge falls along it or inward, not over the frame)
-    const reach = HEIGHT[b.kind] + 0.05;
+    const reach = heightOf(b.kind) + 0.05;
     const inside = (d: Vector3) => Math.abs(base.x + d.x * reach) < BOARD.half - 0.05 && Math.abs(base.z + d.z * reach) < BOARD.half - 0.05;
     // a direction with a piece in the way would lay it across that piece: an open one wins over a nearer one
     const blocked = (d: Vector3) =>
@@ -1200,7 +1558,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
     }
     if (best === -Infinity) away = base.clone().multiplyScalar(-1).setY(0).normalize();
     // it turns about the rim of its base on the side it falls to
-    const pivot = base.clone().addScaledVector(away, GIRTH[b.kind]);
+    const pivot = base.clone().addScaledVector(away, girthOf(b.kind));
     const axis = new Vector3(0, 1, 0).cross(away).normalize();
     b.flight = null;
     b.mode = 'rest';
@@ -1376,7 +1734,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
       moving = true;
     }
     for (const b of bodies) {
-      if (b.mode === 'off') continue;
+      if (b.mode === 'off' || b.mode === 'stand') continue;
       if (b.fall) {
         if (b.fall.t < FALL_END) {
           const was = b.fall.t;
@@ -1630,6 +1988,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
     W = Math.max(1, Math.round(r.width));
     H = Math.max(1, Math.round(r.height));
     renderer.setSize(W, H, false);
+    lensFx?.setSize(W, H);
     lens.snap = true;
     portrait = W / H < 0.85;
     elevation = preset().el;
@@ -1667,7 +2026,12 @@ export function createBoard3d(o: BoardOptions): BoardView {
         return (parseFloat(v) || 0) * (v.endsWith('rem') ? rem : 1);
       };
       const box = { x: px('--inset-left'), y: px('--inset-top'), w: W - px('--inset-left') - px('--inset-right'), h: H - px('--inset-top') - px('--inset-bottom') };
-      const f = frameBounds(boardBounds(rigFor(azimuthFor(), elevation, preset().dist), tight()), W, H, box.w > 50 && box.h > 50 ? box : undefined);
+      const f = frameBounds(
+        boardBounds(rigFor(azimuthFor(), elevation, preset().dist), tight(), caseView, cinema && portrait ? 0.74 : 1),
+        W,
+        H,
+        box.w > 50 && box.h > 50 ? box : undefined,
+      );
       lens.to = { fov: f.fov, ox: f.ox, oy: f.oy };
       // a resize or the first frame snaps; a change of the free space (the coach saying more) eases, like a
       // broadcast camera reframing
@@ -1693,9 +2057,10 @@ export function createBoard3d(o: BoardOptions): BoardView {
       a.mat.uniforms.uColor.value.copy(accent);
       if (a.badge) ((a.badge.children[0] as Mesh).material as MeshBasicMaterial).color.copy(accent);
     }
-    hemi.intensity = STUDIO.hemi;
-    key.intensity = STUDIO.lamp;
-    renderer.toneMappingExposure = STUDIO.exposure;
+    // with the room lighting the scene, the sky-and-ground fill steps back and the lamp is the key
+    hemi.intensity = realism ? world.fill : STUDIO.hemi;
+    key.intensity = realism ? world.lamp.power : STUDIO.lamp;
+    renderer.toneMappingExposure = realism ? world.exposure : STUDIO.exposure;
     dirty = true;
   }
   scheme.addEventListener('change', recolour);
@@ -1713,14 +2078,93 @@ export function createBoard3d(o: BoardOptions): BoardView {
   );
   io.observe(o.host);
 
+  const focusAt = new Vector3();
   function render() {
     if (shadowsStale || dirty) {
       renderer.shadowMap.needsUpdate = true;
       shadowsStale = false;
     }
-    renderer.render(scene, camera);
+    if (cinema && lensFx) {
+      // the focus lies a little in front of the middle of the board, on the player's side
+      focusAt.set(0, BOARD.top + 0.5, orientation === 'w' ? 2.2 : -2.2);
+      lensFx.render(scene, camera, camera.position.distanceTo(focusAt));
+    } else renderer.render(scene, camera);
     dirty = false;
   }
+
+  // ---------------------------------------------------------------- the room and the set, changed in place
+  /** A material in the room's light: its own strength of reflection (kept the first time), scaled for the room, the
+   *  photograph turned as the room is. */
+  function lit<T extends Material>(m: T): T {
+    const p = m as unknown as MeshPhysicalMaterial;
+    if (!p.envMap) return m;
+    if (p.userData.env0 === undefined) p.userData.env0 = p.envMapIntensity;
+    p.envMap = room;
+    p.envMapIntensity = p.userData.env0 * (realism ? world.reflect : 1);
+    p.envMapRotation.set(0, realism ? world.turn : 0, 0);
+    return m;
+  }
+  /** Everything in the room's light: the board, the table, the props and every piece, lying or standing. */
+  function applyRoom() {
+    scene.traverse((ob) => {
+      const m = (ob as Mesh).material;
+      if (!m) return;
+      (Array.isArray(m) ? m : [m]).forEach((x) => lit(x));
+    });
+    shadowsStale = true;
+    dirty = true;
+  }
+  function applyWorld() {
+    if (realism) {
+      scene.background = room;
+      scene.backgroundBlurriness = world.blur;
+      scene.backgroundIntensity = world.backdrop;
+      scene.backgroundRotation.set(0, world.turn, 0);
+      key.color.set(world.lamp.color);
+      key.angle = world.lamp.cone;
+    }
+    buildProps();
+    placeProps();
+    applyRoom();
+    placeKey();
+    recolour();
+  }
+  let looking = 0;
+  let disposed = false;
+  /** Another room: its photograph and table load, then the board is moved into it in one frame. */
+  async function setWorld(id: WorldId) {
+    if (!realism || id === world.id) return;
+    const ticket = ++looking;
+    let r: Room;
+    try {
+      r = await loadRoom(id);
+    } catch {
+      return;
+    }
+    if (ticket !== looking || disposed) {
+      r.hdr.dispose();
+      return;
+    }
+    world = WORLDS[id];
+    const old = room;
+    room = roomLight(renderer, r);
+    r.hdr.dispose();
+    dressTable(r);
+    applyWorld();
+    old.dispose();
+  }
+  /** Another set: each piece takes the new finish where it stands. */
+  function setPieces(id: PieceSetId) {
+    if (!realism || id === pieceSet || !turnedWood) return;
+    pieceSet = id;
+    for (const b of bodies) {
+      const old = b.mesh.material as Material;
+      b.mesh.material = turnedWood(b.side);
+      old.dispose();
+    }
+    dirty = true;
+  }
+  applyWorld();
 
   // warm every program the board will use (the pieces of both colours, marks, an arrow) before the first move
   {
@@ -1863,20 +2307,39 @@ export function createBoard3d(o: BoardOptions): BoardView {
       piece: (s: Sq) => {
         const b = bySq.get(s);
         if (!b) return null;
-        v.copy(b.pos).add(new Vector3(0, HEIGHT[b.kind] * 0.45, 0)).project(camera);
+        v.copy(b.pos).add(new Vector3(0, heightOf(b.kind) * 0.45, 0)).project(camera);
         const r = canvas.getBoundingClientRect();
         return { x: r.left + ((v.x + 1) / 2) * r.width, y: r.top + ((1 - v.y) / 2) * r.height };
       },
       state: () => ({ chosen: chosen?.sq ?? null, busy: view.busy, pieces: [...bySq.entries()].map(([s, b]) => `${b.side}${b.kind}${s}`).sort() }),
       // the case and the animations: the far leaf's angle, pieces lying over, a promotion under way
       fx: () => ({
-        leaf: Number(leaf.rotation.x.toFixed(3)),
+        // 'play' when both halves lie as built, 'shut' when the lid lies closed on the other half
+        box:
+          halves[0].position.y === 0 && halves[1].position.y === 0 && halves[0].quaternion.w === 1
+            ? 'play'
+            : halves[0].position.y === T && halves[0].quaternion.w === 1
+              ? 'shut'
+              : 'moving',
+        phase: unboxing?.phase ?? null,
         unboxing: !!unboxing,
         visible: bodies.filter((b) => b.group.visible).length,
         fallen: [...bySq.entries()].filter(([, b]) => b.fall).map(([s, b]) => ({ sq: s, tilt: Number((2 * Math.acos(Math.min(1, Math.abs(b.group.quaternion.w)))).toFixed(2)) })),
         morphing: bodies.filter((b) => b.morph).length,
       }),
       shadows: () => (vsm ? 'vsm' : 'pcf'),
+      // a free camera for close-up checks of the materials (development only)
+      look: (x: number, y: number, z: number, tx: number, ty: number, tz: number, fov = 30) => {
+        lens.at = { fov, ox: 0, oy: 0 };
+        lens.to = { ...lens.at };
+        camera.fov = fov;
+        camera.setViewOffset(W, H, 0, 0, W, H);
+        camera.updateProjectionMatrix();
+        camera.position.set(x, y, z);
+        camera.lookAt(tx, ty, tz);
+        orbitSpeed = 0;
+        dirty = true;
+      },
       danger: () => [...(marks.danger ?? [])],
     };
   }
@@ -1889,6 +2352,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
       orientation = side;
       az = azimuthFor();
       placeKey();
+      placeProps();
       drawInlay();
       placeCamera(true);
       shadowsStale = true;
@@ -1909,7 +2373,15 @@ export function createBoard3d(o: BoardOptions): BoardView {
     },
     fold,
     unbox,
+    setWorld: (id) => void setWorld(id),
+    setPieces,
     topple,
+    setCinema(on: boolean) {
+      cinema = on;
+      if (on && realism && !lensFx) lensFx = createFocus(renderer, { aperture: 1.0, maxBlur: 9 });
+      fit();
+      shadowsStale = true;
+    },
     setAngle(i: number) {
       angle = Math.max(0, Math.min(ANGLES.length - 1, i));
       fit();
@@ -1946,6 +2418,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
       if (!on) choose(null);
     },
     dispose() {
+      disposed = true;
       ro.disconnect();
       io.disconnect();
       scheme.removeEventListener('change', recolour);
@@ -1959,6 +2432,13 @@ export function createBoard3d(o: BoardOptions): BoardView {
       geometries.forEach((g) => g.dispose());
       materials.forEach((m) => m.dispose());
       textures.forEach((t) => t.dispose());
+      bodies.forEach((b) => (b.mesh.material as Material).dispose());
+      tableMaps.forEach((t) => t.dispose());
+      propParts.geos.forEach((g) => g.dispose());
+      propParts.mats.forEach((m) => m.dispose());
+      propParts.texs.forEach((t) => t.dispose());
+      room.dispose();
+      lensFx?.dispose();
       numbers.forEach((t) => t.dispose());
       inlayMap?.dispose();
       ranksMap?.dispose();

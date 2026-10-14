@@ -32,6 +32,7 @@ import '../styles/play.css';
       <div class="home__actions" data-rise style="--i: 1">
         <a class="cue cue--on home__go" href="/luaj/" data-go><Fragment set:html={icon('horse')} /><span data-go-label>Luaj</span></a>
         <a class="streak" href="/ushtrime/?tema=dita" data-streak hidden><Fragment set:html={icon('fire')} /><b class="tabular" data-streak-n></b><span data-streak-word>ditë</span></a>
+        <button type="button" class="look-open" data-look-open aria-label="Pamja: dhoma dhe figurat"><Fragment set:html={icon('palette')} /></button>
       </div>
     </div>
 
@@ -93,7 +94,7 @@ import '../styles/play.css';
   }
   .unbox__cue {
     display: inline-flex; align-items: center; gap: 0.5rem; min-height: 50px; padding: 0 1.5rem; border-radius: 999px;
-    color: #fff; font-weight: 600; font-size: var(--t-body);
+    color: var(--label); font-weight: 600; font-size: var(--t-body);
     background-color: var(--glass); background-image: linear-gradient(180deg, var(--glass-sheen), transparent 46%);
     -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
     box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 0.5px var(--glass-rim), var(--glass-depth);
@@ -107,7 +108,7 @@ import '../styles/play.css';
   @keyframes cue-breathe { 50% { box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 0.5px var(--glass-rim), var(--glass-depth), 0 0 0 6px rgb(255 255 255 / 0.08); } }
   .unbox__skip {
     position: absolute; top: max(env(safe-area-inset-top), 0.75rem); right: 0.75rem; min-height: 44px; padding: 0 1rem; border-radius: 999px;
-    color: rgb(255 255 255 / 0.86); font-weight: 600; font-size: var(--t-sub);
+    color: var(--hero-ink-2); font-weight: 600; font-size: var(--t-sub);
   }
   .unbox__skip:focus-visible { outline: 3px solid color-mix(in srgb, var(--tint) 75%, transparent); outline-offset: 2px; }
   /* on a wide screen the navigation bar holds the top: Kalo sits under it */
@@ -128,21 +129,32 @@ import '../styles/play.css';
   /* the name the way the Lock Screen sets its clock: rounded, heavy, a little translucent over the table */
   .home__mark {
     font-family: var(--font-rounded); font-size: clamp(5rem, 2rem + 17vw, 9.5rem); font-weight: 800;
-    letter-spacing: -0.04em; line-height: 0.92; color: rgb(255 255 255 / 0.9);
-    text-shadow: 0 2px 30px rgb(0 0 0 / 0.35);
+    letter-spacing: -0.04em; line-height: 0.92; color: var(--hero-ink);
+    text-shadow: 0 2px 30px var(--hero-shade);
   }
-  .home__line { max-width: 28ch; color: rgb(255 255 255 / 0.82); font-weight: 500; font-size: var(--t-body); line-height: 1.32; text-shadow: 0 1px 12px rgb(0 0 0 / 0.5); }
+  .home__line { max-width: 28ch; color: var(--hero-ink-2); font-weight: 500; font-size: var(--t-body); line-height: 1.32; text-shadow: 0 1px 12px var(--hero-shade); }
   .home__actions { display: flex; align-items: center; gap: 0.625rem; }
   .home__go { min-height: 50px; padding-inline: 1.5rem; font-size: var(--t-body); }
   /* the streak: days in a row with today's puzzle solved, in a glass capsule with its flame */
   .streak {
     display: inline-flex; align-items: center; gap: 0.3rem; min-height: 50px; padding: 0 1.125rem; border-radius: 999px;
-    color: #fff; text-decoration: none; font-weight: 600;
+    color: var(--label); text-decoration: none; font-weight: 600;
     background-color: var(--glass); background-image: linear-gradient(180deg, var(--glass-sheen), transparent 46%);
     -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
     box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 0.5px var(--glass-rim), var(--glass-depth);
   }
   .streak[hidden] { display: none; }
+  /* Pamja: the room and the pieces, a glass circle beside the capsules */
+  .look-open {
+    display: inline-grid; place-items: center; width: 50px; height: 50px; border-radius: 999px; color: var(--label);
+    background-color: var(--glass); background-image: linear-gradient(180deg, var(--glass-sheen), transparent 46%);
+    -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+    box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 0.5px var(--glass-rim), var(--glass-depth);
+    transition: transform var(--dur-press) var(--ease-out);
+  }
+  .look-open:active { transform: scale(0.94); }
+  .look-open .icon { width: 1.375rem; height: 1.375rem; }
+  .look-open:focus-visible { outline: 3px solid color-mix(in srgb, var(--tint) 75%, transparent); outline-offset: 3px; }
   .streak .icon { width: 1.25rem; height: 1.25rem; color: #ff9f0a; }
   .streak b { font-size: var(--t-title3); font-weight: 700; }
   .home__guide { padding: 0.25rem 0; gap: 0; }

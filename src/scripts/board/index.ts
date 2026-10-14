@@ -5,6 +5,7 @@ import { Chess } from 'chess.js';
 import { onTick } from '../shell.ts';
 import { createBoard2d } from './board2d.ts';
 import type { BoardOptions, BoardView, Side, Sq } from './types.ts';
+import type { PieceSetId, WorldId } from './looks.ts';
 import { FILES } from './types.ts';
 
 export type { BoardView } from './types.ts';
@@ -22,8 +23,22 @@ export async function createBoard(kind: '3d' | '2d', o: BoardOptions): Promise<B
   o.host.dataset.kind = kind;
   if (kind === '3d' && webgl()) {
     try {
-      const { createBoard3d } = await import('./board3d.ts');
-      return createBoard3d(o);
+      // the board and its real-world materials load side by side; without the materials it keeps its drawn ones
+      const [{ createBoard3d }, { loadRealism }, { chosenWorld }] = await Promise.all([import('./board3d.ts'), import('./realism.ts'), import('./looks.ts')]);
+      const view = createBoard3d(o, await loadRealism(chosenWorld()));
+      // a change of room or set in Pamja reaches the board that is out
+      const onLook = (e: Event) => {
+        const d = (e as CustomEvent<{ world: WorldId; pieces: PieceSetId }>).detail;
+        view.setWorld?.(d.world);
+        view.setPieces?.(d.pieces);
+      };
+      window.addEventListener('shah:look', onLook);
+      const dispose = view.dispose.bind(view);
+      view.dispose = () => {
+        window.removeEventListener('shah:look', onLook);
+        dispose();
+      };
+      return view;
     } catch (e) {
       console.warn('3D board failed, using the flat one', e);
     }

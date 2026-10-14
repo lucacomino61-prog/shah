@@ -168,13 +168,14 @@ export function caseSound(part: 'creak' | 'land') {
   buzz(12);
 }
 
-/** A piece set down on its square as the board is laid out; the pitch wanders a little, as wood does. */
-export function pieceDownSound(n: number) {
+/** A piece set down as the board is laid out; the pitch wanders a little, as wood does. */
+export function pieceDownSound(n: number, quiet = false) {
   if (!on()) return;
   wake();
   const t = ctx ? ctx.currentTime + 0.005 : 0;
-  knock(t, 1380 + ((n * 37) % 5) * 45, 0.3);
-  buzz(8);
+  // set down on the table beside the box: softer, and no vibration (that is for the board)
+  knock(t, (quiet ? 1150 : 1380) + ((n * 37) % 5) * 45, quiet ? 0.16 : 0.3);
+  if (!quiet) buzz(8);
 }
 
 /** A king going over at mate: the body hitting the board, then its small bounce. */

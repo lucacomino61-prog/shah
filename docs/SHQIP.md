@@ -125,3 +125,16 @@ and the Caro-Kann (Karo-Kan): please check the transliterations.
 
 **The opening and the small moments:** "Prek për ta hapur" (tap to open: the board lying shut in its case) · Kalo
 (skip) · "Ditë rresht" with the flame on today's puzzle.
+
+**Pamja: the room and the pieces** (the palette button on the board, and Progresi > Pamja): Pamja · Dhoma (the room)
+· Figurat (the pieces) · Mbaro (done) · "Pamja: dhoma dhe figurat" (the button's spoken name) · "Dhoma ku qëndron
+tabela dhe figurat me të cilat luan. Ndryshon menjëherë në çdo faqe me tabelë."
+
+The rooms and their one-line notes: **Biblioteka** "Dru i errët, libra, llamba e gjelbër" · **Dritë dite** "Dhomë
+moderne, dritare, lis i çelët" · **Pranë zjarrit** "Dhomë e ngrohtë, qershi e llakuar" · **Natën** "Tavolinë pune,
+llambë, dritat e qytetit". Please check "llamba" against "llamba e gjelbër" (the green banker's lamp) and "lis i çelët"
+(light oak).
+
+The sets: **Dru** "Bush dhe eben, si në turne" (boxwood and ebony) · **Llak** "Krem dhe e kuqe, me shkëlqim"
+(lacquer) · **Xham** "I tejdukshëm dhe rubin" (glass: clear and ruby) · **Metal** "Argjend dhe ar". Is "bush" the word
+Albanian woodworkers use for boxwood?
