@@ -1,11 +1,16 @@
 // How strongly the engine plays. The lower levels pick among its top lines, and now and then a random move, so
-// a learner can win. The names say how it plays; no rating number is claimed.
+// a learner can win. Each level is a character with an Albanian name (invented, nobody real) and says how it
+// plays; no rating number is claimed, since none has been measured.
 
 import type { Analysis } from './engine.ts';
 import { lineScore } from './coach.ts';
 
 export interface Level {
   n: number;
+  /** the character across the table */
+  bot: string;
+  /** the colour of the character's initial */
+  hue: string;
   name: string;
   note: string;
   /** search depth of the move choice (the coach's own search is never shallower than 12) */
@@ -20,12 +25,12 @@ export interface Level {
 }
 
 export const LEVELS: Level[] = [
-  { n: 1, name: 'Shumë i lehtë', note: 'Gabon shpesh dhe lë figura pa mbrojtje.', depth: 12, random: 0.3, weights: [1, 1, 1, 1], cap: Infinity },
-  { n: 2, name: 'I lehtë', note: 'Luan me kujdes, por bën gabime të qarta.', depth: 12, random: 0.12, weights: [0.4, 0.3, 0.2, 0.1], cap: 700 },
-  { n: 3, name: 'Mesatar', note: 'Rrallë lë diçka falas. Duhet të luash mirë.', depth: 12, random: 0.04, weights: [0.6, 0.25, 0.15], cap: 250 },
-  { n: 4, name: 'I fortë', note: 'Zgjedh pothuajse gjithmonë një nga dy lëvizjet më të mira.', depth: 12, random: 0, weights: [0.8, 0.2], cap: 80 },
-  { n: 5, name: 'Shumë i fortë', note: 'Luan lëvizjen më të mirë që gjen.', depth: 14, random: 0, weights: [1], cap: 0 },
-  { n: 6, name: 'Motori i plotë', note: 'Stockfish me gjithë forcën që ka në shfletues.', depth: 18, movetime: 2500, random: 0, weights: [1], cap: 0 },
+  { n: 1, bot: 'Agimi', hue: '#34c759', name: 'Shumë i lehtë', note: 'Gabon shpesh dhe lë figura pa mbrojtje.', depth: 12, random: 0.3, weights: [1, 1, 1, 1], cap: Infinity },
+  { n: 2, bot: 'Drita', hue: '#30b0c7', name: 'I lehtë', note: 'Luan me kujdes, por bën gabime të qarta.', depth: 12, random: 0.12, weights: [0.4, 0.3, 0.2, 0.1], cap: 700 },
+  { n: 3, bot: 'Besniku', hue: '#007aff', name: 'Mesatar', note: 'Rrallë lë diçka falas. Duhet të luash mirë.', depth: 12, random: 0.04, weights: [0.6, 0.25, 0.15], cap: 250 },
+  { n: 4, bot: 'Teuta', hue: '#5856d6', name: 'I fortë', note: 'Zgjedh pothuajse gjithmonë një nga dy lëvizjet më të mira.', depth: 12, random: 0, weights: [0.8, 0.2], cap: 80 },
+  { n: 5, bot: 'Ardiani', hue: '#af52de', name: 'Shumë i fortë', note: 'Luan lëvizjen më të mirë që gjen.', depth: 14, random: 0, weights: [1], cap: 0 },
+  { n: 6, bot: 'Stockfish', hue: '#8e8e93', name: 'Motori i plotë', note: 'Stockfish me gjithë forcën që ka në shfletues.', depth: 18, movetime: 2500, random: 0, weights: [1], cap: 0 },
 ];
 
 export const levelOf = (n: number) => LEVELS.find((l) => l.n === n) ?? LEVELS[1];

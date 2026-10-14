@@ -83,6 +83,10 @@ let pre: { fen: string; done: Promise<Analysis> } | null = null;
 let hintStep = 0;
 let warning: string | null = null;
 let result: 'win' | 'loss' | 'draw' | 'resigned' | null = null;
+/** two players on one phone: side is then whoever moves next, and nothing goes into the learner's record */
+let friend = false;
+const colourName = (s: Side) => (s === 'w' ? 'të bardhat' : 'të zezat');
+const Cap = (t: string) => t[0].toUpperCase() + t.slice(1);
 let board: BoardView;
 let lastVerdict: Verdict | null = null;
 let boardReady = false;
@@ -214,11 +218,12 @@ function rebuild() {
 }
 
 function persist() {
-  saveGame(result ? null : { fens, sans, ucis, side, level: level.n, verdicts, evals, clock });
+  saveGame(result ? null : { fens, sans, ucis, side, level: level.n, verdicts, evals, clock, friend });
 }
 
-function newGame(s: Side, lv: Level, clk: string = prefs.clock) {
+function newGame(s: Side, lv: Level, clk: string = prefs.clock, withFriend = false) {
   gen++;
+  friend = withFriend;
   engine.newGame();
   side = s;
   level = lv;
@@ -359,10 +364,17 @@ async function userMove(from: Sq, to: Sq) {
   renderVerdict(v, true);
   renderSheet();
   persist();
-  if (v.tags.length) update((p) => v.tags.forEach((t) => (p.tags[t] = (p.tags[t] ?? 0) + 1)));
-  // a mistake becomes a puzzle that comes back on a schedule
-  addCard(v);
+  if (!friend) {
+    if (v.tags.length) update((p) => v.tags.forEach((t) => (p.tags[t] = (p.tags[t] ?? 0) + 1)));
+    // a mistake becomes a puzzle that comes back on a schedule
+    addCard(v);
+  }
   if (over) return endGame();
+  // a friend across the table: the other side moves now, on the same phone
+  if (friend) {
+    side = turn();
+    return userTurn();
+  }
   await engineMove(after);
 }
 
@@ -415,7 +427,8 @@ function takeBack(message: string) {
   if (phase === 'study') leaveStudy(false);
   gen++;
   engine.cancelAll();
-  // back to the learner's turn before their last move: the side to move after a pop made the popped move
+  // back to the learner's turn before their last move: the side to move after a pop made the popped move (with a
+  // friend, one move back is the other player's retry)
   while (ucis.length) {
     fens.pop();
     ucis.pop();
@@ -423,6 +436,10 @@ function takeBack(message: string) {
     verdicts.pop();
     evals.pop();
     rebuild();
+    if (friend) {
+      side = turn();
+      break;
+    }
     if (turn() === side) break;
   }
   result = null;
@@ -446,7 +463,14 @@ function endGame(resigned = false, flagged: Side | null = null) {
   let res: 'win' | 'loss' | 'draw' | 'resigned';
   let headline: string;
   let line: string;
-  if (resigned) {
+  if (friend && (resigned || flagged || chess.isCheckmate())) {
+    // between two players: the side to move resigns or ran out of time or is mated, and the other colour wins
+    const loser: Side = flagged ?? turn();
+    const winner: Side = loser === 'w' ? 'b' : 'w';
+    res = 'win';
+    headline = `Fitojnë ${colourName(winner)}`;
+    line = resigned ? `${Cap(colourName(loser))} u dorëzuan.` : flagged ? `${Cap(colourName(loser))} mbetën pa kohë.` : 'Shah mat.';
+  } else if (resigned) {
     res = 'resigned';
     headline = 'Dorëzim';
     line = 'U dorëzove. Rishiko lojën dhe gjej ku ndryshoi pozicioni.';
@@ -477,7 +501,8 @@ function endGame(resigned = false, flagged: Side | null = null) {
   const tagCounts = new Map<string, number>();
   mine.forEach((v) => v.tags.forEach((t) => tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1)));
   const topTag = [...tagCounts.entries()].sort((a, b) => b[1] - a[1])[0];
-  update((p) => {
+  // a game between two friends stays out of the learner's record
+  if (!friend) update((p) => {
     p.games.push({
       date: new Date().toISOString(),
       side,
@@ -522,6 +547,7 @@ function status() {
   else if (phase === 'thinking') t = 'Trajneri po e shikon lëvizjen…';
   else if (phase === 'engine') t = 'Kundërshtari po mendon…';
   else if (phase === 'study') t = 'Loja pret.';
+  else if (friend) t = `${chess.inCheck() ? 'Shah! ' : ''}Radha e ${turn() === 'w' ? 'të bardhave' : 'të zezave'}.`;
   else t = chess.inCheck() ? 'Shah! Radha jote.' : 'Radha jote.';
   ui.status.textContent = t;
   const op = openingOf(sans);
@@ -539,8 +565,15 @@ function status() {
 function showIntro() {
   ui.coach.dataset.state = 'intro';
   ui.coach.dataset.grade = '';
-  ui.glyph.innerHTML = side === 'w' ? 'Radha jote' : 'Fillon motori';
-  ui.title.textContent = `Ti luan me ${side === 'w' ? 'të bardhat' : 'të zezat'}. Niveli ${level.n}, ${level.name.toLowerCase()}.`;
+  if (friend) {
+    ui.glyph.innerHTML = 'Dy lojtarë';
+    ui.title.textContent = 'Të bardhat fillojnë.';
+    ui.reasons.innerHTML = '<li>Lëvizni me radhë në të njëjtin telefon. Trajneri e vlerëson çdo lëvizje, për të dy.</li>';
+    showWarning();
+    return;
+  }
+  ui.glyph.innerHTML = side === 'w' ? 'Radha jote' : `Fillon ${level.bot}`;
+  ui.title.textContent = `Ti luan me ${side === 'w' ? 'të bardhat' : 'të zezat'}. Kundërshtari: ${level.bot}, niveli ${level.n}.`;
   ui.reasons.innerHTML = `<li>Pas çdo lëvizjeje trajneri të thotë si ishte dhe pse. Prek një figurë, pastaj fushën ku do ta çosh.</li>`;
   showWarning();
 }
@@ -596,7 +629,7 @@ function ticker() {
   const items: string[] = [];
   const op = openingOf(sans);
   if (op) items.push(op.name);
-  items.push(`Niveli ${level.n}, ${level.name.toLowerCase()}`);
+  items.push(friend ? 'Dy lojtarë në një telefon' : `${level.bot}: niveli ${level.n}, ${level.name.toLowerCase()}`);
   if (sans.length) items.push(`Lëvizja ${Math.ceil(sans.length / 2)}`);
   if (warning) items.push(sentenceText(warning));
   const v = [...verdicts].reverse().find(Boolean);
@@ -924,10 +957,13 @@ const fmt = (ms: number) => {
   const m = Math.floor(s / 60);
   return `${m}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 };
+/** the colour at the near edge: the learner, or with a friend whoever sits on the board's near side */
+const seat = (): Side => (friend ? orientation : side);
 function renderClock() {
+  const near = seat();
   const rows: [HTMLElement, Side][] = [
-    [ui.you, side],
-    [ui.them, side === 'w' ? 'b' : 'w'],
+    [ui.you, near],
+    [ui.them, near === 'w' ? 'b' : 'w'],
   ];
   for (const [row, s] of rows) {
     const el = row.querySelector<HTMLElement>('[data-clock]')!;
@@ -969,20 +1005,23 @@ function renderPlayers() {
     }
     return { html, points };
   };
-  const me = takenBy(side);
-  const op = takenBy(side === 'w' ? 'b' : 'w');
+  const near = seat();
+  const me = takenBy(near);
+  const op = takenBy(near === 'w' ? 'b' : 'w');
   const diff = me.points - op.points;
   ui.you.querySelector('[data-taken]')!.innerHTML = me.html + (diff > 0 ? `<span class="adv tabular">+${diff}</span>` : '');
   ui.them.querySelector('[data-taken]')!.innerHTML = op.html + (diff < 0 ? `<span class="adv tabular">+${-diff}</span>` : '');
-  ui.them.querySelector('[data-name]')!.textContent = `Motori · Niveli ${level.n}, ${level.name.toLowerCase()}`;
-  ui.them.toggleAttribute('data-turn', phase === 'engine');
-  ui.you.toggleAttribute('data-turn', phase === 'user');
+  ui.them.querySelector('[data-name]')!.textContent = friend ? Cap(colourName(near === 'w' ? 'b' : 'w')) : `${level.bot} · Niveli ${level.n}`;
+  ui.you.querySelector('.score__name')!.textContent = friend ? Cap(colourName(near)) : 'Ti';
+  ui.them.toggleAttribute('data-turn', friend ? phase === 'user' && turn() !== near : phase === 'engine');
+  ui.you.toggleAttribute('data-turn', friend ? phase === 'user' && turn() === near : phase === 'user');
 }
 
 // ------------------------------------------------------------------ setup, flip, view, resign
 
 function openSetup() {
   ui.setupDialog.showModal();
+  ui.setup.querySelector<HTMLInputElement>(`input[name="opponent"][value="${prefs.opponent}"]`)!.checked = true;
   ui.setup.querySelector<HTMLInputElement>(`input[name="side"][value="${prefs.side}"]`)!.checked = true;
   ui.setup.querySelector<HTMLInputElement>(`input[name="level"][value="${level.n}"]`)!.checked = true;
   ui.setup.querySelector<HTMLInputElement>(`input[name="clock"][value="${prefs.clock}"]`)!.checked = true;
@@ -996,17 +1035,20 @@ ui.setup.addEventListener('submit', (e) => {
   const s = String(data.get('side')) as Side | 'random';
   const n = Number(data.get('level'));
   const clk = String(data.get('clock') ?? 'none');
+  const opponent = data.get('opponent') === 'friend' ? 'friend' : 'engine';
   prefs = update((p) => {
     p.side = s;
     p.level = n;
     p.clock = clk;
+    p.opponent = opponent;
   });
   ui.setupDialog.close();
+  if (opponent === 'friend') return newGame('w', levelOf(n), clk, true);
   newGame(s === 'random' ? (Math.random() < 0.5 ? 'w' : 'b') : s, levelOf(n));
 });
 ui.setup.querySelector('[data-levels]')!.innerHTML = LEVELS.map(
   (l) =>
-    `<label class="choice"><input type="radio" name="level" value="${l.n}"><span class="choice__body"><b>${l.n}. ${l.name}</b><span>${l.note}</span></span></label>`,
+    `<label class="choice choice--bot"><input type="radio" name="level" value="${l.n}"><span class="bot" style="--hue: ${l.hue}" aria-hidden="true">${l.bot[0]}</span><span class="choice__body"><b>${l.bot}</b><span>Niveli ${l.n}, ${l.name.toLowerCase()}. ${l.note}</span></span></label>`,
 ).join('');
 
 const threatsBtn = $<HTMLButtonElement>('[data-threats]');
@@ -1027,6 +1069,8 @@ angleBtn.addEventListener('click', () => {
 ui.flip.addEventListener('click', () => {
   orientation = orientation === 'w' ? 'b' : 'w';
   board.setOrientation(orientation);
+  renderPlayers();
+  renderClock();
 });
 
 let resignArmed: ReturnType<typeof setTimeout> | null = null;
@@ -1047,7 +1091,7 @@ ui.resign.addEventListener('click', () => {
   endGame(true);
 });
 
-ui.end.querySelector('[data-again]')!.addEventListener('click', () => newGame(side, level));
+ui.end.querySelector('[data-again]')!.addEventListener('click', () => (friend ? newGame('w', level, prefs.clock, true) : newGame(side, level)));
 ui.end.querySelector('[data-review]')!.addEventListener('click', () => {
   ui.review.open = true;
   ui.review.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto', block: 'start' });
@@ -1074,7 +1118,12 @@ keyboard(ui.host, () => board, () => orientation);
     verdicts = saved.verdicts as (Verdict | null)[];
     evals = saved.evals ?? saved.ucis.map(() => null);
     clock = saved.clock ?? null;
+    friend = saved.friend ?? false;
     rebuild();
+    if (friend) {
+      orientation = 'w';
+      side = turn();
+    }
   } else {
     side = prefs.side === 'b' ? 'b' : 'w';
     orientation = side;
@@ -1096,7 +1145,7 @@ keyboard(ui.host, () => board, () => orientation);
 
 if (import.meta.env.DEV) {
   (window as unknown as Record<string, unknown>).__play = {
-    state: () => ({ phase, fen: fen(), sans: [...sans], side, level: level.n, verdicts: verdicts.map((v) => v && { grade: v.grade, reasons: v.reasons }) }),
+    state: () => ({ phase, fen: fen(), sans: [...sans], side, friend, level: level.n, verdicts: verdicts.map((v) => v && { grade: v.grade, reasons: v.reasons }) }),
     engine: () => engine.state,
     move: (from: Sq, to: Sq) => userMove(from, to),
     // tests: play the engine at another strength without touching the saved preference

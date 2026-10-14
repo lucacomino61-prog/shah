@@ -340,6 +340,9 @@ html[data-motion="off"] .ticker__track { animation: none; }
 /* the segmented control: a capsule track, the choice on a raised thumb */
 .segmented { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0.1875rem; border-radius: 999px; background: var(--fill); }
 .segmented--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.segmented--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* a friend across the table: no colour to pick and no engine level */
+.setup__form:has(input[name="opponent"][value="friend"]:checked) [data-engine-only] { display: none; }
 .segmented label {
   position: relative; display: grid; place-items: center; min-height: 2.5rem; padding-inline: 0.25rem; border-radius: 999px;
   cursor: pointer; font-size: var(--t-sub); font-weight: 600; text-align: center;
@@ -366,6 +369,14 @@ html[data-motion="off"] .ticker__track { animation: none; }
 .choice:has(input:checked)::after { opacity: 1; }
 .choice:has(input:focus-visible) { outline: 3px solid color-mix(in srgb, var(--tint) 75%, transparent); outline-offset: -3px; border-radius: var(--r-list); }
 .choice__body { display: grid; gap: 0.0625rem; }
+/* a level is a character: the initial in a coloured circle, as a contact in iOS */
+.choice--bot { grid-template-columns: 2.5rem minmax(0, 1fr) 1.25rem; }
+.choice--bot + .choice--bot { box-shadow: inset 4.25rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
+.bot {
+  display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--hue) 82%, #fff), var(--hue));
+  color: #fff; font-weight: 700; font-size: var(--t-title3);
+}
 .choice__body b { font-weight: 500; }
 .choice__body span { color: var(--label-2); font-size: var(--t-foot); }
 .setup__actions { display: grid; gap: 0.25rem; }

@@ -89,6 +89,29 @@ s = await store();
 ok(!after.rush.active && after.rush.strikes === 3, 'three wrong moves end the race', `strikes ${after.rush.strikes}`);
 ok(s.rushBest >= 1, 'the best race score is kept', `best ${s.rushBest}`);
 
+// a friend on the same phone: no engine move, the turn passes, the rows name the colours, take-back is one move
+await page.goto(base + '/luaj/', { waitUntil: 'networkidle0' });
+await page.waitForFunction(() => window.__play && window.__play.engine() === 'ready', { timeout: 30000 });
+await page.evaluate(() => document.querySelector('[data-new]').click());
+await sleep(700);
+await page.click('input[name="opponent"][value="friend"]');
+const hidden = await page.$eval('[data-engine-only]', (e) => getComputedStyle(e).display === 'none');
+await page.click('.setup button[type="submit"]');
+await sleep(600);
+await page.evaluate(() => window.__play.move('e2', 'e4'));
+await sleep(2500);
+let fs1 = await page.evaluate(() => window.__play.state());
+ok(hidden && fs1.friend && fs1.side === 'b' && fs1.phase === 'user' && fs1.sans.length === 1, 'with a friend the engine stays out and black moves next', `${fs1.sans.join(' ')} side ${fs1.side}`);
+await page.evaluate(() => window.__play.move('e7', 'e5'));
+await sleep(2500);
+const names = await page.evaluate(() => [...document.querySelectorAll('.score__name')].map((e) => e.textContent));
+fs1 = await page.evaluate(() => window.__play.state());
+ok(fs1.sans.length === 2 && names.includes('Të bardhat') && names.includes('Të zezat'), 'the rows name the colours and the turn comes back to white', names.join(' / '));
+await page.evaluate(() => document.querySelector('[data-undo]').click());
+await sleep(800);
+fs1 = await page.evaluate(() => window.__play.state());
+ok(fs1.sans.length === 1 && fs1.side === 'b', 'a take-back with a friend undoes one move', fs1.sans.join(' '));
+
 // settings: the switches write the store; the backup loads back what it holds
 await page.goto(base + '/progresi/', { waitUntil: 'networkidle0' });
 await page.click('[data-sound]');

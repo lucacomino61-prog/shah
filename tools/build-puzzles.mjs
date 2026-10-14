@@ -12,7 +12,8 @@ const rows = JSON.parse(readFileSync(join(root, 'tools', 'cache', 'puzzle-rows.j
 
 // the order decides a puzzle's main theme when it has several
 const THEMES = ['mateIn1', 'backRankMate', 'mateIn2', 'fork', 'pin', 'skewer', 'discoveredAttack', 'hangingPiece', 'trappedPiece', 'promotion'];
-const PER_THEME = 26;
+// node tools/build-puzzles.mjs [per-theme]: up to this many per theme (a rare theme gives what the sample holds)
+const PER_THEME = Number(process.argv[2] ?? 200);
 
 const picked = new Map();
 for (const theme of THEMES) {
@@ -55,6 +56,10 @@ for (const p of picked.values()) {
 sf.quit();
 out.sort((a, b) => a.rating - b.rating);
 writeFileSync(join(root, 'src', 'data', 'puzzles.json'), JSON.stringify(out));
+// the lessons' practice steps take the easiest of a theme: they get their own small file, so the pages that only
+// list the lessons do not carry the whole puzzle set
+const forLessons = THEMES.flatMap((t) => out.filter((p) => p.theme === t).slice(0, 12));
+writeFileSync(join(root, 'src', 'data', 'lesson-puzzles.json'), JSON.stringify(forLessons));
 const count = {};
 for (const p of out) count[p.theme] = (count[p.theme] ?? 0) + 1;
 console.log(`kept ${out.length}, dropped ${dropped}`, count);

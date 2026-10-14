@@ -135,6 +135,13 @@ import '../styles/play.css';
     <form class="setup__form" data-setup method="dialog">
       <h2 class="setup__title" id="setup-title" data-setup-title tabindex="-1">Lojë e re</h2>
       <fieldset>
+        <legend>Kundërshtari</legend>
+        <div class="segmented segmented--2">
+          <label><input type="radio" name="opponent" value="engine" checked /><span>Motori</span></label>
+          <label><input type="radio" name="opponent" value="friend" /><span>Një shok</span></label>
+        </div>
+      </fieldset>
+      <fieldset data-engine-only>
         <legend>Luaj me</legend>
         <div class="segmented">
           <label><input type="radio" name="side" value="w" checked /><span>Të bardhat</span></label>
@@ -151,7 +158,7 @@ import '../styles/play.css';
           <label><input type="radio" name="clock" value="3+2" /><span>3+2</span></label>
         </div>
       </fieldset>
-      <fieldset>
+      <fieldset data-engine-only>
         <legend>Niveli i kundërshtarit</legend>
         <div class="choices" data-levels></div>
       </fieldset>

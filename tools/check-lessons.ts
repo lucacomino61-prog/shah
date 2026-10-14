@@ -53,7 +53,8 @@ for (const lesson of LESSONS) {
         mine = -score(a.lines[0]);
       }
       // a mate in fewer moves than the best is fine; otherwise within 0.6 pawns of the best (opening steps)
-      const ok = mine >= top - (step.task.also ? 60 : 30) || (top > 90000 && mine > 90000);
+      // the engine's own best move always passes: a second search of the same move can score it a little apart
+      const ok = u.slice(0, 4) === best.bestmove?.slice(0, 4) || mine >= top - (step.task.also ? 60 : 30) || (top > 90000 && mine > 90000);
       if (!ok) failed++;
       console.log(`${ok ? 'ok   ' : 'FAIL '} ${label}: ${u} scores ${mine} against best ${best.bestmove} ${top}`);
     }

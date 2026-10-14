@@ -2,7 +2,7 @@
 // with a task waits for the learner's move. Practice steps take real Lichess puzzles of the lesson's theme.
 // Every authored position and answer is checked by tools/check-lessons.ts against the engine.
 
-import puzzles from './puzzles.json' with { type: 'json' };
+import puzzles from './lesson-puzzles.json' with { type: 'json' };
 
 export interface Task {
   /** the learner's move first, then the opponent's answer, then the learner again... (UCI) */

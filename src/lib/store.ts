@@ -44,6 +44,8 @@ export interface Progress {
   streak: { count: number; last: string };
   /** the best score in the three-minute race */
   rushBest: number;
+  /** who sits across the table: the engine, or a friend on the same phone */
+  opponent: 'engine' | 'friend';
 }
 
 export interface Daily {
@@ -153,6 +155,7 @@ const fresh = (): Progress => ({
   daily: null,
   streak: { count: 0, last: '' },
   rushBest: 0,
+  opponent: 'engine',
 });
 
 export function load(): Progress {
@@ -190,6 +193,8 @@ export interface SavedGame {
   /** the position's value after each move, centipawns for white */
   evals?: (number | null)[];
   clock?: { base: number; inc: number; w: number; b: number } | null;
+  /** two people on one phone: side is whoever moves next */
+  friend?: boolean;
 }
 
 export function loadGame(): SavedGame | null {
