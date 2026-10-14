@@ -1,5 +1,5 @@
-// Phosphor icons, inlined at build time: one family, one weight. Pause and play use the filled weight, since thin
-// bars at 16 px read as a missing glyph.
+// Phosphor icons, inlined at build time: one family, one weight. Pause, play and the streak flame use the filled
+// weight, since thin strokes at 16 px read as a missing glyph.
 import arrowCounterClockwise from '@phosphor-icons/core/assets/regular/arrow-counter-clockwise.svg?raw';
 import arrowLeft from '@phosphor-icons/core/assets/regular/arrow-left.svg?raw';
 import arrowRight from '@phosphor-icons/core/assets/regular/arrow-right.svg?raw';
@@ -20,6 +20,23 @@ import plus from '@phosphor-icons/core/assets/regular/plus.svg?raw';
 import puzzlePiece from '@phosphor-icons/core/assets/regular/puzzle-piece.svg?raw';
 import videoCamera from '@phosphor-icons/core/assets/regular/video-camera.svg?raw';
 import x from '@phosphor-icons/core/assets/regular/x.svg?raw';
+import bell from '@phosphor-icons/core/assets/regular/bell.svg?raw';
+import calendarCheck from '@phosphor-icons/core/assets/regular/calendar-check.svg?raw';
+import cloudArrowUp from '@phosphor-icons/core/assets/regular/cloud-arrow-up.svg?raw';
+import downloadSimple from '@phosphor-icons/core/assets/regular/download-simple.svg?raw';
+import fire from '@phosphor-icons/core/assets/fill/fire-fill.svg?raw';
+import globe from '@phosphor-icons/core/assets/regular/globe.svg?raw';
+import lightning from '@phosphor-icons/core/assets/regular/lightning.svg?raw';
+import magnifyingGlass from '@phosphor-icons/core/assets/regular/magnifying-glass.svg?raw';
+import shieldWarning from '@phosphor-icons/core/assets/regular/shield-warning.svg?raw';
+import speakerHigh from '@phosphor-icons/core/assets/regular/speaker-high.svg?raw';
+import speakerSlash from '@phosphor-icons/core/assets/regular/speaker-slash.svg?raw';
+import timer from '@phosphor-icons/core/assets/regular/timer.svg?raw';
+import uploadSimple from '@phosphor-icons/core/assets/regular/upload-simple.svg?raw';
+import users from '@phosphor-icons/core/assets/regular/users.svg?raw';
+import robot from '@phosphor-icons/core/assets/regular/robot.svg?raw';
+import shareNetwork from '@phosphor-icons/core/assets/regular/share-network.svg?raw';
+import copy from '@phosphor-icons/core/assets/regular/copy.svg?raw';
 
 const raw = {
   arrowCounterClockwise,
@@ -42,6 +59,23 @@ const raw = {
   puzzlePiece,
   videoCamera,
   x,
+  bell,
+  calendarCheck,
+  cloudArrowUp,
+  downloadSimple,
+  fire,
+  globe,
+  lightning,
+  magnifyingGlass,
+  shieldWarning,
+  speakerHigh,
+  speakerSlash,
+  timer,
+  uploadSimple,
+  users,
+  robot,
+  shareNetwork,
+  copy,
 };
 export type IconName = keyof typeof raw;
 

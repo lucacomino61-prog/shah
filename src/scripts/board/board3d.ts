@@ -717,6 +717,11 @@ export function createBoard3d(o: BoardOptions): BoardView {
   overMat.toneMapped = false;
   const ringMat = own(new MeshBasicMaterial({ transparent: true, opacity: 0.95, depthWrite: false, side: DoubleSide, polygonOffset: true, polygonOffsetFactor: -3 }));
   ringMat.toneMapped = false;
+  // a piece in danger: a ring in the status red round its foot, over a faint red wash of its square
+  const dangerMat = own(new MeshBasicMaterial({ transparent: true, opacity: 0.92, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 }));
+  dangerMat.toneMapped = false;
+  const dangerWash = own(new MeshBasicMaterial({ transparent: true, opacity: 0.2, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 }));
+  dangerWash.toneMapped = false;
   const glowMap = glowTexture();
   textures.push(glowMap);
   const glowMat = own(new MeshBasicMaterial({ map: glowMap, transparent: true, opacity: 0.9, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 }));
@@ -754,6 +759,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
   checkGlow.renderOrder = 1;
   board.add(checkGlow);
   const focusRings: Mesh[] = [];
+  const dangerMarks: Mesh[] = [];
   const cursorRing = new Mesh(outlineGeo, ringMat);
   cursorRing.visible = false;
   cursorRing.renderOrder = 4;
@@ -856,6 +862,18 @@ export function createBoard3d(o: BoardOptions): BoardView {
       r.renderOrder = 4;
       board.add(r);
       focusRings.push(r);
+    }
+    dangerMarks.forEach((m) => board.remove(m));
+    dangerMarks.length = 0;
+    for (const s of marks.danger ?? []) {
+      const wash = new Mesh(tileGeo, dangerWash);
+      wash.position.copy(square(s)).setY(BOARD.top + 0.0025);
+      wash.renderOrder = 1;
+      const ring = new Mesh(takeGeo, dangerMat);
+      ring.position.copy(square(s)).setY(BOARD.top + 0.0045);
+      ring.renderOrder = 3;
+      board.add(wash, ring);
+      dangerMarks.push(wash, ring);
     }
     drawArrows(marks.arrows ?? []);
     dirty = true;
@@ -1349,6 +1367,8 @@ export function createBoard3d(o: BoardOptions): BoardView {
     ringMat.color.copy(accent);
     // check is a warning, so it glows in the status red, as on the flat board
     glowMat.color.set(token('--red'));
+    dangerMat.color.set(token('--red'));
+    dangerWash.color.set(token('--red'));
     for (const a of arrows) {
       a.mat.uniforms.uColor.value.copy(accent);
       if (a.badge) ((a.badge.children[0] as Mesh).material as MeshBasicMaterial).color.copy(accent);
@@ -1536,6 +1556,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
       },
       state: () => ({ chosen: chosen?.sq ?? null, busy: view.busy, pieces: [...bySq.entries()].map(([s, b]) => `${b.side}${b.kind}${s}`).sort() }),
       shadows: () => (vsm ? 'vsm' : 'pcf'),
+      danger: () => [...(marks.danger ?? [])],
     };
   }
 

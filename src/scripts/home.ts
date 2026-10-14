@@ -3,7 +3,7 @@
 
 import { LESSONS } from '../data/lessons.ts';
 import { levelOf } from '../lib/levels.ts';
-import { dueCards, load, loadGame } from '../lib/store.ts';
+import { dueCards, load, loadGame, streakNow, today } from '../lib/store.ts';
 import { createBoard } from './board/index.ts';
 import { motionOn, onMotion, onTick } from './shell.ts';
 
@@ -20,12 +20,28 @@ if (saved && saved.ucis.length) {
   const lv = levelOf(prefs.level);
   $('[data-game-line]').textContent = `Niveli ${lv.n}, ${lv.name.toLowerCase()}. Ti me ${prefs.side === 'b' ? 'të zezat' : 'të bardhat'}.`;
 }
+// the streak beside Luaj, and today's puzzle first in the programme until it is solved
+const streak = streakNow(prefs);
+if (streak) {
+  $('[data-streak]').hidden = false;
+  $('[data-streak-n]').textContent = String(streak);
+  $('[data-streak-word]').textContent = streak === 1 ? 'ditë' : 'ditë rresht';
+  $('[data-streak]').setAttribute('aria-label', `${streak} ${streak === 1 ? 'ditë' : 'ditë rresht'} me ushtrimin e ditës`);
+}
+const dailyOpen = !(prefs.daily?.date === today() && prefs.daily.solved);
 const due = dueCards(prefs).length;
-if (due) {
+if (dailyOpen) {
+  $<HTMLAnchorElement>('[data-puzzle-link]').href = '/ushtrime/?tema=dita';
+  $('[data-puzzle-title]').textContent = 'Ushtrimi i ditës';
+} else if (due) {
   $<HTMLAnchorElement>('[data-puzzle-link]').href = '/ushtrime/?tema=gabimet';
   $('[data-puzzle-title]').textContent = 'Gabimet e tua';
 }
-$('[data-puzzle-line]').textContent = due
+$('[data-puzzle-line]').textContent = dailyOpen
+  ? streak
+    ? `${streak === 1 ? '1 ditë' : `${streak} ditë rresht`}. Mos e humb serinë.`
+    : 'Një ushtrim i ri çdo ditë. Fillo serinë.'
+  : due
   ? `${due} gabime nga lojërat e tua presin sot.`
   : prefs.puzzlesTried
   ? `Vlerësimi yt: ${prefs.puzzleRating}. Të zgjidhura: ${prefs.puzzlesSolved}.`

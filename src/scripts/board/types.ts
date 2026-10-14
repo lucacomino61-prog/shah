@@ -19,6 +19,8 @@ export interface Marks {
   arrows?: Arrow[];
   /** squares the hint points at (the piece to move) */
   focus?: Sq[];
+  /** the learner's pieces the opponent could win next move (the Show-threats switch) */
+  danger?: Sq[];
 }
 
 export interface BoardOptions {

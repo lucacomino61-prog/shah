@@ -12,7 +12,10 @@ import '../styles/play.css';
     <div class="home__title" data-board-ui>
       <h1 class="home__mark poster">Shah</h1>
       <p class="home__line">Luaj kundër motorit. Pas çdo lëvizjeje, trajneri të thotë pse.</p>
-      <a class="cue cue--on home__go" href="/luaj/" data-go><Fragment set:html={icon('horse')} /><span data-go-label>Luaj</span></a>
+      <div class="home__actions">
+        <a class="cue cue--on home__go" href="/luaj/" data-go><Fragment set:html={icon('horse')} /><span data-go-label>Luaj</span></a>
+        <a class="streak" href="/ushtrime/?tema=dita" data-streak hidden><Fragment set:html={icon('fire')} /><b class="tabular" data-streak-n></b><span data-streak-word>ditë</span></a>
+      </div>
     </div>
 
     <section class="lower home__guide" aria-labelledby="guide-title" data-board-ui>
@@ -74,7 +77,19 @@ import '../styles/play.css';
     text-shadow: 0 2px 30px rgb(0 0 0 / 0.35);
   }
   .home__line { max-width: 28ch; color: rgb(255 255 255 / 0.82); font-weight: 500; font-size: var(--t-body); line-height: 1.32; text-shadow: 0 1px 12px rgb(0 0 0 / 0.5); }
+  .home__actions { display: flex; align-items: center; gap: 0.625rem; }
   .home__go { min-height: 50px; padding-inline: 1.5rem; font-size: var(--t-body); }
+  /* the streak: days in a row with today's puzzle solved, in a glass capsule with its flame */
+  .streak {
+    display: inline-flex; align-items: center; gap: 0.3rem; min-height: 50px; padding: 0 1.125rem; border-radius: 999px;
+    color: #fff; text-decoration: none; font-weight: 600;
+    background-color: var(--glass); background-image: linear-gradient(180deg, var(--glass-sheen), transparent 46%);
+    -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+    box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 0.5px var(--glass-rim), var(--glass-depth);
+  }
+  .streak[hidden] { display: none; }
+  .streak .icon { width: 1.25rem; height: 1.25rem; color: #ff9f0a; }
+  .streak b { font-size: var(--t-title3); font-weight: 700; }
   .home__guide { padding: 0.25rem 0; gap: 0; }
   .guide { display: grid; width: 100%; }
   .guide li + li::before { content: ""; display: block; height: 0.5px; margin-inline-start: 5.25rem; background: var(--sep); }

@@ -3,7 +3,7 @@
 import { TAG_NAMES, type Tag } from '../lib/coach.ts';
 import { LESSONS } from '../data/lessons.ts';
 import { levelOf } from '../lib/levels.ts';
-import { load, save, saveGame } from '../lib/store.ts';
+import { load, loadGame, save, saveGame, streakNow, today } from '../lib/store.ts';
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const p = load();
@@ -35,6 +35,8 @@ const rows: [string, string][] = [
   [p.puzzlesTried ? 'Vlerësimi në ushtrime' : 'Vlerësimi fillestar në ushtrime', String(p.puzzleRating)],
   ['Ushtrime të zgjidhura pa ndihmë', `${p.puzzlesSolved} nga ${p.puzzlesTried}`],
   ['Mësime të kryera', `${p.lessons.length} nga ${LESSONS.length}`],
+  ['Ushtrimi i ditës', streakNow(p) ? `${streakNow(p)} ditë rresht` : 'Seria nuk ka filluar'],
+  ['Rekordi në garë', p.rushBest ? `${p.rushBest} pikë` : 'Ende pa garë'],
 ];
 $('[data-summary]').innerHTML = rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('');
 
@@ -104,4 +106,57 @@ glass.addEventListener('input', () => {
   try {
     localStorage.setItem(GLASS_KEY, String(v));
   } catch {}
+});
+
+// the game's switches: sounds and vibration, and the red rings on pieces in danger
+const switchFor = (sel: string, key: 'sound' | 'threats') => {
+  const box = $<HTMLInputElement>(sel);
+  box.checked = load()[key];
+  box.addEventListener('change', () => save({ ...load(), [key]: box.checked }));
+};
+switchFor('[data-sound]', 'sound');
+switchFor('[data-threats-pref]', 'threats');
+
+// a backup of everything this browser keeps: a file to carry to another phone or to keep safe
+const note = $('[data-backup-note]');
+$('[data-export]').addEventListener('click', async () => {
+  const data = { app: 'shah', version: 1, saved: new Date().toISOString(), progress: load(), game: loadGame() };
+  const name = `shah-progresi-${today()}.json`;
+  const file = new File([JSON.stringify(data)], name, { type: 'application/json' });
+  // a phone offers its share sheet (Files, a chat, AirDrop); elsewhere the file downloads
+  if (navigator.canShare?.({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: 'Shah: progresi' });
+      note.textContent = 'Kopja u ruajt.';
+      return;
+    } catch (e) {
+      if ((e as Error).name === 'AbortError') return;
+    }
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(file);
+  a.download = name;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  note.textContent = `Kopja u ruajt si ${name}.`;
+});
+
+const fileInput = $<HTMLInputElement>('[data-import-file]');
+$('[data-import]').addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', async () => {
+  const f = fileInput.files?.[0];
+  fileInput.value = '';
+  if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (data?.app !== 'shah' || typeof data.progress?.puzzleRating !== 'number') throw new Error('not a Shah backup');
+    if (!confirm('Kjo kopje zëvendëson progresin që ke në këtë shfletues. Vazhdo?')) return;
+    save({ ...load(), ...data.progress });
+    saveGame(data.game ?? null);
+    location.reload();
+  } catch {
+    note.textContent = 'Ky skedar nuk është një kopje e Shah.';
+  }
 });

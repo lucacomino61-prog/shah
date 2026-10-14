@@ -4,11 +4,12 @@
 import { Chess, type Square } from 'chess.js';
 import puzzles from '../data/puzzles.json';
 import { sanHtml, sentenceHtml, sentenceText } from '../lib/notation.ts';
-import { DAYS, dueCards, load, ratePuzzle, reviewCard, update, type Card } from '../lib/store.ts';
+import { DAYS, dueCards, load, ratePuzzle, reviewCard, solveDaily, streakNow, today, update, type Card } from '../lib/store.ts';
 import { THEMES, themeOf } from '../lib/themes.ts';
 import { createBoard, followBroadcast, keyboard, type BoardView } from './board/index.ts';
 import type { Side, Sq } from './board/types.ts';
 import { gsap, motionOn, onMotion, onTick } from './shell.ts';
+import { missSound, moveSound, winSound } from '../lib/sound.ts';
 
 interface Puzzle {
   id: string;
@@ -60,6 +61,10 @@ let busy = false;
 let hintStep = 0;
 let done = false;
 let gen = 0;
+/** a theme from the list, today's puzzle, or the three-minute race */
+let mode: 'theme' | 'daily' | 'rush' = 'theme';
+const RUSH_SECONDS = 180;
+const rush = { active: false, left: RUSH_SECONDS, score: 0, strikes: 0, target: 600, used: new Set<string>() };
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, motionOn() ? ms : Math.min(ms, 120)));
 const fen = () => chess.fen();
@@ -81,6 +86,7 @@ function lastMarks(extra: { arrows?: { from: Sq; to: Sq }[]; focus?: Sq[] } = {}
 
 function play(uci: string) {
   const m = chess.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] || undefined });
+  moveSound(m.san);
   board.setPosition(fen(), true);
   lastMarks();
   return m;
@@ -92,7 +98,34 @@ function pool(): Puzzle[] {
   return theme === 'all' ? ALL : ALL.filter((p) => p.theme === theme || p.themes.includes(theme));
 }
 
+/** Today's puzzle: near the learner's rating, chosen by the date, so it stays the same all day. */
+function dailyPuzzle(): Puzzle {
+  const t = today();
+  if (prefs.daily?.date === t) {
+    const kept = ALL.find((p) => p.id === prefs.daily!.id);
+    if (kept) return kept;
+  }
+  const near = [...ALL].sort((a, b) => Math.abs(a.rating - prefs.puzzleRating) - Math.abs(b.rating - prefs.puzzleRating)).slice(0, 60);
+  let h = 0;
+  for (const c of t) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  const p = near[h % near.length];
+  prefs = update((x) => (x.daily = { date: t, id: p.id, solved: false }));
+  return p;
+}
+
+/** The race: each puzzle a little harder than the last, never the same one twice in a race. */
+function rushPuzzle(): Puzzle {
+  const fresh = ALL.filter((p) => !rush.used.has(p.id) && p.rating >= rush.target - 120);
+  const from = fresh.length ? fresh : ALL.filter((p) => !rush.used.has(p.id));
+  const near = [...from].sort((a, b) => Math.abs(a.rating - rush.target) - Math.abs(b.rating - rush.target)).slice(0, 5);
+  const p = near[Math.floor(Math.random() * near.length)];
+  rush.used.add(p.id);
+  return p;
+}
+
 function pick(): Puzzle | null {
+  if (mode === 'daily') return dailyPuzzle();
+  if (mode === 'rush') return rushPuzzle();
   if (theme === 'mine') {
     const due = dueCards(prefs);
     return due.length ? fromCard(due[0]) : null;
@@ -108,7 +141,9 @@ function pick(): Puzzle | null {
   return near[Math.floor(Math.random() * near.length)];
 }
 
-async function deal(next: Puzzle | null = pick()) {
+async function deal(next?: Puzzle | null) {
+  if (mode === 'daily' && prefs.daily?.date === today() && prefs.daily.solved) return dailyDone();
+  if (next === undefined) next = pick();
   const g = ++gen;
   if (!next) return noneDue();
   const p = next;
@@ -140,6 +175,7 @@ async function deal(next: Puzzle | null = pick()) {
   }
   ui.myRating.textContent = String(prefs.puzzleRating);
   ratingLabel();
+  capsule();
   showButtons();
   ui.status.textContent = own ? 'Radha jote.' : 'Kundërshtari lëviz…';
   ticker();
@@ -222,6 +258,8 @@ async function onMove(from: Sq, to: Sq) {
   if (!right) {
     failed = true;
     const m = play(uci);
+    missSound();
+    if (mode === 'rush') return rushMiss(m.san, g);
     setCoach('wrong', 'Jo kjo', 'Provo përsëri', [`[[${m.san}]] nuk e zgjidh ushtrimin. Shiko çfarë kërcënon kundërshtari dhe kërko diçka më të fortë.`]);
     say('Jo kjo. Provo përsëri.');
     await wait(900);
@@ -249,6 +287,7 @@ async function onMove(from: Sq, to: Sq) {
 
 function solved(lastSan: string) {
   if (!puzzle) return;
+  if (mode === 'rush') return rushSolved(lastSan);
   done = true;
   busy = false;
   const clean = !failed && !helped;
@@ -265,15 +304,19 @@ function solved(lastSan: string) {
   ui.myRating.textContent = String(prefs.puzzleRating);
   ratingLabel();
   const t = themeOf(puzzle.theme);
+  winSound();
+  if (mode === 'daily') prefs = solveDaily(puzzle.id);
+  const streak = streakNow(prefs);
   setCoach(
     'solved',
     `${sanHtml(lastSan)} Saktë`,
-    clean ? `Vlerësimi ${diff >= 0 ? '+' : ''}${diff}` : 'E zgjidhur me ndihmë',
+    mode === 'daily' ? `Ushtrimi i ditës · ${streak} ${streak === 1 ? 'ditë' : 'ditë rresht'}` : clean ? `Vlerësimi ${diff >= 0 ? '+' : ''}${diff}` : 'E zgjidhur me ndihmë',
     [t.idea],
     true,
   );
   say(`Saktë. ${t.idea}`);
   ui.status.textContent = 'U zgjidh.';
+  capsule();
   showButtons();
   countThemes();
   ticker();
@@ -284,6 +327,7 @@ function solvedCard(c: Card, san: string, clean: boolean) {
   const after = reviewCard(c.id, clean);
   prefs = load();
   const when = !after ? '' : after.box > 4 ? 'E mësuar: nuk kthehet më.' : clean ? (DAYS[after.box] === 1 ? 'Kthehet nesër.' : `Kthehet pas ${DAYS[after.box]} ditësh.`) : 'Kthehet nesër.';
+  winSound();
   setCoach('solved', `${sanHtml(san)} Saktë`, when, [`Në lojë luajte [[${c.played}]]. ${c.reason}`], true);
   say(`Saktë. ${when}`);
   ui.status.textContent = 'U zgjidh.';
@@ -291,6 +335,128 @@ function solvedCard(c: Card, san: string, clean: boolean) {
   countThemes();
   ticker();
 }
+
+// ------------------------------------------------------------------ today's puzzle and the race
+
+const clockText = (s: number) => `${Math.floor(Math.max(0, s) / 60)}:${String(Math.floor(Math.max(0, s) % 60)).padStart(2, '0')}`;
+
+/** The top capsule speaks for the mode: the race shows its clock and score, today's puzzle the streak. */
+function capsule() {
+  const label = document.querySelector('[data-my-label]')!;
+  if (mode === 'rush') {
+    ui.themeName.textContent = 'Gara';
+    ui.puzzleRating.textContent = clockText(rush.left);
+    label.textContent = 'Pikët';
+    ui.myRating.textContent = rush.strikes ? `${rush.score} · ${rush.strikes} ${rush.strikes === 1 ? 'gabim' : 'gabime'}` : String(rush.score);
+  } else if (mode === 'daily') {
+    ui.themeName.textContent = 'Ushtrimi i ditës';
+    label.textContent = 'Ditë rresht';
+    ui.myRating.textContent = String(streakNow(prefs));
+  }
+}
+
+function dailyDone() {
+  puzzle = null;
+  done = true;
+  board.setInteractive(false);
+  board.setMarks({});
+  const n = streakNow(prefs);
+  setCoach('note', 'U zgjidh sot', n === 1 ? '1 ditë' : `${n} ditë rresht`, ['Ushtrimi i ditës kthehet nesër. Ndërkohë zgjidh një temë ose provo garën 3 minutëshe.']);
+  ui.status.textContent = 'Kthehu nesër.';
+  capsule();
+  ui.hint.hidden = true;
+  ui.solution.hidden = true;
+  ui.again.hidden = true;
+  ui.next.hidden = false;
+}
+
+function startRush() {
+  mode = 'rush';
+  Object.assign(rush, { active: true, left: RUSH_SECONDS, score: 0, strikes: 0, target: Math.max(500, Math.min(1200, prefs.puzzleRating - 300)), used: new Set<string>() });
+  say('Gara filloi: tre minuta.');
+  void deal();
+}
+
+function stopRush() {
+  rush.active = false;
+}
+
+/** A solved race puzzle: a point, a step harder, and straight on to the next. */
+async function rushSolved(san: string) {
+  const g = gen;
+  rush.score++;
+  rush.target += 60;
+  winSound();
+  setCoach('good', `${sanHtml(san)} Saktë`, `${rush.score} pikë`, ['Tjetri vjen menjëherë.'], true);
+  capsule();
+  await wait(450);
+  if (g !== gen || !rush.active) return;
+  void deal();
+}
+
+/** A wrong move in the race: a strike; the third ends it. */
+async function rushMiss(san: string, g: number) {
+  rush.strikes++;
+  capsule();
+  setCoach('wrong', 'Jo kjo', `${rush.strikes} nga 3 gabime`, [`[[${san}]] nuk e zgjidh ushtrimin.`]);
+  await wait(800);
+  if (g !== gen) return;
+  if (rush.strikes >= 3) return endRush('Tre gabime.');
+  void deal();
+}
+
+function endRush(why: string) {
+  if (!rush.active) return;
+  rush.active = false;
+  gen++;
+  done = true;
+  busy = false;
+  board.setInteractive(false);
+  const best = prefs.rushBest;
+  const record = rush.score > best;
+  if (record) prefs = update((p) => (p.rushBest = rush.score));
+  if (rush.score) winSound();
+  setCoach(
+    'end',
+    `${rush.score} ${rush.score === 1 ? 'pikë' : 'pikë'}`,
+    record ? 'Rekord i ri' : `Rekordi yt: ${best}`,
+    [`${why} Zgjidhe ${rush.score} ${rush.score === 1 ? 'ushtrim' : 'ushtrime'} në garë.`, 'Provo përsëri për të thyer rekordin, ose kthehu te temat.'],
+  );
+  ui.status.textContent = 'Gara mbaroi.';
+  capsule();
+  showButtons();
+  renderModes();
+}
+
+// the race clock runs on the one ticker
+onTick((dt) => {
+  if (!rush.active) return;
+  const before = Math.ceil(rush.left);
+  rush.left -= dt;
+  if (Math.ceil(rush.left) !== before) ui.puzzleRating.textContent = clockText(rush.left);
+  if (rush.left <= 0) endRush('Koha mbaroi.');
+});
+
+/** The two modes above the themes, with today's state and the race record. */
+function renderModes() {
+  const d = prefs.daily?.date === today() && prefs.daily.solved;
+  const n = streakNow(prefs);
+  const line = document.querySelector('[data-daily-line]');
+  if (line) line.textContent = d ? `U zgjidh sot · ${n === 1 ? '1 ditë' : `${n} ditë rresht`}` : n ? `${n} ditë rresht. Mos e humb serinë.` : 'Një ushtrim i ri çdo ditë.';
+  const best = document.querySelector('[data-rush-best]');
+  if (best) best.textContent = prefs.rushBest ? `Rekordi yt: ${prefs.rushBest} pikë` : 'Sa ushtrime zgjidh në 3 minuta?';
+}
+
+document.querySelector('[data-daily]')?.addEventListener('click', () => {
+  stopRush();
+  mode = 'daily';
+  void deal();
+  document.querySelector('.stage')?.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto' });
+});
+document.querySelector('[data-rush]')?.addEventListener('click', () => {
+  startRush();
+  document.querySelector('.stage')?.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto' });
+});
 
 // ------------------------------------------------------------------ help
 
@@ -329,9 +495,20 @@ ui.solution.addEventListener('click', async () => {
   solved(last);
 });
 
-ui.next.addEventListener('click', () => void deal());
-ui.nextTool.addEventListener('click', () => void deal());
-ui.again.addEventListener('click', () => puzzle && void deal(puzzle));
+// Next leaves today's puzzle or the race for the chosen theme; Again restarts a race that ended
+const toThemes = () => {
+  if (mode !== 'theme') {
+    stopRush();
+    mode = 'theme';
+  }
+  void deal();
+};
+ui.next.addEventListener('click', toThemes);
+ui.nextTool.addEventListener('click', toThemes);
+ui.again.addEventListener('click', () => {
+  if (mode === 'rush') return startRush();
+  if (puzzle) void deal(puzzle);
+});
 
 // ------------------------------------------------------------------ the broadcast
 
@@ -348,6 +525,14 @@ function setCoach(state: string, glyph: string, title: string, lines: string[], 
 }
 
 function showButtons() {
+  if (mode === 'rush') {
+    // no help in a race: solve it or lose a strike
+    ui.hint.hidden = true;
+    ui.solution.hidden = true;
+    ui.next.hidden = !done;
+    ui.again.hidden = !done;
+    return;
+  }
   ui.hint.hidden = done;
   ui.solution.hidden = done;
   ui.next.hidden = !done;
@@ -392,6 +577,8 @@ ui.themes.addEventListener('change', (e) => {
   const input = e.target as HTMLInputElement;
   if (input.name !== 'theme') return;
   theme = input.value;
+  stopRush();
+  mode = 'theme';
   void deal();
   document.querySelector('.stage')?.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto' });
 });
@@ -419,20 +606,25 @@ followBroadcast(ui.host, ui.coach, () => board);
 keyboard(ui.host, () => board, () => side);
 
 (async () => {
-  // /ushtrime/?tema=gabimet opens on the learner's own mistakes
-  if (new URLSearchParams(location.search).get('tema') === 'gabimet') {
+  // /ushtrime/?tema=gabimet opens on the learner's own mistakes, ?tema=dita on today's puzzle, ?tema=gara on the race
+  const tema = new URLSearchParams(location.search).get('tema');
+  if (tema === 'gabimet') {
     theme = 'mine';
     ui.themes.querySelector<HTMLInputElement>('input[value="mine"]')!.checked = true;
   }
+  if (tema === 'dita') mode = 'daily';
   await mount();
   countThemes();
+  renderModes();
   ui.myRating.textContent = String(prefs.puzzleRating);
+  if (tema === 'gara') return startRush();
   await deal();
 })();
 
 if (import.meta.env.DEV) {
   (window as unknown as Record<string, unknown>).__puzzle = {
-    state: () => ({ id: puzzle?.id, step, side, done, failed, fen: fen(), next: puzzle?.moves[step] }),
+    state: () => ({ id: puzzle?.id, step, side, done, failed, fen: fen(), next: puzzle?.moves[step], mode, rush: { ...rush, used: rush.used.size } }),
+    endRush: () => endRush('Koha mbaroi.'),
     move: (f: Sq, t: Sq) => onMove(f, t),
   };
 }

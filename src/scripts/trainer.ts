@@ -10,6 +10,7 @@ import { load, update } from '../lib/store.ts';
 import { createBoard, followBroadcast, keyboard, type BoardView } from './board/index.ts';
 import type { Side, Sq } from './board/types.ts';
 import { gsap, motionOn, onMotion, onTick } from './shell.ts';
+import { missSound, moveSound, winSound } from '../lib/sound.ts';
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const stageEl = $('[data-stage-box]');
@@ -122,7 +123,7 @@ async function advance(g: number) {
     await wait(ply === 0 ? 600 : 450);
     if (g !== gen) return;
     const u = LINES[line].ucis[ply];
-    chess.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] || undefined });
+    moveSound(chess.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] || undefined }).san);
     ply++;
     board.setPosition(chess.fen(), true);
     marks();
@@ -146,6 +147,7 @@ async function onMove(from: Sq, to: Sq) {
   let m;
   try {
     m = chess.move({ from, to, promotion: expected[4] || 'q' });
+    moveSound(m.san);
   } catch {
     busy = false;
     board.setInteractive(true);
@@ -157,6 +159,7 @@ async function onMove(from: Sq, to: Sq) {
   if (uci !== expected.slice(0, 4)) {
     errors++;
     const right = LINES[line].sans[ply];
+    missSound();
     coach('wrong', 'Jo kjo', 'Repertori yt luan ndryshe', [`[[${m.san}]] nuk është në repertor. Këtu luhet [[${right}]].`]);
     await wait(1000);
     if (g !== gen) return;
@@ -186,6 +189,7 @@ function finish() {
   const st = stats()[keyOf(line)];
   const l = LINES[line];
   const tail = st.streak >= LEARNT ? 'Linja e mësuar.' : clean ? `Pa gabim: ${st.streak} nga ${LEARNT} herë rresht.` : 'Me gabime: numri rresht nis nga e para.';
+  winSound();
   coach('solved', l.name, tail, [l.idea]);
   ui.status.textContent = 'Linja mbaroi.';
   ui.hint.hidden = true;

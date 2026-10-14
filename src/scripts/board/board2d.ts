@@ -167,6 +167,10 @@ export function createBoard2d(o: BoardOptions): BoardView {
       const { x, y } = xy(s);
       marksG.append(el('rect', { x: x + 5, y: y + 5, width: 90, height: 90, class: 'mk-focus' }));
     }
+    for (const s of marks.danger ?? []) {
+      const { x, y } = xy(s);
+      marksG.append(el('rect', { x, y, width: 100, height: 100, class: 'mk-danger-wash' }), el('circle', { cx: x + 50, cy: y + 50, r: 43, class: 'mk-danger' }));
+    }
     if (cursor) {
       const { x, y } = xy(cursor);
       marksG.append(el('rect', { x: x + 4, y: y + 4, width: 92, height: 92, class: 'mk-cursor' }));

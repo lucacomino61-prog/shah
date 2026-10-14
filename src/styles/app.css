@@ -402,6 +402,8 @@ html[data-motion="off"] .motion-switch [data-when="off"] { display: inline-flex;
 .mk-focus { fill: none; stroke: var(--pointer); stroke-width: 7; }
 .mk-cursor { fill: none; stroke: #000; stroke-width: 5; stroke-dasharray: 10 8; }
 .mk-chosen { fill: var(--pointer); opacity: 0.3; }
+.mk-danger { fill: none; stroke: var(--red); stroke-width: 7; opacity: 0.92; }
+.mk-danger-wash { fill: var(--red); opacity: 0.18; }
 .mk-dot { fill: var(--pointer); opacity: 0.85; pointer-events: none; }
 .mk-take { fill: none; stroke: var(--pointer); stroke-width: 7; opacity: 0.85; pointer-events: none; }
 .board-arrows { pointer-events: none; }
@@ -441,3 +443,17 @@ html[data-motion="off"] .motion-switch [data-when="off"] { display: inline-flex;
 a.row:active, button.row:active, label.row:active { background: var(--cell-press); }
 @media (hover: hover) and (pointer: fine) { a.row:hover, button.row:hover, label.row:hover { background: color-mix(in srgb, var(--cell-press) 55%, var(--cell)); } }
 .chev { width: 0.9rem; height: 0.9rem; color: var(--label-3); }
+
+/* the iOS switch: a capsule that turns green, a white knob that slides across */
+.switch {
+  -webkit-appearance: none; appearance: none; position: relative; flex: none; margin: 0;
+  width: 3.1875rem; height: 1.9375rem; border-radius: 999px; background: var(--fill); cursor: pointer;
+  transition: background-color 200ms ease;
+}
+.switch::before {
+  content: ""; position: absolute; top: 2px; left: 2px; width: 1.6875rem; height: 1.6875rem; border-radius: 50%;
+  background: #fff; box-shadow: 0 3px 8px rgb(0 0 0 / 0.15), 0 1px 1px rgb(0 0 0 / 0.16);
+  transition: transform 260ms var(--ease-out);
+}
+.switch:checked { background: var(--green); }
+.switch:checked::before { transform: translateX(1.25rem); }

@@ -9,6 +9,8 @@ import { LEVELS, levelOf, pickMove, type Level } from '../lib/levels.ts';
 import { sanHtml, sentenceHtml, sentenceText } from '../lib/notation.ts';
 import { openingOf } from '../lib/openings.ts';
 import { addCard, load, loadGame, saveGame, update, type Progress } from '../lib/store.ts';
+import { inDanger } from '../lib/threats.ts';
+import { moveSound, winSound } from '../lib/sound.ts';
 import { createBoard, followBroadcast, keyboard, type BoardView } from './board/index.ts';
 import type { Arrow, Side, Sq } from './board/types.ts';
 import { gsap, motionOn, onMotion, onTick } from './shell.ts';
@@ -199,7 +201,9 @@ function marks(extra: { arrows?: Arrow[]; focus?: Sq[] } = {}) {
   if (chess.inCheck()) {
     for (const row of chess.board()) for (const p of row) if (p && p.type === 'k' && p.color === chess.turn()) check = p.square;
   }
-  board.setMarks({ last, check, arrows: extra.arrows ?? [], focus: extra.focus ?? [] });
+  // the Show-threats switch: what the learner could lose next move, in red (not while a past move is open)
+  const danger = prefs.threats && !study && phase !== 'over' ? inDanger(chess.fen(), side) : [];
+  board.setMarks({ last, check, arrows: extra.arrows ?? [], focus: extra.focus ?? [], danger });
 }
 
 // ------------------------------------------------------------------ the game
@@ -323,6 +327,7 @@ async function userMove(from: Sq, to: Sq) {
   fens.push(chess.fen());
   ucis.push(uci);
   sans.push(m.san);
+  moveSound(m.san);
   verdicts.push(null);
   evals.push(null);
   if (clock) clock[side] += clock.inc;
@@ -383,6 +388,7 @@ async function engineMove(given?: Analysis) {
   fens.push(chess.fen());
   ucis.push(uci);
   sans.push(m.san);
+  moveSound(m.san);
   verdicts.push(null);
   evals.push(chess.isGameOver() ? finalCp() : null);
   if (clock) {
@@ -464,6 +470,7 @@ function endGame(resigned = false, flagged: Side | null = null) {
           : 'Pesëdhjetë lëvizje pa kapje dhe pa lëvizje ushtari.';
   }
   result = res;
+  if (res === 'win') winSound();
   const mine = verdicts.filter((v): v is Verdict => !!v);
   const acc = gameAccuracy(mine);
   const count = (g: Grade) => mine.filter((v) => v.grade === g).length;
@@ -1001,6 +1008,15 @@ ui.setup.querySelector('[data-levels]')!.innerHTML = LEVELS.map(
   (l) =>
     `<label class="choice"><input type="radio" name="level" value="${l.n}"><span class="choice__body"><b>${l.n}. ${l.name}</b><span>${l.note}</span></span></label>`,
 ).join('');
+
+const threatsBtn = $<HTMLButtonElement>('[data-threats]');
+threatsBtn.setAttribute('aria-pressed', String(prefs.threats));
+threatsBtn.addEventListener('click', () => {
+  prefs = update((p) => (p.threats = !p.threats));
+  threatsBtn.setAttribute('aria-pressed', String(prefs.threats));
+  say(prefs.threats ? 'Rreziqet shfaqen me të kuqe.' : 'Rreziqet nuk shfaqen.');
+  marks();
+});
 
 const angleBtn = $<HTMLButtonElement>('[data-angle]');
 angleBtn.addEventListener('click', () => {

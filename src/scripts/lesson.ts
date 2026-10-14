@@ -9,6 +9,7 @@ import { update } from '../lib/store.ts';
 import { createBoard, followBroadcast, keyboard, type BoardView } from './board/index.ts';
 import type { Side, Sq } from './board/types.ts';
 import { gsap, motionOn, onMotion, onTick } from './shell.ts';
+import { missSound, moveSound, winSound } from '../lib/sound.ts';
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const stageEl = $('[data-stage-box]');
@@ -149,11 +150,13 @@ async function onMove(from: Sq, to: Sq) {
   busy = true;
   board.setInteractive(false);
   const m = chess.move({ from, to, promotion });
+  moveSound(m.san);
   board.setPosition(chess.fen(), true);
   marks();
   if (!right) {
     ui.task.innerHTML = `${sentenceHtml(`[[${m.san}]] nuk është përgjigjja. Provo përsëri.`)}`;
     ui.live.textContent = 'Jo kjo. Provo përsëri.';
+    missSound();
     await wait(900);
     if (g !== gen) return;
     chess.undo();
@@ -179,6 +182,7 @@ async function onMove(from: Sq, to: Sq) {
 }
 
 function done(text: string) {
+  winSound();
   solved = true;
   busy = false;
   ui.task.hidden = false;
@@ -199,6 +203,7 @@ async function playout(from: Sq, to: Sq) {
   let m;
   try {
     m = chess.move({ from, to, promotion: 'q' });
+    moveSound(m.san);
   } catch {
     busy = false;
     board.setInteractive(true);
@@ -230,7 +235,7 @@ async function playout(from: Sq, to: Sq) {
   const u = a.bestmove!;
   await wait(250);
   if (g !== gen) return;
-  chess.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] || undefined });
+  moveSound(chess.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] || undefined }).san);
   board.setPosition(chess.fen(), true);
   marks();
   if (chess.isDraw()) return slipped(chess.isInsufficientMaterial() ? 'Figura jote u mor: me dy mbretër vetëm është barazim. Provo përsëri.' : 'Barazim. Provo përsëri.');
@@ -240,6 +245,7 @@ async function playout(from: Sq, to: Sq) {
 }
 
 function slipped(text: string) {
+  missSound();
   busy = false;
   solved = false;
   ui.task.hidden = false;

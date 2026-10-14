@@ -28,12 +28,28 @@ export interface Progress {
   level: number;
   side: 'w' | 'b' | 'random';
   warnings: boolean;
+  /** the Show-threats switch: a red ring round each of the learner's pieces the opponent could win next move */
+  threats: boolean;
+  /** move sounds (and a short vibration where the phone allows it) */
+  sound: boolean;
   /** the game clock: 'none' or minutes+increment, e.g. '5+3' */
   clock: string;
   /** opening lines: correct runs in a row and tries, by repertoire slug + line index */
   reps: Record<string, { streak: number; tries: number }>;
   /** the learner's own mistakes, brought back as puzzles */
   cards: Card[];
+  /** today's puzzle, the same one all day */
+  daily: Daily | null;
+  /** days in a row with the daily puzzle solved; last = the latest such day */
+  streak: { count: number; last: string };
+  /** the best score in the three-minute race */
+  rushBest: number;
+}
+
+export interface Daily {
+  date: string;
+  id: string;
+  solved: boolean;
 }
 
 /** One of the learner's mistakes, kept as a puzzle: find a good move where the bad one was played. */
@@ -59,8 +75,22 @@ export interface Card {
 /** Days before a card comes back, by box. */
 export const DAYS = [0, 1, 3, 7, 21];
 
-export const today = (d = new Date()) => d.toISOString().slice(0, 10);
+/** The local date, YYYY-MM-DD: a day turns at the learner's midnight, not at UTC's. */
+export const today = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const addDays = (n: number) => today(new Date(Date.now() + n * 86400000));
+
+/** The streak as it stands now: it holds while the last solved day is today or yesterday. */
+export const streakNow = (p: Progress) => (p.streak.last === today() || p.streak.last === addDays(-1) ? p.streak.count : 0);
+
+/** The daily puzzle was solved: the streak grows by a day if yesterday's was solved too, else starts again. */
+export function solveDaily(id: string): Progress {
+  return update((p) => {
+    if (!p.daily || p.daily.id !== id || p.daily.date !== today() || p.daily.solved) return;
+    p.daily.solved = true;
+    const count = p.streak.last === today() ? p.streak.count : p.streak.last === addDays(-1) ? p.streak.count + 1 : 1;
+    p.streak = { count, last: today() };
+  });
+}
 
 /** Cards due today or earlier, oldest first. */
 export const dueCards = (p: Progress) => p.cards.filter((c) => c.box <= 4 && c.due <= today()).sort((a, b) => a.due.localeCompare(b.due));
@@ -115,9 +145,14 @@ const fresh = (): Progress => ({
   level: 2,
   side: 'w',
   warnings: true,
+  threats: true,
+  sound: true,
   clock: 'none',
   reps: {},
   cards: [],
+  daily: null,
+  streak: { count: 0, last: '' },
+  rushBest: 0,
 });
 
 export function load(): Progress {

@@ -27,16 +27,30 @@ import { icon } from '../lib/icons';
     </section>
 
     <section aria-labelledby="look-title">
-      <h2 class="group-h" id="look-title">Pamja</h2>
-      <div class="group look">
+      <h2 class="group-h" id="look-title">Cilësimet</h2>
+      <div class="group settings">
+        <label class="row"><span>Tingujt dhe dridhja</span><input type="checkbox" class="switch" data-sound /></label>
+        <label class="row"><span>Trego rreziqet në lojë</span><input type="checkbox" class="switch" data-threats-pref /></label>
+        <div class="look">
         <label class="look__label" for="glass-level">Xhami</label>
         <div class="look__range">
           <span aria-hidden="true">I qartë</span>
           <input id="glass-level" type="range" min="0" max="1" step="0.05" value="0.5" data-glass aria-valuetext="Mesatar" />
           <span aria-hidden="true">I ngjyrosur</span>
         </div>
+        </div>
       </div>
-      <p class="group-note look__note">Sa shihet tabela përmes xhamit të menyve dhe kartave. Majtas më e qartë, djathtas më e lexueshme.</p>
+      <p class="group-note look__note">Rreziqet: një rreth i kuq rreth figurave të tua që kundërshtari mund t’i marrë në lëvizjen tjetër. Xhami: sa shihet tabela përmes menyve dhe kartave; majtas më e qartë, djathtas më e lexueshme.</p>
+    </section>
+
+    <section aria-labelledby="backup-title">
+      <h2 class="group-h" id="backup-title">Kopja rezervë</h2>
+      <div class="group backup">
+        <button type="button" class="row" data-export><span>Ruaj një kopje</span><Fragment set:html={icon('downloadSimple')} /></button>
+        <button type="button" class="row" data-import><span>Ngarko një kopje</span><Fragment set:html={icon('uploadSimple')} /></button>
+      </div>
+      <input type="file" accept="application/json,.json" hidden data-import-file />
+      <p class="group-note look__note" data-backup-note role="status">Progresi ruhet vetëm në këtë shfletues. Ruaj një kopje për ta çuar në një telefon tjetër, ose për ta pasur të sigurt.</p>
     </section>
 
     <section aria-labelledby="about-title">
@@ -83,6 +97,10 @@ import { icon } from '../lib/icons';
   .progress :global(.games .res[data-r="loss"]) { color: var(--red-ink); background: color-mix(in srgb, var(--red) 14%, transparent); }
   .progress :global(.games .meta) { grid-column: 1 / -1; }
   .progress :global(.empty a) { display: flex; align-items: center; min-height: 44px; margin-top: 0.25rem; color: var(--tint-ink); font-weight: 600; text-decoration: none; }
+  .backup > * + * { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
+  .backup .row { width: 100%; text-align: start; color: var(--tint-ink); }
+  .backup .icon { width: 1.125rem; height: 1.125rem; }
+  .settings > * + * { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
   .look { display: grid; gap: 0.5rem; padding: 0.875rem 1rem 1rem; }
   .look__label { font-size: var(--t-body); }
   .look__range { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.75rem; font-size: var(--t-foot); color: var(--label-2); }
