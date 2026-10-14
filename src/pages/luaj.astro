@@ -1,6 +1,7 @@
 ---
 import App from '../layouts/App.astro';
 import { icon } from '../lib/icons';
+import { hasServer } from '../lib/server';
 import '../styles/play.css';
 ---
 
@@ -137,9 +138,10 @@ import '../styles/play.css';
       <h2 class="setup__title" id="setup-title" data-setup-title tabindex="-1">Lojë e re</h2>
       <fieldset>
         <legend>Kundërshtari</legend>
-        <div class="segmented segmented--2">
+        <div class={hasServer ? 'segmented' : 'segmented segmented--2'}>
           <label><input type="radio" name="opponent" value="engine" checked /><span>Motori</span></label>
-          <label><input type="radio" name="opponent" value="friend" /><span>Një shok</span></label>
+          <label><input type="radio" name="opponent" value="friend" /><span>{hasServer ? 'Shok këtu' : 'Një shok'}</span></label>
+          {hasServer && <label><input type="radio" name="opponent" value="online" /><span>Shok online</span></label>}
         </div>
       </fieldset>
       <fieldset data-engine-only>
@@ -159,12 +161,12 @@ import '../styles/play.css';
           <label><input type="radio" name="clock" value="3+2" /><span>3+2</span></label>
         </div>
       </fieldset>
-      <fieldset data-engine-only>
+      <fieldset data-engine-only data-not-online>
         <legend>Niveli i kundërshtarit</legend>
         <div class="choices" data-levels></div>
       </fieldset>
       <div class="setup__actions">
-        <button type="submit" class="btn btn--solid" value="start">Fillo lojën</button>
+        <button type="submit" class="btn btn--solid" value="start"><span data-when-local>Fillo lojën</span><span data-when-online>Krijo lojën online</span></button>
         <button type="button" class="btn btn--quiet" data-setup-close>Anulo</button>
       </div>
     </form>

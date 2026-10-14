@@ -366,21 +366,26 @@ The coach card's capsule buttons: 44px, subhead 600, fill background with label 
 - **Coach card:** one glass card. The move at Title 1 with its informant symbol in the status colour, and the verdict as a status pill (footnote 700): green for best and good, orange 18-24% for inaccuracy and mistake, red 22% for blunder. While the coach looks, the move waits in label-3 and inks in over 320ms. Reasons in subhead, a warning in orange-ink, then the cues. The label is visually hidden; the headline speaks.
 - **Accessory** (wide screens only; hidden below 1024px): a glass capsule along the foot of the table: headlines crawl (40s linear, edges masked, pause on hover, stop with motion off) separated by small label-3 dots, and a rail of ticks along its foot, one per move, taller and in the status colour the worse the move (2px label-3 to 11px red); the current move carries a 2px tint cap.
 
+- **Online game** (`/online/`): the play page's table without the coach's voice. The card carries the room: the four-letter code in monospace at 1.6em with 0.18em tracking while the room waits (so it can be read aloud across a table), then "Radha jote" / "Radha e shokut", the friend's last move, a draw offer, or the result ("Fitove", "Humbe", "Barazim" with the reason). One primary cue at a time (Krijo lojën, Hyr në lojë, Dërgo lidhjen, Prano barazimin, Merr fitoren, Revansh), the rest as symbol buttons on phones, except "Hyr me kod", which keeps its words (`cue--label`). The friend's name on the score card reads "Shoku · larg" while their phone is away. The page title gains "● Radha jote" when it is the learner's move in a background tab.
+
 ### Inputs
 - **Segmented control:** capsule fill track with 0.1875rem padding, 2.5rem cells, the choice on a seg-thumb capsule with a soft shadow.
 - **Checkmark list:** inset-grouped rows (min 3.25rem) with a tint check drawn by the `--check` mask (Phosphor check, bold) on the chosen row; used for levels and puzzle themes.
 - **Slider (Pamja):** a 4px capsule track filled in tint to a white 1.75rem thumb; it sets `--glass-level` live.
+- **Switch:** the iOS switch (green on), 0.45 opacity when it cannot be used (the reminder in a browser without push).
+- **Value row:** a select inside a row, its value trailing in label-2 with a caret-up-down, as an iOS menu row (the reminder's hour).
+- **Code fields:** monospace, uppercase; the sync code in a row field with an XXXX-XXXX-XXXX-XXXX placeholder, the room code as one 2rem cell, centred, 0.4em tracking.
 
 ### Lists
 Inset-grouped groups on cell, radius 1.375rem, rows min 2.875rem with 0.6875rem 1rem padding, pressed in cell-press, hover a 55% mix on fine pointers. Disclosure uses the `--chevron` mask (Phosphor caret-right) in label-3, rotated 90 degrees when a disclosure group opens. Lesson rows lead with a 2.25rem tile at 0.625rem radius: tint-fill with the white step number, or white or black for the side a repertoire trains. Results sit in small tinted capsules (win green, loss red).
 
 ### Sheets and overlays
-- **New-game sheet:** a strong-glass dialog at 2.25rem radius with a 2.25rem grabber on phones, rising from the bottom over 460ms on the sheet curve; from 640px it centres and pops (scale 0.94, blur 8px, 320ms). Backdrop rgb(0 0 0 / 0.42). Title 2 centred, footnote legends, segmented control, checkmark list, full-width capsule buttons.
+- **New-game sheet:** the opponent is a three-way segmented control (Motori, Shok këtu, Shok online) when the server is there; online hides the levels and the button reads "Krijo lojën online". The online page's own sheets (Lojë online, Hyr me kod) are the same dialog. A strong-glass dialog at 2.25rem radius with a 2.25rem grabber on phones, rising from the bottom over 460ms on the sheet curve; from 640px it centres and pops (scale 0.94, blur 8px, 320ms). Backdrop rgb(0 0 0 / 0.42). Title 2 centred, footnote legends, segmented control, checkmark list, full-width capsule buttons.
 - **Intro:** black, the rounded mark, and an 11rem 4px capsule progress bar filled in tint from the script's `--p`.
 - **Promotion:** glass tiles at 1.25rem radius over a 42% black scrim.
 
 ### Navigation
-- **Phone:** a floating capsule tab bar of glass, four tabs with a 1.625rem icon over a caption2 label; the current tab is tint-ink in a glass-press lens; press scales 0.94. No navigation bar on table pages; elsewhere the rounded mark sits left and the round motion button right, over the scroll-edge blur.
+- **Phone:** a floating capsule tab bar of glass, five tabs (Luaj, Ushtrime, Mësime, Analizo, Progresi) with a 1.625rem icon over a caption2 label; the current tab is tint-ink in a glass-press lens; press scales 0.94. No navigation bar on table pages; elsewhere the rounded mark sits left and the round motion button right, over the scroll-edge blur.
 - **Desktop:** the tabs float as one glass capsule centred in the navigation bar, 40px items with icon and subhead label, current in tint-ink on glass-press, hover fill-2; the motion switch becomes a labelled glass capsule.
 
 ### Board

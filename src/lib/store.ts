@@ -1,5 +1,6 @@
-// Progress kept in this browser only: games, puzzle rating, mistake families, lessons done, the game in progress.
-// Every read and write survives a private window or blocked storage (the page then forgets on reload).
+// Progress kept in this browser: games, puzzle rating, mistake families, lessons done, the game in progress.
+// Every read and write survives a private window or blocked storage (the page then forgets on reload). When the
+// learner turns sync on, an encrypted copy also goes to the server (src/lib/sync.ts) and merges with their other phones.
 
 import type { Tag, Verdict } from './coach.ts';
 
@@ -46,6 +47,12 @@ export interface Progress {
   rushBest: number;
   /** who sits across the table: the engine, or a friend on the same phone */
   opponent: 'engine' | 'friend';
+  /** when this copy last changed (ISO) */
+  updated: string;
+  /** when a setting (SETTINGS) last changed here (ISO): syncing keeps the settings changed last */
+  settingsAt: string;
+  /** when the progress was last wiped (ISO); a wipe wins over older copies on other phones */
+  resetAt: string;
 }
 
 export interface Daily {
@@ -136,7 +143,7 @@ export function reviewCard(id: string, solved: boolean): Card | null {
 const KEY = 'shah.progress.v1';
 const SAVED = 'shah.game.v1';
 
-const fresh = (): Progress => ({
+export const fresh = (): Progress => ({
   games: [],
   puzzleRating: 900,
   puzzlesSolved: 0,
@@ -156,7 +163,13 @@ const fresh = (): Progress => ({
   streak: { count: 0, last: '' },
   rushBest: 0,
   opponent: 'engine',
+  updated: '',
+  settingsAt: '',
+  resetAt: '',
 });
+
+/** the fields that are choices rather than history: sync keeps whichever phone changed them last */
+export const SETTINGS = ['level', 'side', 'warnings', 'threats', 'sound', 'clock', 'opponent'] as const;
 
 export function load(): Progress {
   try {
@@ -168,12 +181,21 @@ export function load(): Progress {
   }
 }
 
-export function save(p: Progress) {
+/** Keeps the progress; `touch` marks it changed here (a copy merged in from another phone is not a change). */
+export function save(p: Progress, touch = true) {
+  if (touch) {
+    const now = new Date().toISOString();
+    const before = load();
+    if (SETTINGS.some((k) => before[k] !== p[k])) p.settingsAt = now;
+    p.updated = now;
+  }
   try {
     localStorage.setItem(KEY, JSON.stringify(p));
   } catch {
     /* storage blocked: progress lasts for this page only */
   }
+  // the sync (when it is on) sends the change to the other phones a little later
+  if (touch && typeof window !== 'undefined') window.dispatchEvent(new Event('shah:saved'));
 }
 
 export function update(fn: (p: Progress) => void): Progress {

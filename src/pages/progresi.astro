@@ -1,12 +1,15 @@
 ---
 import App from '../layouts/App.astro';
 import { icon } from '../lib/icons';
+import { hasServer } from '../lib/server';
+
+const hours = Array.from({ length: 24 }, (_, h) => (h + 6) % 24);
 ---
 
 <App title="Progresi · Shah" description="Lojërat, ushtrimet dhe gabimet e tua më të shpeshta, të ruajtura vetëm në këtë pajisje." tab="progresi">
   <div class="page progress">
     <h1 class="page-title poster">Progresi</h1>
-    <p class="lede">Gjithçka ruhet vetëm në këtë shfletues. Askush tjetër nuk e sheh.</p>
+    <p class="lede" data-lede>Gjithçka ruhet vetëm në këtë shfletues. Askush tjetër nuk e sheh.</p>
 
     <section aria-labelledby="sum-title">
       <h2 class="group-h" id="sum-title">Përmbledhja</h2>
@@ -42,6 +45,50 @@ import { icon } from '../lib/icons';
       </div>
       <p class="group-note look__note">Rreziqet: një rreth i kuq rreth figurave të tua që kundërshtari mund t’i marrë në lëvizjen tjetër. Xhami: sa shihet tabela përmes menyve dhe kartave; majtas më e qartë, djathtas më e lexueshme.</p>
     </section>
+
+    {hasServer && (
+      <section aria-labelledby="remind-title" data-remind-box>
+        <h2 class="group-h" id="remind-title">Kujtesa</h2>
+        <div class="group settings">
+          <label class="row"><span>Kujtesa e përditshme</span><input type="checkbox" class="switch" data-remind /></label>
+          <label class="row" data-remind-hour-row hidden>
+            <span>Ora</span>
+            <span class="pick">
+              <select data-remind-hour aria-label="Ora e kujtesës">
+                {hours.map((h) => <option value={h} selected={h === 19}>{String(h).padStart(2, '0')}:00</option>)}
+              </select>
+              <Fragment set:html={icon('caretUpDown')} />
+            </span>
+          </label>
+        </div>
+        <p class="group-note look__note" data-remind-note role="status">Një njoftim në orën që zgjedh, vetëm në ditët kur ushtrimi i ditës nuk është zgjidhur ende.</p>
+      </section>
+    )}
+
+    {hasServer && (
+      <section aria-labelledby="sync-title" data-sync>
+        <h2 class="group-h" id="sync-title">Telefonat e tu</h2>
+        <div class="group sync" data-sync-off>
+          <button type="button" class="row" data-sync-start><span>Ndiz sinkronizimin</span><Fragment set:html={icon('deviceMobile')} /></button>
+          <button type="button" class="row" data-sync-join-open aria-expanded="false" aria-controls="sync-join"><span>Kam një kod nga telefoni tjetër</span><Fragment set:html={icon('caretRight', 'icon chev')} /></button>
+        </div>
+        <form class="group sync-join" id="sync-join" data-sync-join hidden>
+          <label class="field-row">
+            <span class="visually-hidden">Kodi i sinkronizimit</span>
+            <input class="field code-field" name="code" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="24" required />
+          </label>
+          <div class="field-row"><button type="submit" class="btn btn--solid sync__go">Lidhu</button></div>
+        </form>
+        <div class="group sync" data-sync-on hidden>
+          <div class="row sync__code"><span>Kodi</span><b class="code tabular" data-sync-code></b></div>
+          <button type="button" class="row" data-sync-share><span>Dërgo kodin në telefonin tjetër</span><Fragment set:html={icon('shareNetwork')} /></button>
+          <button type="button" class="row" data-sync-now><span>Sinkronizo tani</span><span class="row__value" data-sync-when></span></button>
+          <button type="button" class="row" data-sync-stop><span>Fik në këtë telefon</span></button>
+          <button type="button" class="row reset" data-sync-wipe><span data-label>Fshi kopjen nga serveri</span></button>
+        </div>
+        <p class="group-note look__note" data-sync-note role="status">Me një kod, progresi bashkohet në të gjithë telefonat e tu. Kopja në server është e koduar: pa kodin nuk e lexon dot askush, as serveri.</p>
+      </section>
+    )}
 
     <section aria-labelledby="backup-title">
       <h2 class="group-h" id="backup-title">Kopja rezervë</h2>
@@ -97,9 +144,31 @@ import { icon } from '../lib/icons';
   .progress :global(.games .res[data-r="loss"]) { color: var(--red-ink); background: color-mix(in srgb, var(--red) 14%, transparent); }
   .progress :global(.games .meta) { grid-column: 1 / -1; }
   .progress :global(.empty a) { display: flex; align-items: center; min-height: 44px; margin-top: 0.25rem; color: var(--tint-ink); font-weight: 600; text-decoration: none; }
+  .sync > * + * { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
+  .sync .row { width: 100%; text-align: start; color: var(--tint-ink); }
+  .sync .icon { width: 1.125rem; height: 1.125rem; }
+  .sync .chev { width: 0.9rem; height: 0.9rem; color: var(--label-3); }
+  .sync .sync__code { color: var(--label); }
+  .sync .reset { color: var(--red-ink); }
+  .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 600; letter-spacing: 0.04em; user-select: all; overflow-wrap: anywhere; text-align: end; }
+  .row__value { color: var(--label-2); font-size: var(--t-foot); font-variant-numeric: tabular-nums; }
+  .sync-join { display: grid; padding: 0.25rem 0; margin-top: var(--space-2xs); }
+  .sync-join[hidden], .sync[hidden] { display: none; }
+  .field-row { display: block; padding: 0.5rem 1rem; }
+  .field-row + .field-row { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
+  .field { width: 100%; min-height: 44px; padding: 0.5rem 0; border: 0; background: transparent; color: var(--label); font-size: max(16px, var(--t-body)); outline: none; }
+  .code-field { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.06em; text-transform: uppercase; }
+  .field::placeholder { color: var(--label-3); letter-spacing: 0.04em; }
+  .field-row:focus-within { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tint) 60%, transparent); border-radius: var(--r-list); }
+  .sync__go { width: 100%; }
+  .pick { position: relative; display: inline-flex; align-items: center; gap: 0.25rem; color: var(--label-2); }
+  .pick select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; color: inherit; font: inherit; font-variant-numeric: tabular-nums; min-height: 44px; padding: 0 1.25rem 0 0.75rem; margin-inline-end: -1.25rem; cursor: pointer; text-align: end; }
+  .pick .icon { width: 0.875rem; height: 0.875rem; pointer-events: none; }
+  .pick select:focus-visible { outline: 2px solid var(--tint); outline-offset: 2px; border-radius: 6px; }
   .backup > * + * { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
   .backup .row { width: 100%; text-align: start; color: var(--tint-ink); }
   .backup .icon { width: 1.125rem; height: 1.125rem; }
+  .settings > [hidden] { display: none; }
   .settings > * + * { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
   .look { display: grid; gap: 0.5rem; padding: 0.875rem 1rem 1rem; }
   .look__label { font-size: var(--t-body); }

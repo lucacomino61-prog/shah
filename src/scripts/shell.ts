@@ -1,7 +1,8 @@
-// What every page shares: the Stop-animations switch and the one clock. GSAP's ticker owns requestAnimationFrame;
-// the boards and every timed effect step from it.
+// What every page shares: the Stop-animations switch, the one clock and sync between phones (when it is on).
+// GSAP's ticker owns requestAnimationFrame; the boards and every timed effect step from it.
 
 import { gsap } from 'gsap';
+import { autoSync } from '../lib/sync.ts';
 
 const root = document.documentElement;
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -61,6 +62,7 @@ export function initShell() {
     });
   });
   gsap.ticker.lagSmoothing(0);
+  autoSync();
 }
 
 /** Step something every frame from the shared clock; returns the way to stop. */

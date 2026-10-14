@@ -30,15 +30,18 @@ on the first try.
 ## Positioning
 
 The coach speaks Albanian and explains moves in words rather than numbers. It runs fully in the browser on a free
-engine: no account, no server, no cost per question. The board is a classic wooden set in 3D under one lamp, and the
-coach speaks as a TV broadcast, not as a flat web widget.
+engine: no account and no cost per question. The board is a classic wooden set in 3D under one lamp. A small server
+carries only what needs more than one phone: a game with a friend online, sync between the learner's own phones, and
+the daily reminder. It holds no accounts, and it cannot read the synced progress (encrypted on the phone).
 
 ## Operating Context
 
 - Short sessions on a phone: one game, or a handful of puzzles.
-- Games against Stockfish at eight strengths, from one that blunders on purpose to full strength.
-- A move-by-move review, built while the game is played.
-- Progress (games, puzzles, recurring mistake types) stays in the browser's own storage on that device.
+- Games against Stockfish at six strengths, each a named bot, from one that blunders on purpose to full strength.
+- Games with a friend: on the same phone, or online with a four-letter code, each on their own phone.
+- A move-by-move review, built while the game is played; any game (chess.com, Lichess, pasted PGN) reviewed on Analizo.
+- Progress (games, puzzles, recurring mistake types) stays in the browser's own storage on that device. With sync on,
+  an encrypted copy joins it with the learner's other phones; a backup file carries it by hand.
 
 ## Capabilities and Constraints
 
@@ -50,7 +53,11 @@ coach speaks as a TV broadcast, not as a flat web widget.
 - Puzzles: real positions from the Lichess puzzle database, which is CC0. Solutions are checked against the engine
   before they ship.
 - Strength labels are approximate. No Elo figure is shown as a measured rating.
-- Undecided: deploy target, domain, app name beyond the working title.
+- Hosting: Cloudflare Pages for the app (shah-trajneri.pages.dev); the server is a Cloudflare Worker with Durable
+  Objects (`server/`): one room per online game, one encrypted vault per sync code, one bell for the reminders.
+- Online games stay out of the learner's record and the coach stays silent in them; "Analizo lojën" opens one after.
+- Web push on iPhone works only once Shah is on the home screen (iOS 16.4+); the reminder says so.
+- Undecided: domain, app name beyond the working title.
 
 ## Brand Commitments
 

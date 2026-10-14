@@ -1,0 +1,147 @@
+---
+import App from '../layouts/App.astro';
+import { icon } from '../lib/icons';
+import { hasServer } from '../lib/server';
+import '../styles/play.css';
+---
+
+<App title="Luaj online · Shah" description="Luaj shah me një shok, secili në telefonin e vet: krijo lojën dhe dërgoji lidhjen." tab="luaj" stage noindex={!hasServer}>
+  <h1 class="visually-hidden">Luaj online me një shok</h1>
+  <div class="stage" data-stage-box>
+    <div class="board" data-board tabindex="0" role="application" aria-label="Tabela e lojës online. Shigjetat lëvizin kursorin, Enter zgjedh figurën dhe e lëviz, Escape e lëshon.">
+      <div class="promo" data-promo data-board-ui hidden role="group" aria-label="Ushtari bëhet">
+        <button type="button" data-piece="q"><svg aria-hidden="true"><use href="#pc-w-q"></use></svg><span>Mbretëreshë</span></button>
+        <button type="button" data-piece="r"><svg aria-hidden="true"><use href="#pc-w-r"></use></svg><span>Torrë</span></button>
+        <button type="button" data-piece="b"><svg aria-hidden="true"><use href="#pc-w-b"></use></svg><span>Oficer</span></button>
+        <button type="button" data-piece="n"><svg aria-hidden="true"><use href="#pc-w-n"></use></svg><span>Kalë</span></button>
+        <button type="button" data-piece="x" class="promo__cancel" aria-label="Anulo"><Fragment set:html={icon('x')} /></button>
+      </div>
+    </div>
+
+    <div class="bug bug--live" data-board-ui>
+      <span class="bug__live">Online</span>
+      <span class="bug__status" data-status>{hasServer ? 'Po lidhet…' : 'Lojërat online nuk janë gati ende.'}</span>
+    </div>
+
+    <div class="bug bug--score" data-board-ui aria-label="Lojtarët">
+      <div class="score__row" data-them>
+        <span class="score__name" data-name>Shoku</span>
+        <span class="score__taken" data-taken></span>
+        <span class="score__clock tabular" data-clock hidden></span>
+      </div>
+      <div class="score__row" data-you>
+        <span class="score__name">Ti</span>
+        <span class="score__taken" data-taken></span>
+        <span class="score__clock tabular" data-clock hidden></span>
+      </div>
+    </div>
+
+    <ol class="strip" data-strip data-board-ui aria-label="Lëvizjet e lojës"><li class="strip__empty">Lëvizjet shfaqen këtu.</li></ol>
+
+    <div class="tools" data-board-ui>
+      <button type="button" class="tool tool--menu" data-tools-toggle aria-expanded="false" aria-controls="tools-list" aria-label="Mjetet"><Fragment set:html={icon('dotsThreeVertical')} /></button>
+      <div class="tools__list" id="tools-list">
+        <button type="button" class="tool" data-new><span class="tool__icon"><Fragment set:html={icon('plus')} /></span><span class="tool__label">Lojë e re online</span></button>
+        <button type="button" class="tool" data-flip><span class="tool__icon"><Fragment set:html={icon('arrowsDownUp')} /></span><span class="tool__label">Rrotullo tabelën</span></button>
+        <button type="button" class="tool" data-analyse><span class="tool__icon"><Fragment set:html={icon('magnifyingGlass')} /></span><span class="tool__label">Analizo lojën</span></button>
+        <button type="button" class="tool" data-angle><span class="tool__icon"><Fragment set:html={icon('videoCamera')} /></span><span class="tool__label">Këndi i kamerës</span></button>
+        <button type="button" class="tool tool--motion" data-motion-switch aria-pressed="false"><span class="tool__icon" data-when="on"><Fragment set:html={icon('pause')} /></span><span class="tool__icon" data-when="off"><Fragment set:html={icon('play')} /></span><span class="tool__label">Ndal animacionet</span></button>
+      </div>
+    </div>
+
+    <section class="lower" data-coach data-state="intro" aria-labelledby="card-title" data-board-ui>
+      <div class="lower__head">
+        <h2 class="lower__tag" id="card-title">Loja online</h2>
+        <div class="lower__headline">
+          <p class="lower__glyph poster" data-glyph>Me një shok</p>
+          <p class="lower__title" data-title>{hasServer ? 'Secili në telefonin e vet. Krijo lojën dhe dërgoji lidhjen, ose hyr me kodin që të dha.' : 'Kjo pjesë hapet sapo të ndizet serveri i Shah.'}</p>
+        </div>
+      </div>
+      <div class="lower__body">
+        <div class="lower__actions" data-actions>
+          <button type="button" class="cue cue--on" data-act="create" hidden={!hasServer}><Fragment set:html={icon('plus')} />Krijo lojën</button>
+          <button type="button" class="cue cue--on" data-act="join" hidden><Fragment set:html={icon('handshake')} />Hyr në lojë</button>
+          <button type="button" class="cue cue--on" data-act="share" hidden><Fragment set:html={icon('shareNetwork')} />Dërgo lidhjen</button>
+          <button type="button" class="cue cue--on" data-act="accept" hidden><Fragment set:html={icon('handshake')} />Prano barazimin</button>
+          <button type="button" class="cue cue--on" data-act="claim" hidden><Fragment set:html={icon('flag')} />Merr fitoren</button>
+          <button type="button" class="cue cue--on" data-act="rematch" hidden><Fragment set:html={icon('arrowsClockwise')} /><span data-label>Revansh</span></button>
+          <button type="button" class="cue cue--label" data-act="code" hidden={!hasServer}><Fragment set:html={icon('linkSimple')} />Hyr me kod</button>
+          <button type="button" class="cue" data-act="copy" hidden><Fragment set:html={icon('copy')} />Kopjo kodin</button>
+          <button type="button" class="cue" data-act="decline" hidden><Fragment set:html={icon('x')} />Refuzo</button>
+          <button type="button" class="cue" data-act="draw" hidden><Fragment set:html={icon('handshake')} />Ofro barazim</button>
+          <button type="button" class="cue" data-act="resign" hidden><Fragment set:html={icon('flag')} /><span data-label>Dorëzohu</span></button>
+          <button type="button" class="cue" data-act="analyse" hidden><Fragment set:html={icon('magnifyingGlass')} />Analizo lojën</button>
+          <button type="button" class="cue" data-act="leave" hidden><Fragment set:html={icon('plus')} />Lojë e re</button>
+        </div>
+      </div>
+      <p class="visually-hidden" aria-live="polite" data-live></p>
+    </section>
+  </div>
+
+  <section class="record" aria-labelledby="sheet-title">
+    <h2 class="record__title" id="sheet-title">Fleta e lojës</h2>
+    <p class="record__opening" data-opening hidden></p>
+    <ol class="sheet" data-sheet><li class="sheet-empty">Lëvizjet do të shkruhen këtu.</li></ol>
+  </section>
+
+  <dialog class="setup" data-setup-dialog aria-labelledby="setup-title">
+    <form class="setup__form" data-setup method="dialog">
+      <h2 class="setup__title" id="setup-title" tabindex="-1">Lojë online</h2>
+      <fieldset>
+        <legend>Luaj me</legend>
+        <div class="segmented">
+          <label><input type="radio" name="side" value="w" checked /><span>Të bardhat</span></label>
+          <label><input type="radio" name="side" value="b" /><span>Të zezat</span></label>
+          <label><input type="radio" name="side" value="random" /><span>Rastësisht</span></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Ora</legend>
+        <div class="segmented segmented--4">
+          <label><input type="radio" name="clock" value="none" checked /><span>Pa orë</span></label>
+          <label><input type="radio" name="clock" value="10+0" /><span>10 min</span></label>
+          <label><input type="radio" name="clock" value="5+3" /><span>5+3</span></label>
+          <label><input type="radio" name="clock" value="3+2" /><span>3+2</span></label>
+        </div>
+      </fieldset>
+      <div class="setup__actions">
+        <button type="submit" class="btn btn--solid">Krijo lojën</button>
+        <button type="button" class="btn btn--quiet" data-setup-close>Anulo</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="setup" data-code-dialog aria-labelledby="code-title">
+    <form class="setup__form" data-code-form method="dialog">
+      <h2 class="setup__title" id="code-title" tabindex="-1">Hyr me kod</h2>
+      <label class="code-box">
+        <span class="code-box__label">Kodi që të dha shoku, katër shkronja</span>
+        <input class="code-box__field" name="code" maxlength="4" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" inputmode="text" placeholder="K7QF" required pattern="[A-Za-z2-9]{4}" />
+      </label>
+      <p class="code-box__note" data-code-note role="status"></p>
+      <div class="setup__actions">
+        <button type="submit" class="btn btn--solid">Hyr në lojë</button>
+        <button type="button" class="btn btn--quiet" data-code-close>Anulo</button>
+      </div>
+    </form>
+  </dialog>
+  <script>
+    import '../scripts/online';
+  </script>
+</App>
+
+<style>
+  .code-box { display: grid; gap: 0.5rem; }
+  .code-box__label { padding-inline: 0.75rem; font-size: var(--t-foot); font-weight: 600; color: var(--label-2); }
+  .code-box__field {
+    width: 100%; min-height: 4rem; border: 0; border-radius: var(--r-list); background: var(--cell); color: var(--label);
+    font: 700 2rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.4em; text-align: center; text-transform: uppercase;
+    padding-inline-start: 0.4em; outline: none;
+  }
+  .code-box__field::placeholder { color: var(--label-3); }
+  .code-box__field:focus-visible { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tint) 70%, transparent); }
+  .code-box__note { min-height: 1.25em; padding-inline: 0.75rem; font-size: var(--t-foot); color: var(--red-ink); }
+  .code-box__note:empty { display: none; }
+  /* the room code, large enough to read aloud across a table */
+  :global(.lower__glyph .room) { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.18em; font-size: 1.6em; }
+</style>

@@ -1035,14 +1035,19 @@ ui.setup.addEventListener('submit', (e) => {
   const s = String(data.get('side')) as Side | 'random';
   const n = Number(data.get('level'));
   const clk = String(data.get('clock') ?? 'none');
-  const opponent = data.get('opponent') === 'friend' ? 'friend' : 'engine';
+  const picked = data.get('opponent');
+  const opponent = picked === 'friend' ? 'friend' : 'engine';
   prefs = update((p) => {
     p.side = s;
-    p.level = n;
+    if (picked !== 'online') {
+      p.level = n;
+      p.opponent = opponent;
+    }
     p.clock = clk;
-    p.opponent = opponent;
   });
   ui.setupDialog.close();
+  // a friend on their own phone: the online page makes the room and hands over the link
+  if (picked === 'online') return void (location.href = `/online/?krijo=1&ana=${s}&ora=${encodeURIComponent(clk)}`);
   if (opponent === 'friend') return newGame('w', levelOf(n), clk, true);
   newGame(s === 'random' ? (Math.random() < 0.5 ? 'w' : 'b') : s, levelOf(n));
 });

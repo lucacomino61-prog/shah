@@ -38,6 +38,11 @@ import robot from '@phosphor-icons/core/assets/regular/robot.svg?raw';
 import shareNetwork from '@phosphor-icons/core/assets/regular/share-network.svg?raw';
 import copy from '@phosphor-icons/core/assets/regular/copy.svg?raw';
 import pencilSimple from '@phosphor-icons/core/assets/regular/pencil-simple.svg?raw';
+import caretUpDown from '@phosphor-icons/core/assets/regular/caret-up-down.svg?raw';
+import deviceMobile from '@phosphor-icons/core/assets/regular/device-mobile.svg?raw';
+import linkSimple from '@phosphor-icons/core/assets/regular/link-simple.svg?raw';
+import arrowsClockwise from '@phosphor-icons/core/assets/regular/arrows-clockwise.svg?raw';
+import handshake from '@phosphor-icons/core/assets/regular/handshake.svg?raw';
 
 const raw = {
   arrowCounterClockwise,
@@ -78,6 +83,11 @@ const raw = {
   shareNetwork,
   copy,
   pencilSimple,
+  caretUpDown,
+  deviceMobile,
+  linkSimple,
+  arrowsClockwise,
+  handshake,
 };
 export type IconName = keyof typeof raw;
 

@@ -9,7 +9,9 @@
     "preview": "astro preview --port 3771 --host 127.0.0.1",
     "engine": "node tools/copy-engine.mjs",
     "test": "node --experimental-strip-types tools/test-coach.ts",
-    "preview:lan": "astro preview --port 3772 --host 0.0.0.0"
+    "preview:lan": "astro preview --port 3772 --host 0.0.0.0",
+    "server": "npx wrangler dev -c server/wrangler.jsonc --port 8787 --ip 127.0.0.1 --test-scheduled",
+    "server:check": "cd server && npx wrangler types && npx tsc -p tsconfig.json"
   },
   "dependencies": {
     "@phosphor-icons/core": "^2.1.1",

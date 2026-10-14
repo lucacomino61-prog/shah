@@ -89,7 +89,6 @@ engine.ready.then(
 
 const say = (t: string) => (ui.live.textContent = t);
 const sideToMove = (fen: string) => fen.split(' ')[1] as Side;
-const colour = (s: Side) => (s === 'w' ? 'të bardhat' : 'të zezat');
 
 // ------------------------------------------------------------------ the board
 

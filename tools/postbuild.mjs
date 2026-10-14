@@ -1,5 +1,5 @@
-// After `astro build`: the service worker (every built file precached, so the app and the engine work offline),
-// the sitemap and robots.txt. Run by `npm run build`.
+// After `astro build`: the service worker (every built file precached, so the app and the engine work offline;
+// it also shows the daily reminder), the sitemap and robots.txt. Run by `npm run build`.
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
@@ -54,10 +54,38 @@ self.addEventListener('fetch', (e) => {
   // assets have hashed names: the cache first
   e.respondWith(caches.match(req, { ignoreSearch: true, ignoreVary: true }).then((r) => r || fetch(req)));
 });
+// the daily reminder from Shah's server; a tap opens today's puzzle (in the open app if there is one)
+self.addEventListener('push', (e) => {
+  let m = {};
+  try {
+    m = e.data ? e.data.json() : {};
+  } catch (err) {}
+  e.waitUntil(
+    self.registration.showNotification(m.title || 'Shah', {
+      body: m.body || 'Ushtrimi i ditës të pret.',
+      icon: '/icon-192.png',
+      tag: m.tag || 'daily',
+      lang: 'sq',
+      data: { url: m.url || '/ushtrime/?tema=dita' },
+    }),
+  );
+});
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const url = new URL((e.notification.data && e.notification.data.url) || '/', location.origin).href;
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      const open = list.find((c) => new URL(c.url).origin === location.origin);
+      if (open) return open.navigate(url).then((c) => (c || open).focus()).catch(() => self.clients.openWindow(url));
+      return self.clients.openWindow(url);
+    }),
+  );
+});
 `,
 );
 
-const pages = urls.filter((u) => u.endsWith('/') && !u.includes('404'));
+// pages marked noindex (the online page before the server exists) stay out of the sitemap
+const pages = urls.filter((u) => u.endsWith('/') && !u.includes('404') && !/<meta name="robots" content="noindex"/.test(readFileSync(join(dist, u, 'index.html'), 'utf8')));
 writeFileSync(
   join(dist, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +

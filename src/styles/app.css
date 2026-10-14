@@ -457,3 +457,4 @@ a.row:active, button.row:active, label.row:active { background: var(--cell-press
 }
 .switch:checked { background: var(--green); }
 .switch:checked::before { transform: translateX(1.25rem); }
+.switch:disabled { opacity: 0.45; cursor: not-allowed; }

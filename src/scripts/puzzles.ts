@@ -10,6 +10,7 @@ import { createBoard, followBroadcast, keyboard, type BoardView } from './board/
 import type { Side, Sq } from './board/types.ts';
 import { gsap, motionOn, onMotion, onTick } from './shell.ts';
 import { missSound, moveSound, winSound } from '../lib/sound.ts';
+import { remindDone } from '../lib/remind.ts';
 
 interface Puzzle {
   id: string;
@@ -305,7 +306,10 @@ function solved(lastSan: string) {
   ratingLabel();
   const t = themeOf(puzzle.theme);
   winSound();
-  if (mode === 'daily') prefs = solveDaily(puzzle.id);
+  if (mode === 'daily') {
+    prefs = solveDaily(puzzle.id);
+    void remindDone();
+  }
   const streak = streakNow(prefs);
   setCoach(
     'solved',

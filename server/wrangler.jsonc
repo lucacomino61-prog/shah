@@ -1,0 +1,25 @@
+// Shah's small server: rooms for a game between two friends online, an encrypted copy of the progress for
+// keeping two phones in step, and the daily reminder. The app itself stays on Cloudflare Pages.
+// Local: npx wrangler dev -c server/wrangler.jsonc --port 8787 --test-scheduled (secrets in server/.dev.vars).
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "shah-server",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "observability": { "enabled": true },
+  "durable_objects": {
+    "bindings": [
+      { "name": "ROOMS", "class_name": "Room" },
+      { "name": "VAULTS", "class_name": "Vault" },
+      { "name": "BELL", "class_name": "Bell" }
+    ]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room", "Vault", "Bell"] }],
+  // the reminders go out on the hour, each at the hour its learner chose in their own time zone
+  "triggers": { "crons": ["0 * * * *"] },
+  "vars": {
+    "ORIGINS": "https://shah-trajneri.pages.dev,http://127.0.0.1:3770,http://127.0.0.1:3772,http://localhost:3770,http://localhost:3772",
+    "VAPID_PUBLIC": "BIuL8Ez8HbmJJxs1J9I8tQQew701M77O2DLz9nAeaVCbHda9RRSXdXOds7q_pNn9OBrGvCCs1ZmGKBQVVcMAFpw",
+    "VAPID_SUBJECT": "https://shah-trajneri.pages.dev"
+  }
+}

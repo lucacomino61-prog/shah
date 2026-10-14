@@ -75,3 +75,50 @@ Kthehet nesër / Kthehet pas 3 ditësh · Grafiku i lojës · Momenti kyç · Pa
 - The status during a replay said "Analizë: loja pret." next to the tag "Analizë"; it now says **"Loja pret."**
 - "Pamje e sheshtë / Pamje 3D" is gone: the board is always 3D.
 - The level is written one way everywhere: **"Niveli 2, i lehtë"** (it was also "Niveli 2: I lehtë").
+
+## New in October 2026, please check
+
+Added with "do all" (threats, sounds, today's puzzle, the race, backup, bots, two players, Analizo, online play, sync,
+reminders). The words below are the ones a learner reads most; a native speaker should check them first.
+
+**Settings and backup (Progresi):** Cilësimet · Tingujt dhe dridhja · Trego rreziqet në lojë · Kopja rezervë ·
+Ruaj një kopje · Ngarko një kopje · "Kjo kopje zëvendëson progresin që ke në këtë shfletues. Vazhdo?"
+
+**Threats:** Trego rreziqet (the red ring round a piece the opponent can win next move) · "Rreziqet shfaqen me të
+kuqe." / "Rreziqet nuk shfaqen."
+
+**Puzzles:** Ushtrimi i ditës · "Një ushtrim i ri çdo ditë." · seria (the streak): "3 ditë rresht", "Mos e humb
+serinë." · Gara 3 minutëshe · "Sa ushtrime zgjidh në 3 minuta?" · "Gara filloi: tre minuta." · "Gara mbaroi." ·
+Rekordi në garë · Gabimet e tua.
+
+**Opponents:** the bots Agimi, Drita, Besniku, Teuta, Ardiani, Stockfish · "Kundërshtari: Agimi, niveli 1." (not
+"kundër Agimi", to avoid declining the name) · Kundërshtari: Motori / Shok këtu / Shok online · "Dy lojtarë në një
+telefon" · "Fitojnë të bardhat" (a game between two friends)
+
+**Analizo:** Analizo · Analizo lojën · Rregullo pozicionin · Pozicioni fillestar · Lëvizin të bardhat / Lëvizin të
+zezat · Pastro tabelën · Gati · Luaj më të mirën · Vlerësimi · Radha · "Pozicion i barabartë." / "Të bardhat janë pak
+më mirë." / "… po fitojnë." / "… japin mat në 3." · Rishiko lojërat e tua · Merr lojërat e fundit · "Emri yt i
+përdoruesit" · "Ose ngjit një lojë" · "Hap në tabelë" · "Unë luajta me të bardhat" · "Me të zezat kundër Ana" ·
+Fitore / Humbje / Barazim · "Grafiku i lojës" · "Shiko momentin kyç".
+
+**Online:** Luaj online · Me një shok · "Secili në telefonin e vet. Krijo lojën dhe dërgoji lidhjen, ose hyr me kodin
+që të dha." · Krijo lojën · Hyr me kod · Hyr në lojë · Dërgo lidhjen · Kopjo kodin · "Shoku të fton në një lojë: ti
+luan me të zezat, pa orë." · "Pret shokun…" · Radha jote / Radha e shokut · "Shoku luajti e5." · Ofro barazim ·
+"Shoku ofron barazim." · Prano barazimin · Refuzo · "Shoku u shkëput. Po e presim të kthehet…" · Merr fitoren ·
+"Shoku · larg" · Fitove / Humbe / Barazim · Revansh / Prano revanshin / "Shoku do revansh." · the endings: "Shah mat.
+Bukur!", "Shoku u dorëzua.", "Të ra ora.", "Shokut i ra ora.", "Barazim me marrëveshje.", "Pat: mbreti nuk ka ku të
+lëvizë, por nuk është në shah." (is "pat" the word players use?), "I njëjti pozicion u përsërit tri herë.", "50 lëvizje
+pa marrë figurë dhe pa lëvizur ushtar.", "Shoku u largua nga loja."
+
+**Sync between phones:** Telefonat e tu · Ndiz sinkronizimin · "Kam një kod nga telefoni tjetër" · Lidhu · Kodi ·
+"Dërgo kodin në telefonin tjetër" · Sinkronizo tani · "Fik në këtë telefon" · "Fshi kopjen nga serveri" · "Me një
+kod, progresi bashkohet në të gjithë telefonat e tu. Kopja në server është e koduar: pa kodin nuk e lexon dot askush,
+as serveri." · "Mbaje si fjalëkalim: kush e ka, e sheh progresin tënd."
+
+**Reminder:** Kujtesa · Kujtesa e përditshme · Ora · "Një njoftim në orën që zgjedh, vetëm në ditët kur ushtrimi i
+ditës nuk është zgjidhur ende." · the notification itself: "Ushtrimi i ditës të pret." and "Mos e humb serinë prej 5
+ditësh." (one day: "prej një dite") · the iPhone note: "prek Shpërndaj (katrori me shigjetë), pastaj «Shto në
+ekranin bazë» (Add to Home Screen)". iOS has no Albanian menus, so the English name follows.
+
+**New lessons and repertoires:** Helli (skewer) · Sulmi i zbuluar · Opozita · the London System (Sistemi i Londrës)
+and the Caro-Kann (Karo-Kan): please check the transliterations.

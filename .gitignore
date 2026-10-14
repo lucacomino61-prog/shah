@@ -4,3 +4,6 @@ dist/
 .impeccable/review/
 .impeccable/live/
 tools/cache/
+server/.dev.vars
+server/.wrangler/
+server/worker-configuration.d.ts
