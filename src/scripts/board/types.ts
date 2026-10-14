@@ -41,6 +41,16 @@ export interface BoardOptions {
   onSquare?: (sq: Sq) => boolean;
 }
 
+/** what the page hears while the board comes out of its case */
+export interface UnboxHooks {
+  /** the board has fallen open */
+  opened?: () => void;
+  /** the n-th piece (from 0) has landed on its square */
+  piece?: (n: number) => void;
+  /** every piece is in place */
+  done?: () => void;
+}
+
 export interface BoardView {
   readonly kind: '3d' | '2d';
   /** show a position; pieces travel from where they stood when `animate` is set and motion is on */
@@ -57,6 +67,12 @@ export interface BoardView {
   setAngle?(i: number): void;
   /** the 3D board: a slow swing of the camera round the table, radians of phase per second (0 stops it) */
   orbit?(speed: number): void;
+  /** the 3D board: lie shut (the pieces put away in the case) or open, at once */
+  fold?(shut: boolean): void;
+  /** the 3D board: open the shut board and bring the pieces of `fen` out of it one by one; returns Skip */
+  unbox?(fen: string, hooks: UnboxHooks): () => void;
+  /** the 3D board: the king on `sq` goes over (mate), away from the square `from` */
+  topple?(sq: Sq, from?: Sq): void;
   /** a word on the frame while the board is not showing the game (ANALIZË) */
   setPlate(text: string | null): void;
   /** a press on a square, from a tap or the keyboard: choose a piece, move it, or let go */

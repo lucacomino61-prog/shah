@@ -1,7 +1,8 @@
 // The sounds of the table, made in the browser (no files to fetch, so they work offline): a wooden click when a
 // piece is set down, a heavier knock for a capture, a soft two-note chime for check, a short rising phrase when a
-// game or a puzzle is won. A phone that allows it also gives a short vibration (iPhones do not let a page vibrate).
-// The Sound switch (Progress.sound) turns all of it off.
+// game or a puzzle is won; the case's hinge and its landing, a knock for each piece laid out, a mated king's thud, a
+// promotion's two notes, the streak's chime. Android also vibrates; an iPhone has no Vibration API, so a hidden
+// switch gives its haptic tick where Safari allows it (during a touch). The Sound switch turns all of it off.
 
 import { load } from './store.ts';
 
@@ -73,13 +74,37 @@ function tone(at: number, freq: number, dur: number, gain: number) {
   o.stop(at + dur + 0.02);
 }
 
+/** iPhones have no Vibration API; Safari 18 gives a haptic tick when a switch control is flipped, so a hidden switch
+ *  stands in (it can only tick while the page is answering a touch). */
+let tickLabel: HTMLLabelElement | null = null;
+function iosTick() {
+  if (!tickLabel) {
+    tickLabel = document.createElement('label');
+    tickLabel.setAttribute('aria-hidden', 'true');
+    tickLabel.style.cssText = 'position:fixed;left:-9px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none';
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.setAttribute('switch', '');
+    input.tabIndex = -1;
+    tickLabel.append(input);
+    document.body.append(tickLabel);
+  }
+  tickLabel.click();
+}
+
 const buzz = (pattern: number | number[]) => {
   try {
-    navigator.vibrate?.(pattern);
+    if (navigator.vibrate) navigator.vibrate(pattern);
+    else if (/iPhone|iPad|iPod/.test(navigator.userAgent)) iosTick();
   } catch {
     /* not allowed here */
   }
 };
+
+/** A short vibration on its own (the Sound switch covers vibration too). */
+export function haptic(pattern: number | number[] = 10) {
+  if (on()) buzz(pattern);
+}
 
 /** The sound of one move, read from its notation: x a capture, + check, # mate. */
 export function moveSound(san: string) {
@@ -107,6 +132,79 @@ export function winSound() {
   const t = ctx ? ctx.currentTime + 0.02 : 0;
   [659, 784, 1047].forEach((f, i) => tone(t + i * 0.11, f, 0.5, 0.1));
   buzz([20, 40, 20]);
+}
+
+/** The case opening: the hinge as the leaf turns ('creak'), then the leaf landing on the felt ('land'). */
+export function caseSound(part: 'creak' | 'land') {
+  if (!on()) return;
+  wake();
+  if (!ctx) return;
+  const t = ctx.currentTime + 0.01;
+  if (part === 'land') {
+    knock(t, 620, 0.75);
+    knock(t + 0.04, 380, 0.5);
+    buzz([30, 40, 14]);
+    return;
+  }
+  // a dry wooden creak: noise through a narrow band that slides up as the leaf turns
+  const len = Math.floor(ctx.sampleRate * 0.9);
+  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * (0.6 + 0.4 * Math.sin(i / 90));
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const band = ctx.createBiquadFilter();
+  band.type = 'bandpass';
+  band.Q.value = 9;
+  band.frequency.setValueAtTime(420, t);
+  band.frequency.exponentialRampToValueAtTime(900, t + 0.8);
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.16, t + 0.12);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.85);
+  noise.connect(band).connect(g).connect(ctx.destination);
+  noise.start(t);
+  knock(t, 900, 0.25);
+  buzz(12);
+}
+
+/** A piece set down on its square as the board is laid out; the pitch wanders a little, as wood does. */
+export function pieceDownSound(n: number) {
+  if (!on()) return;
+  wake();
+  const t = ctx ? ctx.currentTime + 0.005 : 0;
+  knock(t, 1380 + ((n * 37) % 5) * 45, 0.3);
+  buzz(8);
+}
+
+/** A king going over at mate: the body hitting the board, then its small bounce. */
+export function fallSound() {
+  if (!on()) return;
+  wake();
+  const t = ctx ? ctx.currentTime + 0.005 : 0;
+  knock(t, 520, 0.72);
+  knock(t + 0.13, 760, 0.28);
+  buzz([28, 60, 12]);
+}
+
+/** A pawn becoming a piece: two rising notes. */
+export function promoteSound() {
+  if (!on()) return;
+  wake();
+  const t = ctx ? ctx.currentTime + 0.01 : 0;
+  tone(t, 784, 0.3, 0.09);
+  tone(t + 0.09, 1175, 0.45, 0.09);
+  buzz(16);
+}
+
+/** The streak grew by a day: a bright double chime. */
+export function streakSound() {
+  if (!on()) return;
+  wake();
+  const t = ctx ? ctx.currentTime + 0.02 : 0;
+  tone(t, 988, 0.35, 0.08);
+  tone(t + 0.1, 1319, 0.55, 0.08);
+  buzz([10, 30, 10]);
 }
 
 /** A wrong answer: one low muted note. */

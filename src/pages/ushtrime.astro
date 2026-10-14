@@ -25,7 +25,7 @@ import '../styles/play.css';
 
     <div class="bug bug--score" data-board-ui>
       <div class="score__row"><span class="score__name" data-theme-name>Tema</span><span class="tabular" data-puzzle-rating></span></div>
-      <div class="score__row"><span class="score__name" data-my-label>Vlerësimi yt</span><b class="tabular" data-my-rating></b></div>
+      <div class="score__row"><span class="score__name" data-my-label>Vlerësimi yt</span><span class="score__flame" data-flame hidden><Fragment set:html={icon('fire')} /></span><b class="tabular" data-my-rating></b></div>
     </div>
 
     <div class="tools" data-board-ui>
@@ -122,4 +122,7 @@ import '../styles/play.css';
   .theme:has(input:checked)::after { opacity: 1; }
   .theme:has(input:focus-visible) { outline: 3px solid color-mix(in srgb, var(--tint) 75%, transparent); outline-offset: -3px; border-radius: var(--r-list); }
   @media (hover: hover) and (pointer: fine) { .theme:hover { background: color-mix(in srgb, var(--cell-press) 55%, var(--cell)); } }
+  .score__flame { display: inline-flex; color: #ff9f0a; }
+  .score__flame[hidden] { display: none; }
+  .score__flame :global(.icon) { width: 1rem; height: 1rem; }
 </style>

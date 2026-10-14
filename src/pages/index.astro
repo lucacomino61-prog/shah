@@ -7,18 +7,35 @@ import '../styles/play.css';
 
 <App title="Shah · Mëso shah duke luajtur" description="Trajner shahu në shqip: luaj kundër motorit, dëgjo pse ishte gabim, zgjidh ushtrime." tab={null} stage home>
   <div class="stage home" data-stage-box>
+    <script is:inline>
+      // the first visit of the day opens the board from its case: decide before the page paints, so nothing shows and
+      // then hides (the Stop-animations switch and reduced motion skip it)
+      try {
+        var d = new Date();
+        var today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        if (localStorage.getItem('shah.unboxed') !== today && localStorage.getItem('shah.motion') !== 'off' && !matchMedia('(prefers-reduced-motion: reduce)').matches)
+          document.documentElement.dataset.hasUnbox = '';
+      } catch (e) {}
+    </script>
     <div class="board" data-board aria-hidden="true"></div>
+
+    <div class="unbox" data-unbox>
+      <button type="button" class="unbox__open" data-unbox-open>
+        <span class="unbox__cue"><Fragment set:html={icon('handTap')} />Prek për ta hapur</span>
+      </button>
+      <button type="button" class="unbox__skip" data-unbox-skip>Kalo</button>
+    </div>
 
     <div class="home__title" data-board-ui>
       <h1 class="home__mark poster">Shah</h1>
-      <p class="home__line">Luaj kundër motorit. Pas çdo lëvizjeje, trajneri të thotë pse.</p>
-      <div class="home__actions">
+      <p class="home__line" data-rise style="--i: 0">Luaj kundër motorit. Pas çdo lëvizjeje, trajneri të thotë pse.</p>
+      <div class="home__actions" data-rise style="--i: 1">
         <a class="cue cue--on home__go" href="/luaj/" data-go><Fragment set:html={icon('horse')} /><span data-go-label>Luaj</span></a>
         <a class="streak" href="/ushtrime/?tema=dita" data-streak hidden><Fragment set:html={icon('fire')} /><b class="tabular" data-streak-n></b><span data-streak-word>ditë</span></a>
       </div>
     </div>
 
-    <section class="lower home__guide" aria-labelledby="guide-title" data-board-ui>
+    <section class="lower home__guide" aria-labelledby="guide-title" data-board-ui data-rise style="--i: 2">
       <h2 class="visually-hidden" id="guide-title">Sot në program</h2>
       <ol class="guide">
         <li>
@@ -45,7 +62,7 @@ import '../styles/play.css';
       </ol>
     </section>
 
-    <div class="ticker" data-board-ui aria-hidden="true">
+    <div class="ticker" data-board-ui aria-hidden="true" data-rise style="--i: 3">
       <div class="ticker__rail"></div>
       <div class="ticker__band">
         <div class="ticker__track">
@@ -65,6 +82,44 @@ import '../styles/play.css';
 
 <style>
   .home { --inset-top: 16rem; --inset-bottom: 14rem; }
+
+  /* the case: shut on the table until a tap opens it (sound and vibration need that touch); the rest of the page
+     waits and rises in, one part after another, once the last piece is set */
+  .unbox { display: none; }
+  :global(html[data-has-unbox]) .unbox { position: absolute; inset: 0; z-index: 3; display: block; }
+  .unbox__open {
+    position: absolute; inset: 0; width: 100%; display: grid; align-items: end; justify-items: center;
+    padding-bottom: calc(var(--chrome-bottom) + 2rem); cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .unbox__cue {
+    display: inline-flex; align-items: center; gap: 0.5rem; min-height: 50px; padding: 0 1.5rem; border-radius: 999px;
+    color: #fff; font-weight: 600; font-size: var(--t-body);
+    background-color: var(--glass); background-image: linear-gradient(180deg, var(--glass-sheen), transparent 46%);
+    -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+    box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 0.5px var(--glass-rim), var(--glass-depth);
+    transition: transform var(--dur-press) var(--ease-out);
+    animation: cue-breathe 2.4s ease-in-out infinite;
+  }
+  .unbox__cue :global(.icon) { width: 1.25rem; height: 1.25rem; }
+  .unbox__open:active .unbox__cue { transform: scale(0.96); }
+  .unbox__open:focus-visible { outline: none; }
+  .unbox__open:focus-visible .unbox__cue { outline: 3px solid color-mix(in srgb, var(--tint) 75%, transparent); outline-offset: 3px; }
+  @keyframes cue-breathe { 50% { box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 0.5px var(--glass-rim), var(--glass-depth), 0 0 0 6px rgb(255 255 255 / 0.08); } }
+  .unbox__skip {
+    position: absolute; top: max(env(safe-area-inset-top), 0.75rem); right: 0.75rem; min-height: 44px; padding: 0 1rem; border-radius: 999px;
+    color: rgb(255 255 255 / 0.86); font-weight: 600; font-size: var(--t-sub);
+  }
+  .unbox__skip:focus-visible { outline: 3px solid color-mix(in srgb, var(--tint) 75%, transparent); outline-offset: 2px; }
+  /* on a wide screen the navigation bar holds the top: Kalo sits under it */
+  @media (min-width: 1024px) { .unbox__skip { top: 5.25rem; right: 1.5rem; } }
+  /* opened: the cue goes, the case does the rest */
+  .unbox[data-opening] .unbox__open { pointer-events: none; }
+  .unbox[data-opening] .unbox__cue { opacity: 0; transform: scale(0.94); filter: blur(6px); transition: opacity 260ms var(--ease-out), transform 260ms var(--ease-out), filter 260ms var(--ease-out); animation: none; }
+  :global(html[data-has-unbox]) .home .board { opacity: 0; }
+  .home .board { transition: opacity 360ms var(--ease-out); }
+  :global(html[data-has-unbox]) [data-rise] { opacity: 0; transform: translateY(14px); pointer-events: none; }
+  [data-rise] { transition: opacity 460ms var(--ease-out), transform 460ms var(--ease-out); transition-delay: calc(var(--i, 0) * 80ms); }
+  :global(html[data-motion="off"]) [data-rise] { transition: none; }
   .home .board { pointer-events: none; }
   .home__title {
     position: absolute; z-index: 2; left: var(--gutter); right: var(--gutter); top: 1.5rem;

@@ -122,3 +122,6 @@ ekranin bazë» (Add to Home Screen)". iOS has no Albanian menus, so the English
 
 **New lessons and repertoires:** Helli (skewer) · Sulmi i zbuluar · Opozita · the London System (Sistemi i Londrës)
 and the Caro-Kann (Karo-Kan): please check the transliterations.
+
+**The opening and the small moments:** "Prek për ta hapur" (tap to open: the board lying shut in its case) · Kalo
+(skip) · "Ditë rresht" with the flame on today's puzzle.

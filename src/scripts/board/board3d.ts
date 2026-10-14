@@ -50,7 +50,8 @@ import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeom
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { BOARD, GIRTH, HEIGHT, KING_CROSS, KNIGHT_HEAD, PROFILES, QUEEN_CROWN, ROOK_MERLONS, knightOutline } from '../../lib/chess/model.ts';
 import { boardBounds, frameBounds, rigFor } from './camera.ts';
-import { FILES, planMoves, readFen, type Arrow, type BoardOptions, type BoardView, type Kind, type Marks, type Placed, type Side, type Sq } from './types.ts';
+import { FILES, planMoves, readFen, type Arrow, type BoardOptions, type BoardView, type Kind, type Marks, type Placed, type Side, type Sq, type UnboxHooks } from './types.ts';
+import { caseSound, fallSound, pieceDownSound, promoteSound } from '../../lib/sound.ts';
 
 const token = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#000';
 
@@ -104,6 +105,10 @@ interface Body {
   tiltV: Vector2;
   mode: Mode;
   flight: Flight | null;
+  /** a mated king going over: it turns about the rim of its base, `t` from 0 to the end of its bounce */
+  fall: { t: number; axis: Vector3; pivot: Vector3; base: Vector3 } | null;
+  /** a promotion: the pawn sinks into its square, the new piece rises out of it */
+  morph: { t: number; to: Kind; swapped: boolean } | null;
 }
 
 // ---------------------------------------------------------------- geometry
@@ -538,62 +543,115 @@ export function createBoard3d(o: BoardOptions): BoardView {
   scene.add(table);
 
   // ---------------------------------------------------------------- the board
+  // A folding board, as the wooden cases are: two leaves meeting on a hinge across the middle (between the 4th and
+  // 5th ranks). The far leaf turns on that hinge, so the board can lie shut with its squares inside and open on the
+  // first visit of the day; the rest of the time it lies open and the seam is a fine line in the frame.
   const board = new Group();
   scene.add(board);
   const F = BOARD.half + BOARD.frame;
   const frameH = BOARD.top - BOARD.frameDrop;
+  const leaf = new Group();
+  leaf.position.set(0, BOARD.top, 0);
+  board.add(leaf);
+  /** add a part of the board to the leaf it lies on: z < 0 is the far leaf, which turns on the hinge */
+  const mount = (m: Mesh, far: boolean) => {
+    if (far) {
+      m.position.y -= BOARD.top;
+      leaf.add(m);
+    } else board.add(m);
+    return m;
+  };
+  /** a flat plane over the board cut at the hinge: one leaf's half, with that half of the texture */
+  const halfPlane = (w: number, d: number, far: boolean) => {
+    const g = new PlaneGeometry(w, d / 2).rotateX(-Math.PI / 2).translate(0, 0, far ? -d / 4 : d / 4);
+    const uv = g.getAttribute('uv') as BufferAttribute;
+    for (let i = 0; i < uv.count; i++) uv.setY(i, (far ? 0.5 : 0) + uv.getY(i) * 0.5);
+    return keep(g);
+  };
   const grain = grainTexture(512, '#4b2213', 'rgba(22,6,1,A)', 'rgba(150,72,40,A)', 23);
   textures.push(grain);
   const wood = own(new MeshPhysicalMaterial({ map: grain, roughness: 0.78, specularIntensity: 0.15, envMap: room, envMapIntensity: 0.7 }));
-  const frame = new Mesh(keep(new RoundedBoxGeometry(2 * F, frameH, 2 * F, 5, 0.06)), wood);
-  frame.position.y = frameH / 2;
-  frame.castShadow = frame.receiveShadow = true;
-  board.add(frame);
-  // boxwood stringing let into the mahogany: one line round the squares, one near the outer edge
+  for (const far of [false, true]) {
+    const half = new Mesh(keep(new RoundedBoxGeometry(2 * F, frameH, F, 5, 0.06)), wood);
+    half.position.set(0, frameH / 2, far ? -F / 2 : F / 2);
+    half.castShadow = half.receiveShadow = true;
+    mount(half, far);
+  }
+  // boxwood stringing let into the mahogany: one line round the squares, one near the outer edge; the lines that run
+  // across the hinge are cut in two
   const brass = own(new MeshStandardMaterial({ color: 0xe9d3a4, roughness: 0.85, envMap: room, envMapIntensity: 0.5 }));
   for (const [d, w] of [
     [BOARD.half + 0.075, 0.032],
     [F - 0.085, 0.022],
   ] as const) {
-    for (const side of [0, 1, 2, 3]) {
-      const len = 2 * d + w;
-      const bar = new Mesh(keep(new BoxGeometry(side % 2 ? w : len, 0.012, side % 2 ? len : w)), brass);
-      const off = side < 2 ? d : -d;
-      if (side % 2) bar.position.set(off, frameH + 0.001, 0);
-      else bar.position.set(0, frameH + 0.001, off);
+    const len = 2 * d + w;
+    for (const z of [d, -d]) {
+      const bar = new Mesh(keep(new BoxGeometry(len, 0.012, w)), brass);
+      bar.position.set(0, frameH + 0.001, z);
       bar.receiveShadow = true;
-      board.add(bar);
+      mount(bar, z < 0);
     }
+    for (const x of [d, -d])
+      for (const far of [false, true]) {
+        const bar = new Mesh(keep(new BoxGeometry(w, 0.012, len / 2 - 0.03)), brass);
+        bar.position.set(x, frameH + 0.001, (far ? -1 : 1) * (len / 4 + 0.015));
+        bar.receiveShadow = true;
+        mount(bar, far);
+      }
   }
-  const slab = new Mesh(keep(new BoxGeometry(2 * BOARD.half, 0.06, 2 * BOARD.half)), own(new MeshStandardMaterial({ color: 0xd9d4ca, roughness: 0.3 })));
-  slab.position.y = BOARD.top - 0.031;
-  slab.receiveShadow = true;
-  board.add(slab);
+  // the case's clasp: a brass plate on the front edge of each leaf, meeting when the board is shut
+  const claspGeo = keep(new BoxGeometry(0.42, 0.11, 0.035));
+  for (const far of [false, true]) {
+    const clasp = new Mesh(claspGeo, brass);
+    clasp.position.set(0, frameH - 0.075, far ? -F - 0.017 : F + 0.017);
+    clasp.castShadow = true;
+    mount(clasp, far);
+  }
+  const slabMat = own(new MeshStandardMaterial({ color: 0xd9d4ca, roughness: 0.3 }));
+  for (const far of [false, true]) {
+    const slab = new Mesh(keep(new BoxGeometry(2 * BOARD.half, 0.06, BOARD.half)), slabMat);
+    slab.position.set(0, BOARD.top - 0.031, far ? -BOARD.half / 2 : BOARD.half / 2);
+    slab.receiveShadow = true;
+    mount(slab, far);
+  }
   const fieldMap = woodSquares(Math.min(2048, renderer.capabilities.maxTextureSize));
   fieldMap.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   textures.push(fieldMap);
-  const surface = new Mesh(
-    keep(new PlaneGeometry(2 * BOARD.half, 2 * BOARD.half).rotateX(-Math.PI / 2)),
-    own(new MeshPhysicalMaterial({ map: fieldMap, roughness: 0.88, specularIntensity: 0.08, envMap: room, envMapIntensity: 0.55 })),
-  );
-  surface.position.y = BOARD.top + 0.0005;
-  surface.receiveShadow = true;
-  board.add(surface);
+  const fieldMat = own(new MeshPhysicalMaterial({ map: fieldMap, roughness: 0.88, specularIntensity: 0.08, envMap: room, envMapIntensity: 0.55 }));
+  for (const far of [false, true]) {
+    const surface = new Mesh(halfPlane(2 * BOARD.half, 2 * BOARD.half, far), fieldMat);
+    surface.position.y = BOARD.top + 0.0005;
+    surface.receiveShadow = true;
+    mount(surface, far);
+  }
   // the coordinates inlaid in the frame top
   const inlayMat = own(new MeshBasicMaterial({ transparent: true, depthWrite: false }));
   inlayMat.toneMapped = false;
-  const inlayPlane = new Mesh(keep(new PlaneGeometry(2 * F, 2 * F).rotateX(-Math.PI / 2)), inlayMat);
-  inlayPlane.position.y = frameH + 0.008;
-  inlayPlane.renderOrder = 1;
-  board.add(inlayPlane);
+  for (const far of [false, true]) {
+    const inlayPlane = new Mesh(halfPlane(2 * F, 2 * F, far), inlayMat);
+    inlayPlane.position.y = frameH + 0.008;
+    inlayPlane.renderOrder = 1;
+    mount(inlayPlane, far);
+  }
   // on a phone the rank numbers move onto the edge squares (the frame's sides are off screen there)
   const ranksMat = own(new MeshBasicMaterial({ transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
   ranksMat.toneMapped = false;
-  const ranksPlane = new Mesh(keep(new PlaneGeometry(2 * BOARD.half, 2 * BOARD.half).rotateX(-Math.PI / 2)), ranksMat);
-  ranksPlane.position.y = BOARD.top + 0.002;
-  ranksPlane.renderOrder = 1;
+  const rankHalves: Mesh[] = [];
+  for (const far of [false, true]) {
+    const half = new Mesh(halfPlane(2 * BOARD.half, 2 * BOARD.half, far), ranksMat);
+    half.position.y = BOARD.top + 0.002;
+    half.renderOrder = 1;
+    rankHalves.push(mount(half, far));
+  }
+  const ranksPlane = {
+    get visible() {
+      return rankHalves[0].visible;
+    },
+    set visible(v: boolean) {
+      rankHalves.forEach((m) => (m.visible = v));
+    },
+  };
   ranksPlane.visible = false;
-  board.add(ranksPlane);
   let ranksMap: CanvasTexture | null = null;
   let inlayMap: CanvasTexture | null = null;
   const drawInlay = () => {
@@ -671,6 +729,8 @@ export function createBoard3d(o: BoardOptions): BoardView {
       tiltV: new Vector2(),
       mode: 'off',
       flight: null,
+      fall: null,
+      morph: null,
     };
     setShape(b, kind);
     bodies.push(b);
@@ -918,6 +978,8 @@ export function createBoard3d(o: BoardOptions): BoardView {
   // ---------------------------------------------------------------- travel
   const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   function fly(b: Body, to: Vector3, q1: Quaternion, opts: { arc?: number; dur?: number; delay?: number; spin?: number; end?: () => void } = {}) {
+    // a fallen king stands up on the way; a promotion in progress completes
+    unbend(b);
     const p0 = b.pos.clone();
     const dist = p0.distanceTo(to);
     const arc = opts.arc ?? 0.45 + dist * 0.08;
@@ -938,7 +1000,16 @@ export function createBoard3d(o: BoardOptions): BoardView {
     };
   }
 
+  /** a piece is whole again: upright, its own shape, full size */
+  function unbend(b: Body) {
+    if (b.morph) setShape(b, b.morph.to);
+    b.fall = null;
+    b.morph = null;
+    b.mesh.scale.set(1, 1, 1);
+  }
+
   function place(b: Body, sq: Sq) {
+    unbend(b);
     b.sq = sq;
     b.mode = 'rest';
     b.flight = null;
@@ -954,6 +1025,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
   }
 
   function retire(b: Body) {
+    unbend(b);
     b.sq = null;
     b.mode = 'off';
     b.flight = null;
@@ -962,6 +1034,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
 
   /** A taken piece rests on its side on the felt beside the board, as at a real table. */
   function lie(b: Body, slot: Vector3) {
+    unbend(b);
     b.sq = null;
     b.mode = 'off';
     b.flight = null;
@@ -973,6 +1046,228 @@ export function createBoard3d(o: BoardOptions): BoardView {
     shadowsStale = true;
   }
 
+  // ---------------------------------------------------------------- the case, the fallen king, the promotion
+  /** the far leaf on its hinge: 0 lies open, PI lies shut over the near leaf */
+  const setLeaf = (a: number) => {
+    leaf.rotation.x = a;
+    shadowsStale = true;
+    dirty = true;
+  };
+  interface Unboxing {
+    t: number;
+    landed: boolean;
+    hooks: UnboxHooks;
+    /** the pieces still to come out, in order, with the time each leaves the seam */
+    queue: { sq: Sq; p: Placed; at: number }[];
+    total: number;
+    flying: number;
+    end: number;
+  }
+  let unboxing: Unboxing | null = null;
+  /** the lift to upright, then the fall onto the felt, then a small rebound of the wood */
+  const LIFT_S = 0.72;
+  const DROP_S = 0.4;
+  const REBOUND_S = 0.3;
+  /** how the pieces of a set come out: rooks, knights, bishops, queens, kings, then the pawns, file by file */
+  const ORDER: Record<Kind, number> = { r: 0, n: 1, b: 2, q: 3, k: 4, p: 5 };
+
+  function fold(shut: boolean) {
+    unboxing = null;
+    setLeaf(shut ? Math.PI : 0);
+    if (shut) {
+      // the pieces are in the case
+      for (const b of bodies) retire(b);
+      bySq.clear();
+      current = new Map();
+    }
+  }
+
+  /** Open the shut board and bring the pieces of `fen` out of the seam one by one onto their squares. */
+  function unbox(fen: string, hooks: UnboxHooks): () => void {
+    fold(true);
+    const next = readFen(fen);
+    current = next;
+    const queue = [...next.entries()]
+      .sort(([a, pa], [b, pb]) => ORDER[pa.kind] - ORDER[pb.kind] || FILES.indexOf(a[0]) - FILES.indexOf(b[0]) || (pa.side === 'w' ? -1 : 1))
+      .map(([sq, p], i) => ({ sq, p, at: LIFT_S + DROP_S + 0.16 + i * 0.07 }));
+    unboxing = { t: 0, landed: false, hooks, queue, total: queue.length, flying: 0, end: Infinity };
+    caseSound('creak');
+    dirty = true;
+    return finishUnbox;
+  }
+
+  /** Skip: the board lies open with every piece in place. */
+  function finishUnbox() {
+    const u = unboxing;
+    if (!u) return;
+    unboxing = null;
+    setLeaf(0);
+    for (const { sq, p } of u.queue) {
+      const b = spare(p.side, p.kind);
+      place(b, sq);
+      bySq.set(sq, b);
+    }
+    for (const b of bodies) if (b.flight && b.sq) place(b, b.sq);
+    shadowsStale = true;
+    dirty = true;
+    u.hooks.done?.();
+  }
+
+  function stepUnbox(dt: number) {
+    const u = unboxing!;
+    u.t += dt;
+    const t = u.t;
+    let a: number;
+    if (t < LIFT_S) {
+      // lifted from shut to upright, easing in and out like a hand turning it
+      const e = t / LIFT_S;
+      a = Math.PI - (Math.PI / 2) * (0.5 - Math.cos(Math.PI * e) / 2);
+    } else if (t < LIFT_S + DROP_S) {
+      // past upright it falls open under its own weight
+      const e = (t - LIFT_S) / DROP_S;
+      a = (Math.PI / 2) * (1 - e * e);
+    } else {
+      if (!u.landed) {
+        u.landed = true;
+        caseSound('land');
+        u.hooks.opened?.();
+      }
+      const e = (t - LIFT_S - DROP_S) / REBOUND_S;
+      a = e < 1 ? 0.06 * Math.sin(Math.PI * e) * (1 - e) : 0;
+    }
+    if (leaf.rotation.x !== a) setLeaf(a);
+    // the pieces: each rises out of the seam lying down, turns upright in the air and lands on its square
+    while (u.queue.length && u.queue[0].at <= t) {
+      const { sq, p } = u.queue.shift()!;
+      const b = spare(p.side, p.kind);
+      const dest = square(sq);
+      b.pos.set(dest.x, BOARD.top - 0.55, 0);
+      b.group.position.copy(b.pos);
+      b.group.quaternion.copy(lying);
+      b.group.visible = true;
+      b.sq = sq;
+      bySq.set(sq, b);
+      const n = u.total - u.queue.length - 1;
+      u.flying++;
+      fly(b, dest, upright, {
+        arc: 0.75 + Math.abs(dest.z) * 0.08,
+        dur: 0.5 + Math.abs(dest.z) * 0.025,
+        end: () => {
+          b.mode = 'rest';
+          b.target.copy(dest);
+          b.vel.set(0, -1.1, 0);
+          u.flying--;
+          pieceDownSound(n);
+          u.hooks.piece?.(n);
+          if (!u.queue.length && !u.flying) u.end = u.t + 0.35;
+        },
+      });
+    }
+    if (u.t >= u.end) {
+      unboxing = null;
+      u.hooks.done?.();
+    }
+  }
+
+  /** Mate: the king goes over, away from the piece that gave it. */
+  function topple(sq: Sq, from?: Sq) {
+    const b = bySq.get(sq);
+    if (!b || b.mode === 'off') return;
+    const base = square(sq);
+    const want = from ? base.clone().sub(square(from)).setY(0) : new Vector3(0.4, 0, 1);
+    if (want.lengthSq() < 1e-6) want.set(0, 0, 1);
+    want.normalize();
+    // of sixteen directions round the square, the one nearest that keeps the fallen piece on the board (a king on the
+    // edge falls along it or inward, not over the frame)
+    const reach = HEIGHT[b.kind] + 0.05;
+    const inside = (d: Vector3) => Math.abs(base.x + d.x * reach) < BOARD.half - 0.05 && Math.abs(base.z + d.z * reach) < BOARD.half - 0.05;
+    // a direction with a piece in the way would lay it across that piece: an open one wins over a nearer one
+    const blocked = (d: Vector3) =>
+      [0.6, 1.1, reach - 0.1].some((t) => {
+        const sq = (FILES[Math.round(base.x + d.x * t + 3.5)] + (Math.round(3.5 - (base.z + d.z * t)) + 1)) as Sq;
+        return sq !== b.sq && bySq.has(sq);
+      });
+    let away = want.clone();
+    let best = -Infinity;
+    for (let i = 0; i < 16; i++) {
+      const d = new Vector3(Math.cos((i / 16) * Math.PI * 2), 0, Math.sin((i / 16) * Math.PI * 2));
+      if (!inside(d)) continue;
+      const score = d.dot(want) - (blocked(d) ? 10 : 0);
+      if (score > best) {
+        best = score;
+        away = d;
+      }
+    }
+    if (best === -Infinity) away = base.clone().multiplyScalar(-1).setY(0).normalize();
+    // it turns about the rim of its base on the side it falls to
+    const pivot = base.clone().addScaledVector(away, GIRTH[b.kind]);
+    const axis = new Vector3(0, 1, 0).cross(away).normalize();
+    b.flight = null;
+    b.mode = 'rest';
+    b.vel.set(0, 0, 0);
+    b.tilt.set(0, 0);
+    b.tiltV.set(0, 0);
+    b.pos.copy(base);
+    b.fall = { t: motionOn ? 0 : FALL_END, axis, pivot, base };
+    if (!motionOn) fallSound();
+    poseFall(b);
+  }
+  const FALL_S = 0.48;
+  const FALL_END = FALL_S + 0.36;
+  /** the angle of a falling piece over time: gravity to the board, one bounce, at rest a little past level (the head
+   *  is narrower than the base) */
+  const fallAngle = (t: number) => {
+    const rest = Math.PI / 2 + 0.05;
+    if (t < FALL_S) return rest * (t / FALL_S) ** 2;
+    const u = Math.min(1, (t - FALL_S) / (FALL_END - FALL_S));
+    return rest - 0.13 * Math.sin(Math.PI * Math.min(1, u * 1.6)) * (1 - u);
+  };
+  const fallQ = new Quaternion();
+  const fallV = new Vector3();
+  function poseFall(b: Body) {
+    const f = b.fall!;
+    fallQ.setFromAxisAngle(f.axis, fallAngle(f.t));
+    fallV.copy(f.base).sub(f.pivot).applyQuaternion(fallQ).add(f.pivot);
+    b.group.position.copy(fallV);
+    b.group.quaternion.copy(fallQ);
+    shadowsStale = true;
+    dirty = true;
+  }
+
+  /** A pawn reaching the last rank: it sinks into the square and the new piece rises out of it. */
+  function promote(b: Body, kind: Kind) {
+    if (!motionOn) return setShape(b, kind);
+    b.morph = { t: 0, to: kind, swapped: false };
+  }
+  const SINK_S = 0.16;
+  function stepMorph(b: Body, dt: number) {
+    const m = b.morph!;
+    m.t += dt;
+    let sy: number;
+    let sx: number;
+    if (m.t < SINK_S) {
+      const e = m.t / SINK_S;
+      sy = 1 - 0.85 * e * e;
+      sx = 1 - 0.15 * e;
+    } else {
+      if (!m.swapped) {
+        m.swapped = true;
+        setShape(b, m.to);
+        promoteSound();
+      }
+      const u = m.t - SINK_S;
+      const k = Math.exp(-7 * u) * Math.cos(12 * u);
+      sy = 1 - 0.85 * k;
+      sx = 1 - 0.15 * k;
+      if (u > 0.7) {
+        b.morph = null;
+        sy = sx = 1;
+      }
+    }
+    b.mesh.scale.set(sx, sy, sx);
+    shadowsStale = true;
+  }
+
   let current = new Map<Sq, Placed>();
   let takenCount = 0;
 
@@ -981,14 +1276,19 @@ export function createBoard3d(o: BoardOptions): BoardView {
     const plan = planMoves(current, next);
     current = next;
     choose(null);
+    const go = animate && motionOn && visible;
     for (const s of plan.stay) {
       const b = bySq.get(s);
       if (b && b.mode === 'carry') {
         b.mode = 'rest';
         b.target.copy(square(s));
       }
+      // a king that went over at mate stands up when the position moves on (a take-back, the next puzzle)
+      if (b?.fall) {
+        if (go) fly(b, square(s), upright, { arc: 0.12, dur: 0.42, end: () => ((b.mode = 'rest'), b.target.copy(square(s))) });
+        else place(b, s);
+      }
     }
-    const go = animate && motionOn && visible;
     const moves = plan.travel.map((t) => ({ t, b: bySq.get(t.from)! })).filter((x) => x.b);
     const taken = plan.taken.map((s) => bySq.get(s)!).filter(Boolean);
     for (const { t } of moves) bySq.delete(t.from);
@@ -1023,7 +1323,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
         // already in the hand above the square: set it down
         b.mode = 'rest';
         b.target.copy(dest);
-        if (kind) setShape(b, kind);
+        if (kind) promote(b, kind);
         return;
       }
       fly(b, dest, upright, {
@@ -1032,7 +1332,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
           b.mode = 'rest';
           b.target.copy(dest);
           b.vel.set(0, -1.3, 0);
-          if (kind) setShape(b, kind);
+          if (kind) promote(b, kind);
         },
       });
       longest = Math.max(longest, b.flight!.dur + b.flight!.delay);
@@ -1071,8 +1371,26 @@ export function createBoard3d(o: BoardOptions): BoardView {
 
   function step(dt: number): boolean {
     let moving = false;
+    if (unboxing) {
+      stepUnbox(dt);
+      moving = true;
+    }
     for (const b of bodies) {
       if (b.mode === 'off') continue;
+      if (b.fall) {
+        if (b.fall.t < FALL_END) {
+          const was = b.fall.t;
+          b.fall.t = Math.min(FALL_END, b.fall.t + dt);
+          if (was < FALL_S && b.fall.t >= FALL_S) fallSound();
+          poseFall(b);
+          moving = true;
+        }
+        continue;
+      }
+      if (b.morph) {
+        stepMorph(b, dt);
+        moving = true;
+      }
       if (b.mode === 'flight' && b.flight) {
         const f = b.flight;
         if (f.delay > 0) {
@@ -1495,6 +1813,14 @@ export function createBoard3d(o: BoardOptions): BoardView {
   function setMotion(on: boolean) {
     motionOn = on;
     if (!on) {
+      finishUnbox();
+      for (const b of bodies) {
+        if (b.fall) {
+          b.fall.t = FALL_END;
+          poseFall(b);
+        }
+        if (b.morph) unbend(b);
+      }
       if (down) down = null;
       for (const b of bodies) {
         if (b.flight) {
@@ -1542,6 +1868,14 @@ export function createBoard3d(o: BoardOptions): BoardView {
         return { x: r.left + ((v.x + 1) / 2) * r.width, y: r.top + ((1 - v.y) / 2) * r.height };
       },
       state: () => ({ chosen: chosen?.sq ?? null, busy: view.busy, pieces: [...bySq.entries()].map(([s, b]) => `${b.side}${b.kind}${s}`).sort() }),
+      // the case and the animations: the far leaf's angle, pieces lying over, a promotion under way
+      fx: () => ({
+        leaf: Number(leaf.rotation.x.toFixed(3)),
+        unboxing: !!unboxing,
+        visible: bodies.filter((b) => b.group.visible).length,
+        fallen: [...bySq.entries()].filter(([, b]) => b.fall).map(([s, b]) => ({ sq: s, tilt: Number((2 * Math.acos(Math.min(1, Math.abs(b.group.quaternion.w)))).toFixed(2)) })),
+        morphing: bodies.filter((b) => b.morph).length,
+      }),
       shadows: () => (vsm ? 'vsm' : 'pcf'),
       danger: () => [...(marks.danger ?? [])],
     };
@@ -1573,6 +1907,9 @@ export function createBoard3d(o: BoardOptions): BoardView {
         placeCamera(false);
       }
     },
+    fold,
+    unbox,
+    topple,
     setAngle(i: number) {
       angle = Math.max(0, Math.min(ANGLES.length - 1, i));
       fit();
@@ -1602,7 +1939,7 @@ export function createBoard3d(o: BoardOptions): BoardView {
     tick,
     setMotion,
     get busy() {
-      return bodies.some((b) => b.mode === 'flight' || b.mode === 'carry' || b.vel.lengthSq() > 1e-4);
+      return !!unboxing || bodies.some((b) => b.mode === 'flight' || b.mode === 'carry' || !!b.morph || b.vel.lengthSq() > 1e-4);
     },
     setInteractive(on: boolean) {
       interactive = on;

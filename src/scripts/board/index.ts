@@ -1,6 +1,8 @@
 // Picks the board a page shows (marble in 3D when WebGL works, flat otherwise) and gives it a keyboard path:
 // the board takes focus, the arrows move a cursor, Enter or Space presses the square, Escape lets go.
 
+import { Chess } from 'chess.js';
+import { onTick } from '../shell.ts';
 import { createBoard2d } from './board2d.ts';
 import type { BoardOptions, BoardView, Side, Sq } from './types.ts';
 import { FILES } from './types.ts';
@@ -110,5 +112,27 @@ export function keyboard(host: HTMLElement, view: () => BoardView, side: () => S
       e.preventDefault();
       view().press(view().chosen!);
     }
+  });
+}
+
+/**
+ * Mate on the board: once the mating piece has landed, the mated king goes over, away from it. `still` gives the
+ * position the page shows at that moment; if it has moved on (a take-back, the next puzzle) the king stays up.
+ */
+export function mateFall(view: () => BoardView | undefined, fen: string, still: () => string) {
+  const c = new Chess(fen);
+  if (!c.isCheckmate()) return;
+  const king = c.board().flat().find((p) => p && p.type === 'k' && p.color === c.turn());
+  if (!king) return;
+  // the king falls away from the piece that mates it
+  const by = c.attackers(king.square, c.turn() === 'w' ? 'b' : 'w')[0];
+  const placement = (f: string) => f.split(' ')[0];
+  const t0 = performance.now();
+  const stop = onTick(() => {
+    const b = view();
+    if (!b?.topple) return stop();
+    if (b.busy && performance.now() - t0 < 1500) return;
+    stop();
+    if (placement(still()) === placement(fen)) b.topple(king.square, by);
   });
 }

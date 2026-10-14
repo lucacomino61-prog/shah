@@ -9,9 +9,10 @@ import { sanHtml } from '../lib/notation.ts';
 import { openingOf } from '../lib/openings.ts';
 import { api, hasServer, ServerError, wsBase } from '../lib/server.ts';
 import { missSound, moveSound, winSound } from '../lib/sound.ts';
-import { createBoard, keepBoardStill, keyboard, type BoardView } from './board/index.ts';
+import { createBoard, keepBoardStill, keyboard, mateFall, type BoardView } from './board/index.ts';
 import type { Side, Sq } from './board/types.ts';
 import { motionOn, onMotion, onTick } from './shell.ts';
+import { takenIcons, writeTaken } from './celebrate.ts';
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const START = new Chess().fen();
@@ -271,6 +272,7 @@ function applyState(s: RoomState) {
     else if (s.result?.winner) missSound();
   }
   if (prev?.status === 'waiting' && s.status === 'playing') say('Shoku hyri. Loja filloi.');
+  if (s.status === 'over' && s.result?.reason === 'mate' && (prev?.status !== 'over' || prev.round !== s.round)) mateFall(() => board, s.fen, () => shownFen);
   render();
 }
 
@@ -352,6 +354,8 @@ onTick(() => {
   if (state?.clock?.running) renderClocks();
 });
 
+/** the captured pieces each side showed last time, so only a new one pops in */
+const takenSeen = new Map<string, Record<string, number>>();
 function renderPlayers() {
   const c = new Chess(shownFen);
   const full: Record<string, number> = { p: 8, n: 2, b: 2, r: 2, q: 1 };
@@ -360,20 +364,19 @@ function renderPlayers() {
   for (const row of c.board()) for (const p of row) if (p && p.type !== 'k') have[p.color][p.type]++;
   const takenBy = (taker: Side) => {
     const victim = other(taker);
-    let html = '';
     let points = 0;
+    const counts: Record<string, number> = {};
     for (const k of ['q', 'r', 'b', 'n', 'p']) {
-      const n = Math.max(0, full[k] - have[victim][k]);
-      points += n * val[k];
-      for (let i = 0; i < n; i++) html += `<svg class="cap" aria-hidden="true"><use href="#pc-${victim}-${k}"/></svg>`;
+      counts[k] = Math.max(0, full[k] - have[victim][k]);
+      points += counts[k] * val[k];
     }
-    return { html, points };
+    return { html: takenIcons(takenSeen, taker, victim, counts), points };
   };
   const mine = takenBy(me());
   const theirs = takenBy(other(me()));
   const diff = mine.points - theirs.points;
-  ui.you.querySelector('[data-taken]')!.innerHTML = mine.html + (diff > 0 ? `<span class="adv tabular">+${diff}</span>` : '');
-  ui.them.querySelector('[data-taken]')!.innerHTML = theirs.html + (diff < 0 ? `<span class="adv tabular">+${-diff}</span>` : '');
+  writeTaken(ui.you.querySelector('[data-taken]')!, mine.html + (diff > 0 ? `<span class="adv tabular">+${diff}</span>` : ''));
+  writeTaken(ui.them.querySelector('[data-taken]')!, theirs.html + (diff < 0 ? `<span class="adv tabular">+${-diff}</span>` : ''));
   const away = state && state.status !== 'waiting' && !state.here[other(me())];
   ui.them.querySelector('[data-name]')!.textContent = !state || state.status === 'waiting' ? 'Shoku' : away ? 'Shoku · larg' : 'Shoku';
   const playing = state?.status === 'playing';

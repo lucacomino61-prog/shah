@@ -6,11 +6,12 @@ import puzzles from '../data/puzzles.json';
 import { sanHtml, sentenceHtml, sentenceText } from '../lib/notation.ts';
 import { DAYS, dueCards, load, ratePuzzle, reviewCard, solveDaily, streakNow, today, update, type Card } from '../lib/store.ts';
 import { THEMES, themeOf } from '../lib/themes.ts';
-import { createBoard, keepBoardStill, keyboard, type BoardView } from './board/index.ts';
+import { createBoard, keepBoardStill, keyboard, mateFall, type BoardView } from './board/index.ts';
 import type { Side, Sq } from './board/types.ts';
 import { gsap, motionOn, onMotion, onTick } from './shell.ts';
 import { missSound, moveSound, winSound } from '../lib/sound.ts';
 import { remindDone } from '../lib/remind.ts';
+import { rollStreak } from './celebrate.ts';
 
 interface Puzzle {
   id: string;
@@ -288,6 +289,7 @@ async function onMove(from: Sq, to: Sq) {
 
 function solved(lastSan: string) {
   if (!puzzle) return;
+  if (chess.isCheckmate()) mateFall(() => board, chess.fen(), () => chess.fen());
   if (mode === 'rush') return rushSolved(lastSan);
   done = true;
   busy = false;
@@ -306,6 +308,7 @@ function solved(lastSan: string) {
   ratingLabel();
   const t = themeOf(puzzle.theme);
   winSound();
+  const hadDays = streakNow(prefs);
   if (mode === 'daily') {
     prefs = solveDaily(puzzle.id);
     void remindDone();
@@ -321,6 +324,8 @@ function solved(lastSan: string) {
   say(`Saktë. ${t.idea}`);
   ui.status.textContent = 'U zgjidh.';
   capsule();
+  // a day more on the streak: the count rolls up and the flame jumps
+  if (mode === 'daily') rollStreak(ui.myRating, hadDays, streak, document.querySelector('[data-flame] .icon'));
   showButtons();
   countThemes();
   ticker();
@@ -357,6 +362,7 @@ function capsule() {
     label.textContent = 'Ditë rresht';
     ui.myRating.textContent = String(streakNow(prefs));
   }
+  document.querySelector<HTMLElement>('[data-flame]')!.hidden = mode !== 'daily';
 }
 
 function dailyDone() {

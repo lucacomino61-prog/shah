@@ -49,6 +49,7 @@ node tools/test-flow.mjs                  # clock, blunder, graph, the blunder b
 node tools/test-trainer.mjs               # opening trainer and the endgame play-out (dev server)
 node tools/test-extras.mjs                # threats, sounds, puzzle of the day, race, backup, bots, two on one phone (dev)
 node tools/test-analyse.mjs               # the analysis board and game review (dev server)
+node tools/test-animations.mjs            # the case opening, the fallen king, the promotion, captured pieces, the streak (dev)
 npm run server:check                      # the server's types (generates server/worker-configuration.d.ts first)
 node tools/test-server.mjs                # the server alone: rooms, clocks, sync vault, reminders (npm run server)
 node tools/test-online.mjs                # a game between two browsers online (dev server and server)
@@ -90,7 +91,9 @@ as `PUBLIC_SHAH_SERVER=https://shah-server.<account>.workers.dev`, and build and
 - `src/scripts/play.ts`: a game against the engine, or two people on one phone.
 - `src/scripts/online.ts`: a game online.
 - `src/scripts/analyse.ts`: the analysis board and game review.
-- `src/scripts/board/board3d.ts`: the wooden board in three.js (camera angles, arrows, the replay).
+- `src/scripts/board/board3d.ts`: the wooden board in three.js: a folding board on a hinge (the case that opens on the
+  first visit of the day), camera angles, arrows, the replay, the mated king going over, promotions.
+- `src/scripts/celebrate.ts`: the streak's roll and the captured pieces popping in.
 - `src/scripts/board/board2d.ts`: the flat board, used only where WebGL fails (every page shows the 3D table).
 - `src/scripts/trainer.ts`, `src/data/repertoires.ts`: the opening trainer and its lines.
 - `src/data/puzzles.json`: 1,120 puzzles from the Lichess database (CC0), each solution checked with the engine.

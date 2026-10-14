@@ -43,6 +43,7 @@ import deviceMobile from '@phosphor-icons/core/assets/regular/device-mobile.svg?
 import linkSimple from '@phosphor-icons/core/assets/regular/link-simple.svg?raw';
 import arrowsClockwise from '@phosphor-icons/core/assets/regular/arrows-clockwise.svg?raw';
 import handshake from '@phosphor-icons/core/assets/regular/handshake.svg?raw';
+import handTap from '@phosphor-icons/core/assets/regular/hand-tap.svg?raw';
 
 const raw = {
   arrowCounterClockwise,
@@ -88,6 +89,7 @@ const raw = {
   linkSimple,
   arrowsClockwise,
   handshake,
+  handTap,
 };
 export type IconName = keyof typeof raw;
 

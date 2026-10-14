@@ -11,9 +11,10 @@ import { openingOf } from '../lib/openings.ts';
 import { addCard, load, loadGame, saveGame, update, type Progress } from '../lib/store.ts';
 import { inDanger } from '../lib/threats.ts';
 import { moveSound, winSound } from '../lib/sound.ts';
-import { createBoard, keepBoardStill, keyboard, type BoardView } from './board/index.ts';
+import { createBoard, keepBoardStill, keyboard, mateFall, type BoardView } from './board/index.ts';
 import type { Arrow, Side, Sq } from './board/types.ts';
 import { gsap, motionOn, onMotion, onTick } from './shell.ts';
+import { takenIcons, writeTaken } from './celebrate.ts';
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const START = new Chess().fen();
@@ -495,6 +496,7 @@ function endGame(resigned = false, flagged: Side | null = null) {
   }
   result = res;
   if (res === 'win') winSound();
+  if (chess.isCheckmate()) mateFall(() => board, chess.fen(), fen);
   const mine = verdicts.filter((v): v is Verdict => !!v);
   const acc = gameAccuracy(mine);
   const count = (g: Grade) => mine.filter((v) => v.grade === g).length;
@@ -988,6 +990,8 @@ onTick((dt) => {
   renderClock();
 });
 
+/** the captured pieces each side showed last time, so only a new one pops in */
+const takenSeen = new Map<string, Record<string, number>>();
 function renderPlayers() {
   // what each side has taken, from the pieces missing on the board
   const full: Record<string, number> = { p: 8, n: 2, b: 2, r: 2, q: 1 };
@@ -996,21 +1000,20 @@ function renderPlayers() {
   const val: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9 };
   const takenBy = (taker: Side) => {
     const victim: Side = taker === 'w' ? 'b' : 'w';
-    let html = '';
     let points = 0;
+    const counts: Record<string, number> = {};
     for (const k of ['q', 'r', 'b', 'n', 'p']) {
-      const n = Math.max(0, full[k] - have[victim][k]);
-      points += n * val[k];
-      for (let i = 0; i < n; i++) html += `<svg class="cap" aria-hidden="true"><use href="#pc-${victim}-${k}"/></svg>`;
+      counts[k] = Math.max(0, full[k] - have[victim][k]);
+      points += counts[k] * val[k];
     }
-    return { html, points };
+    return { html: takenIcons(takenSeen, taker, victim, counts), points };
   };
   const near = seat();
   const me = takenBy(near);
   const op = takenBy(near === 'w' ? 'b' : 'w');
   const diff = me.points - op.points;
-  ui.you.querySelector('[data-taken]')!.innerHTML = me.html + (diff > 0 ? `<span class="adv tabular">+${diff}</span>` : '');
-  ui.them.querySelector('[data-taken]')!.innerHTML = op.html + (diff < 0 ? `<span class="adv tabular">+${-diff}</span>` : '');
+  writeTaken(ui.you.querySelector('[data-taken]')!, me.html + (diff > 0 ? `<span class="adv tabular">+${diff}</span>` : ''));
+  writeTaken(ui.them.querySelector('[data-taken]')!, op.html + (diff < 0 ? `<span class="adv tabular">+${-diff}</span>` : ''));
   ui.them.querySelector('[data-name]')!.textContent = friend ? Cap(colourName(near === 'w' ? 'b' : 'w')) : `${level.bot} · Niveli ${level.n}`;
   ui.you.querySelector('.score__name')!.textContent = friend ? Cap(colourName(near)) : 'Ti';
   ui.them.toggleAttribute('data-turn', friend ? phase === 'user' && turn() !== near : phase === 'engine');

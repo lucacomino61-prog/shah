@@ -1,8 +1,12 @@
 // The home page: the board on its table under the lamp, the camera swinging slowly round it, and a programme
-// guide for today that knows where the learner stopped.
+// guide for today that knows where the learner stopped. On the first visit of the day the board lies shut in its
+// case: a tap opens it (with its sounds and a vibration, which a browser allows only after a touch), the pieces come
+// out of the seam one by one onto their squares, and the rest of the page rises in after them.
 
 import { LESSONS } from '../data/lessons.ts';
 import { levelOf } from '../lib/levels.ts';
+import { haptic } from '../lib/sound.ts';
+import { rollStreak } from './celebrate.ts';
 import { dueCards, load, loadGame, streakNow, today } from '../lib/store.ts';
 import { createBoard } from './board/index.ts';
 import { motionOn, onMotion, onTick } from './shell.ts';
@@ -55,6 +59,19 @@ function programme() {
 programme();
 window.addEventListener('shah:synced', programme);
 
+/** the streak as this page last showed it: when it has grown since, the number rolls up and the flame jumps */
+function streakRoll() {
+  const n = streakNow(load());
+  let seen: string | null = null;
+  try {
+    seen = localStorage.getItem('shah.streak.seen');
+    localStorage.setItem('shah.streak.seen', String(n));
+  } catch {
+    /* no memory of it: no roll */
+  }
+  if (seen !== null && n > Number(seen) && n > 0) rollStreak($('[data-streak-n]'), Number(seen), n, document.querySelector('[data-streak] .icon'));
+}
+
 (async () => {
   const board = await createBoard('3d', {
     host: $('[data-board]'),
@@ -66,10 +83,59 @@ window.addEventListener('shah:synced', programme);
   });
   board.setInteractive(false);
   board.setAngle?.(2);
-  board.setPosition('8/8/8/8/8/8/8/8 w - - 0 1', false);
-  // the pieces walk on from the edge of the table
-  setTimeout(() => board.setPosition(START, true), 250);
   board.orbit?.(motionOn() ? 0.12 : 0);
+  const html = document.documentElement;
+  const gate = $('[data-unbox]');
+  const host = $('[data-board]');
+  const remember = () => {
+    try {
+      localStorage.setItem('shah.unboxed', today());
+    } catch {
+      /* it opens again next time */
+    }
+  };
+  const reveal = () => {
+    remember();
+    delete html.dataset.hasUnbox;
+    streakRoll();
+  };
+  if (!('hasUnbox' in html.dataset) || !board.unbox || !board.fold) {
+    // a later visit today (or no case to open): the board is set
+    board.setPosition(START, false);
+    reveal();
+  } else {
+    board.fold(true);
+    host.style.opacity = '1';
+    let skip: (() => void) | null = null;
+    const open = () => {
+      if (gate.hasAttribute('data-opening')) return;
+      gate.setAttribute('data-opening', '');
+      // inside the touch: the one moment an iPhone allows a haptic tick
+      haptic(12);
+      remember();
+      skip = board.unbox!(START, { done: () => {
+        skip = null;
+        reveal();
+      } });
+    };
+    const skipAll = () => {
+      if (skip) return skip();
+      board.fold!(false);
+      board.setPosition(START, false);
+      reveal();
+    };
+    $('[data-unbox-open]').addEventListener('click', open);
+    $('[data-unbox-skip]').addEventListener('click', (e) => {
+      e.stopPropagation();
+      skipAll();
+    });
+    addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && 'hasUnbox' in html.dataset) skipAll();
+    });
+    onMotion((on) => {
+      if (!on) skipAll();
+    });
+  }
   onMotion((on) => {
     board.setMotion(on);
     board.orbit?.(on ? 0.12 : 0);

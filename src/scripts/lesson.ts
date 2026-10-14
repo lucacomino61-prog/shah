@@ -6,7 +6,7 @@ import { Engine } from '../lib/engine.ts';
 import { icon } from '../lib/icons.ts';
 import { sentenceHtml } from '../lib/notation.ts';
 import { update } from '../lib/store.ts';
-import { createBoard, keepBoardStill, keyboard, type BoardView } from './board/index.ts';
+import { createBoard, keepBoardStill, keyboard, mateFall, type BoardView } from './board/index.ts';
 import type { Side, Sq } from './board/types.ts';
 import { gsap, motionOn, onMotion, onTick } from './shell.ts';
 import { missSound, moveSound, winSound } from '../lib/sound.ts';
@@ -183,6 +183,7 @@ async function onMove(from: Sq, to: Sq) {
 
 function done(text: string) {
   winSound();
+  mateFall(() => board, chess.fen(), () => chess.fen());
   solved = true;
   busy = false;
   ui.task.hidden = false;
