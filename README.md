@@ -112,6 +112,8 @@ The second command asks for the value; it is in `server/.dev.vars`. The Worker's
 - `src/scripts/board/props.ts`: what stands on each room's table. `src/scripts/board/focus.ts`: the lens (depth of field)
   of the home screen and the opening.
 - `src/scripts/celebrate.ts`: the streak's roll and the captured pieces popping in.
+- `src/scripts/feel.ts`, `src/styles/feel.css`: how the app feels in the hand: the light and spring of a press, haptic
+  ticks, scroll-driven reveals and the folding title, the tab bar's lens and tuck, page transitions, swipe-down sheets.
 - `src/scripts/board/board2d.ts`: the flat board, used only where WebGL fails (every page shows the 3D table).
 - `src/scripts/trainer.ts`, `src/data/repertoires.ts`: the opening trainer and its lines.
 - `src/data/puzzles.json`: 1,120 puzzles from the Lichess database (CC0), each solution checked with the engine.

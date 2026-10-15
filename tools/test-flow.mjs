@@ -56,6 +56,11 @@ ok(cap.includes('Momenti kyç: lëvizja 2'), 'the turning point is the blunder',
 const strip = await page.$$eval('.strip__mv', (l) => l.map((b) => b.textContent.trim()));
 const now = await page.$eval('.strip__mv[aria-current]', (b) => b.dataset.ply);
 ok(strip.length === 4 && now === '3', 'the strip lists the moves with the last one current', `${strip.join(' ')} | current ${now}`);
+// the opponent may be saying something in the strip's place: a tap sends the line away first, as a person would
+if (await page.evaluate(() => !document.querySelector('[data-say]').hidden)) {
+  await page.click('[data-say]');
+  await new Promise((r) => setTimeout(r, 400));
+}
 await page.click('.strip__mv[data-ply="0"]');
 await sleep(500);
 const opened = await page.evaluate(() => [document.documentElement.dataset.mode, document.querySelector('.strip__mv[aria-current]')?.dataset.ply]);

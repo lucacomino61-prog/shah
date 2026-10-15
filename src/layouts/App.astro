@@ -1,5 +1,6 @@
 ---
 import '../styles/app.css';
+import '../styles/feel.css';
 import { icon } from '../lib/icons';
 import { pieceSprite } from '../lib/chess/silhouette';
 
@@ -72,6 +73,25 @@ import LookPicker from '../components/LookPicker.astro';
     {home && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     <style is:inline>@view-transition{navigation:auto}</style>
     <script is:inline>
+      // the kind of move between pages, for the view transition (styles/feel.css): deeper slides in from the right
+      // (push), back slides out (pop), between tabs a quick fade (tab); with motion off there is none
+      addEventListener('pagereveal', function (e) {
+        var vt = e.viewTransition;
+        if (!vt) return;
+        try {
+          if (localStorage.getItem('shah.motion') === 'off' || matchMedia('(prefers-reduced-motion: reduce)').matches) return vt.skipTransition();
+          var act = window.navigation && navigation.activation;
+          var from = act && act.from ? act.from.url : document.referrer;
+          if (!from || new URL(from).origin !== location.origin) return;
+          var depth = function (p) { return p.split('/').filter(Boolean).length; };
+          var a = depth(new URL(from).pathname);
+          var b = depth(location.pathname);
+          var kind = b > a ? 'push' : b < a ? 'pop' : 'tab';
+          if (vt.types) vt.types.add(kind);
+        } catch (err) {}
+      });
+    </script>
+    <script is:inline>
       try {
         if (localStorage.getItem('shah.motion') === 'off') document.documentElement.dataset.motion = 'off';
         var g = parseFloat(localStorage.getItem('shah.glass'));
@@ -90,11 +110,13 @@ import LookPicker from '../components/LookPicker.astro';
     <Fragment set:html={pieceSprite()} />
     <header class="mast">
       <a class="mast__mark" href="/" translate="no" aria-label="Shah, faqja kryesore">Shah</a>
+      {room && <span class="mast__title" aria-hidden="true">{title.split(' · ')[0]}</span>}
       <nav class="mast__nav" aria-label="Kryesore">
         {tabs.map((t) => (
           <a href={t.href} aria-current={tab === t.id ? 'page' : undefined}>
+            {tab === t.id && <span class="tabs__lens" aria-hidden="true" />}
             <Fragment set:html={icon(t.icon)} />
-            {t.label}
+            <span class="tabs__label">{t.label}</span>
           </a>
         ))}
       </nav>
@@ -110,14 +132,17 @@ import LookPicker from '../components/LookPicker.astro';
     <nav class="tabs" aria-label="Kryesore">
       {tabs.map((t) => (
         <a href={t.href} aria-current={tab === t.id ? 'page' : undefined}>
+          {tab === t.id && <span class="tabs__lens" aria-hidden="true" />}
           <Fragment set:html={icon(t.icon)} />
-          {t.label}
+          <span class="tabs__label">{t.label}</span>
         </a>
       ))}
     </nav>
     <script>
       import { initShell } from '../scripts/shell';
+      import { initFeel } from '../scripts/feel';
       initShell();
+      initFeel();
     </script>
     {import.meta.env.PROD && (
       <script is:inline>

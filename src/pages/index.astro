@@ -230,7 +230,7 @@ const START = [
   .dash__tile .dash__k { font-size: var(--t-cap2); }
   .dash__v { font-size: var(--t-foot); font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .dash__bar { display: block; height: 0.1875rem; margin-top: 0.25rem; border-radius: 999px; background: var(--fill); overflow: hidden; }
-  .dash__bar span { display: block; height: 100%; background: linear-gradient(90deg, #c99a52, #ecd29c); transform: scaleX(0); transform-origin: left; }
+  .dash__bar span { display: block; height: 100%; background: linear-gradient(90deg, #c99a52, #ecd29c); transform: scaleX(0); transform-origin: left; transition: transform 700ms var(--ease-out) 250ms; }
   .dash__opp:active, .dash__tile:active { transform: scale(0.98); }
   @media (hover: hover) and (pointer: fine) { .dash__opp:hover { background: var(--glass-press); } .dash__tile:hover { background: var(--fill); } }
 

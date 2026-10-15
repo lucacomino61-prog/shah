@@ -6,6 +6,7 @@ import { LESSONS } from '../data/lessons.ts';
 import { levelOf } from '../lib/levels.ts';
 import { portrait } from '../lib/bots.ts';
 import { accuracies, badges, scores, scoreWords } from '../lib/record.ts';
+import { countUp, settle } from './feel.ts';
 import { load, loadGame, save, saveGame, streakNow, today } from '../lib/store.ts';
 import { remindAt, remindHour, remindOff, remindSupport } from '../lib/remind.ts';
 import { joinSync, normalize, pretty, startSync, stopSync, syncNow, syncState, type SyncResult } from '../lib/sync.ts';
@@ -29,7 +30,7 @@ const CURE: Record<Tag, { href: string; label: string }> = {
   'f-pawn': { href: '/mesime/parimet-e-hapjes/', label: 'Mësimi: Parimet e hapjes' },
 };
 
-function render() {
+function render(first = false) {
   p = load();
   const wins = p.games.filter((g) => g.result === 'win').length;
   const draws = p.games.filter((g) => g.result === 'draw').length;
@@ -38,12 +39,19 @@ function render() {
   const avg = acc.length ? Math.round(acc.reduce((s, g) => s + (g.accuracy ?? 0), 0) / acc.length) : null;
   // the three figures
   const fig = (k: string, n: string, sub: string) => {
+    settle($(`[data-fig="${k}"]`));
     $(`[data-fig="${k}"]`).textContent = n;
     $(`[data-fig-sub="${k}"]`).textContent = sub;
   };
   fig('games', String(p.games.length), p.games.length ? `${wins} fitore, ${draws} ${draws === 1 ? 'barazim' : 'barazime'}, ${losses} humbje` : 'Ende asnjë lojë');
   fig('acc', avg === null ? '–' : `${avg}%`, avg === null ? 'Pas lojës së parë' : 'mesatarja e lojërave');
   fig('rating', String(p.puzzleRating), p.puzzlesTried ? `vlerësimi; ${p.puzzlesSolved} nga ${p.puzzlesTried} pa ndihmë` : 'vlerësimi fillestar');
+  // on arrival the three figures count up to where they stand (a later redraw, after sync, sets them at once)
+  if (first) {
+    countUp($('[data-fig="games"]'), p.games.length);
+    if (avg !== null) countUp($('[data-fig="acc"]'), avg, '%');
+    countUp($('[data-fig="rating"]'), p.puzzleRating);
+  }
   const rows: [string, string][] = [
     ['Mësime të kryera', `${LESSONS.filter((l) => p.lessons.includes(l.slug)).length} nga ${LESSONS.length}`],
     ['Ushtrimi i ditës', streakNow(p) ? `${streakNow(p)} ditë rresht` : 'Seria nuk ka filluar'],
@@ -104,7 +112,7 @@ function chart() {
   const y = (a: number) => T + ((100 - a) * (H - T - B)) / 100;
   const mean = Math.round(pts.reduce((s, q) => s + q.accuracy, 0) / pts.length);
   const grid = [100, 75, 50, 25].map((v) => `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text class="tick" x="${L - 8}" y="${y(v) + 4.5}" text-anchor="end">${v}</text>`).join('');
-  const trace = pts.length > 1 ? `<polyline class="trace" points="${pts.map((q, i) => `${x(i).toFixed(1)},${y(q.accuracy).toFixed(1)}`).join(' ')}"/>` : '';
+  const trace = pts.length > 1 ? `<polyline class="trace" pathLength="1" points="${pts.map((q, i) => `${x(i).toFixed(1)},${y(q.accuracy).toFixed(1)}`).join(' ')}"/>` : '';
   const dots = pts.map((q, i) => `<circle class="dot" data-r="${q.result}" cx="${x(i).toFixed(1)}" cy="${y(q.accuracy).toFixed(1)}" r="5.5"/>`).join('');
   svg.innerHTML = `${grid}<line class="avg" x1="${L}" x2="${W - R}" y1="${y(mean)}" y2="${y(mean)}"/>${trace}${dots}`;
   const first = pts[0].accuracy;
@@ -158,8 +166,8 @@ function medals() {
   }
 }
 
-render();
-window.addEventListener('shah:synced', render);
+render(true);
+window.addEventListener('shah:synced', () => render());
 
 // clearing everything takes two presses
 const reset = $<HTMLButtonElement>('[data-reset]');

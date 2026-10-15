@@ -212,9 +212,12 @@ a.tool, a.cue { text-decoration: none; }
   display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; padding: 0 1.0625rem; border-radius: 999px;
   background: var(--fill); color: var(--label);
   font-size: var(--t-sub); font-weight: 600; letter-spacing: -0.01em;
-  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-ui) ease, filter var(--dur-ui) ease;
+  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-ui) ease, filter var(--dur-ui) ease, opacity 240ms var(--ease-out);
   white-space: nowrap;
 }
+/* a cue that appears (after a move, at the end of a game) fades in where it will stay: opacity only, so a finger
+   already on its way lands where it aimed */
+@starting-style { .lower__actions .cue, .study__bar .cue, .end .cue { opacity: 0; } }
 .cue .icon { width: 1.125rem; height: 1.125rem; }
 .cue:active { transform: scale(0.95); }
 .cue:disabled { opacity: 0.38; cursor: not-allowed; }
@@ -362,8 +365,21 @@ html[data-motion="off"] .ticker__track { animation: none; }
 .setup::before { content: ""; display: block; width: 2.25rem; height: 0.3125rem; margin: 0.5rem auto 0; border-radius: 999px; background: var(--label-3); }
 @media (min-width: 640px) { .setup { margin: auto; } .setup::before { display: none; } }
 .setup::backdrop { background: rgb(0 0 0 / 0.42); }
-.setup[open] { animation: sheet-in 460ms var(--ease-sheet); }
-@keyframes sheet-in { from { transform: translateY(100%); } }
+/* phones: the sheet rises on the sheet curve and goes back down when it closes (by a button, Escape or a swipe on its
+   grabber, scripts/feel.ts); the dimming follows the finger while it is dragged */
+@media (max-width: 639px) {
+  .setup { transition: translate 440ms var(--ease-sheet), display 440ms allow-discrete, overlay 440ms allow-discrete; }
+  .setup:not([open]) { translate: 0 100%; transition-duration: 260ms; transition-timing-function: var(--ease-out); }
+  @starting-style { .setup[open] { translate: 0 100%; } }
+  .setup::backdrop { opacity: calc(1 - var(--drag, 0)); transition: opacity 260ms ease, display 260ms allow-discrete, overlay 260ms allow-discrete; }
+  .setup:not([open])::backdrop { opacity: 0; }
+  @starting-style { .setup[open]::backdrop { opacity: 0; } }
+}
+/* the grabber is a real handle (feel.ts puts it in), taller than the pill it draws; the sheet's title drags it too */
+.setup:has(.sheet-grab)::before { display: none; }
+.sheet-grab { position: relative; display: block; height: 1.75rem; margin-bottom: -0.875rem; cursor: grab; }
+.sheet-grab::after { content: ''; position: absolute; left: 50%; top: 0.5rem; width: 2.25rem; height: 0.3125rem; translate: -50% 0; border-radius: 999px; background: var(--label-3); }
+@media (min-width: 640px) { .sheet-grab { display: none; } }
 @media (min-width: 640px) {
   .setup[open] { animation: sheet-pop 320ms var(--ease-sheet); }
   @keyframes sheet-pop { from { transform: scale(0.94); opacity: 0; filter: blur(8px); } }

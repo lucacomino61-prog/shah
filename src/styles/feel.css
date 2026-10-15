@@ -1,0 +1,126 @@
+/* How the app feels in the hand (scripts/feel.ts holds the touch side). Luca, 2026-10-15: "make the buttons with
+   animation … scroll animation, make everything more like an application". Interface motion stays under 300 ms with
+   ease-out; the long, choreographed moves (a page sliding in) are only for navigation. Everything here stops with the
+   Stop-animations switch and with reduced motion: those get the finished state at once. */
+
+/* ------------------------------------------------------------------ an app, not a web page */
+/* the chrome is not text to select, the pictures are not files to save on a long press */
+:is(button, .btn, .cue, .tool, .tabs, .mast, .tile, .card, .pick, .dash__opp, .dash__tile, .stop__link, .row, .rung, .badge, .score__row, .strip, .segmented, .chapter__head, .stats, .look-open, .streak, label) {
+  -webkit-user-select: none; user-select: none;
+}
+img { -webkit-user-drag: none; -webkit-touch-callout: none; }
+/* the table does not rubber-band or pull to refresh under the board */
+html[data-stage] { overscroll-behavior-y: none; }
+
+/* ------------------------------------------------------------------ pressing */
+/* every control is its own stack, so the light under the finger sits above its fill and below its label */
+:where(.btn, .cue, .tool, .look-open, .streak, .tabs a, .mast__nav a, .motion-switch, .dash__opp, .dash__tile, .stop__link, .pick, .tile, .deck__step, .unbox__cue, a.row, button.row, label.row, .choice) {
+  position: relative; isolation: isolate;
+}
+.press-glow {
+  position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle var(--r, 6rem) at var(--x, 50%) var(--y, 50%), rgb(255 255 255 / 0.3), rgb(255 255 255 / 0.08) 45%, transparent 70%);
+}
+:is(.btn--solid, .cue--on) > .press-glow { background: radial-gradient(circle var(--r, 6rem) at var(--x, 50%) var(--y, 50%), rgb(255 255 255 / 0.5), rgb(255 255 255 / 0.14) 45%, transparent 72%); }
+/* on the light surfaces (the day room, the plain pages) a white light would not show: the tint does it */
+html:not([data-stage]):not([data-room]) .press-glow,
+html[data-world-tone='light'] .press-glow { background: radial-gradient(circle var(--r, 6rem) at var(--x, 50%) var(--y, 50%), color-mix(in srgb, var(--tint) 20%, transparent), transparent 70%); }
+@media (prefers-color-scheme: dark) { html:not([data-stage]):not([data-room]) .press-glow { background: radial-gradient(circle var(--r, 6rem) at var(--x, 50%) var(--y, 50%), rgb(255 255 255 / 0.22), transparent 70%); } }
+
+/* the symbol in a button presses in with it and springs back; a few act out what they do */
+:is(.btn, .cue, .tool, .look-open, .tabs a, .mast__nav a, .motion-switch, .deck__step, .unbox__cue, .streak) .icon {
+  transition: scale 420ms cubic-bezier(0.34, 1.56, 0.64, 1), rotate 560ms cubic-bezier(0.34, 1.56, 0.64, 1), translate 320ms var(--ease-sheet);
+}
+:is(.btn, .cue, .tool, .look-open, .tabs a, .mast__nav a, .motion-switch, .deck__step, .unbox__cue, .streak):active .icon { scale: 0.84; transition-duration: 90ms, 90ms, 320ms; }
+:is([data-new], [data-again]):active .icon { rotate: 90deg; }
+[data-undo]:active .icon { rotate: -70deg; }
+[data-flip]:active .icon { rotate: 180deg; }
+[data-look-open]:active .icon { rotate: -30deg; }
+.tool--menu:active .icon { rotate: 90deg; }
+[data-hint]:active .icon { scale: 1.2; }
+.streak:active .icon { scale: 1.3; rotate: -8deg; }
+
+/* the one primary action on a screen catches the light once, when it first shows */
+a.home__go, a.course__go {
+  background-image: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.36) 50%, transparent 65%);
+  background-size: 260% 100%; background-repeat: no-repeat; background-position: 160% 0;
+}
+html:not([data-has-unbox]) a.home__go, a.course__go { animation: sheen 1.25s 0.9s var(--ease-in-out) both; }
+@keyframes sheen { to { background-position: -70% 0; } }
+
+/* ------------------------------------------------------------------ the tab bar */
+/* the chosen tab sits on a lens that glides to the next tab as the page changes (a shared view transition) */
+.tabs__lens { position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--glass-press); pointer-events: none; }
+.tabs a[aria-current='page'] { background: none; }
+.mast__nav a { position: relative; isolation: isolate; }
+.mast__nav a[aria-current='page'] { background: none; }
+@media (max-width: 1023px) {
+  .tabs { view-transition-name: tabbar; }
+  .tabs .tabs__lens { view-transition-name: tab-lens; }
+  /* scrolling down, the bar tucks smaller and lets its labels go; scrolling up brings it back */
+  .tabs { transform-origin: 50% 100%; transition: transform 340ms var(--ease-sheet); }
+  .tabs__label { transition: opacity 200ms ease; }
+  html[data-tabs-min] .tabs { transform: translateY(0.375rem) scale(0.88); }
+  html[data-tabs-min] .tabs__label { opacity: 0; }
+  html[data-tabs-min] .tabs a .icon { translate: 0 0.4375rem; }
+}
+@media (min-width: 1024px) {
+  .mast { view-transition-name: mast; }
+  .mast__nav .tabs__lens { view-transition-name: tab-lens; }
+}
+html[data-room] .room-bg { view-transition-name: room; }
+
+/* ------------------------------------------------------------------ moving between pages */
+/* As iOS moves: deeper (a lesson from the course, Luaj from home) slides in from the right over the page it leaves,
+   which drifts left and dims; back slides it away to the right; between tabs the content trades places in a quick
+   fade while the tab bar stays and its lens glides. The head script names the kind (push, pop, tab). */
+::view-transition-group(*) { animation-duration: 340ms; animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1); }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 220ms; }
+html:active-view-transition-type(push)::view-transition-new(root) { animation: 340ms cubic-bezier(0.32, 0.72, 0, 1) both vt-from-right; }
+html:active-view-transition-type(push)::view-transition-old(root) { animation: 340ms cubic-bezier(0.32, 0.72, 0, 1) both vt-to-left; }
+html:active-view-transition-type(pop)::view-transition-old(root) { z-index: 1; animation: 300ms cubic-bezier(0.32, 0.72, 0, 1) both vt-to-right; }
+html:active-view-transition-type(pop)::view-transition-new(root) { animation: 300ms cubic-bezier(0.32, 0.72, 0, 1) both vt-from-left; }
+html:active-view-transition-type(tab)::view-transition-old(root) { animation: 160ms ease-out both vt-fade-out; }
+html:active-view-transition-type(tab)::view-transition-new(root) { animation: 220ms 40ms var(--ease-out) both vt-fade-in; }
+@keyframes vt-from-right { from { transform: translateX(100%); } }
+@keyframes vt-to-left { to { transform: translateX(-28%); filter: brightness(0.7); } }
+@keyframes vt-to-right { to { transform: translateX(100%); } }
+@keyframes vt-from-left { from { transform: translateX(-28%); filter: brightness(0.7); } }
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-fade-in { from { opacity: 0; transform: scale(0.985); } }
+
+/* ------------------------------------------------------------------ scrolling */
+/* Driven by the scroll itself (CSS scroll timelines, no script): cards rise into place as they come into view, the
+   large title folds into the bar, the course's numerals drift, the chart draws its line, the ladder's bars fill and
+   the medals are struck in turn. Where the browser has no scroll timelines, everything simply stands in place. */
+.mast__title { display: none; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    html:not([data-motion='off']) :is(.stop, .chapter__head, .rung, .badge, .chart, .stats, .facts, .page section > .group:not(.ladder), .page > .group, .record > *) {
+      animation: rise linear both; animation-timeline: view(); animation-range: entry 0% entry 75%;
+    }
+    html:not([data-motion='off']) .chapter__n { animation: drift linear both; animation-timeline: view(); animation-range: cover; }
+    html:not([data-motion='off']) .chart { view-timeline-name: --chart; }
+    html:not([data-motion='off']) .chart .trace { stroke-dasharray: 1; animation: draw linear both; animation-timeline: --chart; animation-range: entry 35% cover 50%; }
+    html:not([data-motion='off']) .chart .dot { animation: dot-in linear both; animation-timeline: --chart; animation-range: entry 60% cover 50%; transform-box: fill-box; transform-origin: center; }
+    html:not([data-motion='off']) .rung__bar { animation: fill-in linear both; animation-timeline: view(); animation-range: entry 30% entry 100%; }
+    html:not([data-motion='off']) .badge:not([data-new]) .medal { animation: strike-in linear both; animation-timeline: view(); animation-range: entry 10% entry 90%; }
+    /* the large title folds into the bar as the page scrolls, as in iOS */
+    html:not([data-motion='off']) .page-title { transform-origin: 0 100%; animation: title-fold linear both; animation-timeline: scroll(root); animation-range: 0 8rem; }
+    html:not([data-motion='off']) .mast__title {
+      display: block; position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+      font-family: var(--font-display); font-weight: 600; font-size: var(--t-title3); letter-spacing: -0.01em; white-space: nowrap; pointer-events: none;
+      animation: title-in linear both; animation-timeline: scroll(root); animation-range: 5rem 8.5rem;
+    }
+  }
+}
+/* a wide screen keeps its tabs in the middle of the bar, and they already say where the learner is */
+@media (min-width: 1024px) { .mast__title { display: none !important; } }
+@keyframes rise { from { opacity: 0; transform: translateY(1.75rem) scale(0.97); } }
+@keyframes drift { from { transform: translateY(1rem); } to { transform: translateY(-1rem); } }
+@keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes dot-in { from { opacity: 0; transform: scale(0.4); } }
+@keyframes fill-in { from { clip-path: inset(0 100% 0 0 round 999px); } to { clip-path: inset(0 0 0 0 round 999px); } }
+@keyframes strike-in { from { opacity: 0; transform: scale(0.7) rotate(-14deg); } 70% { opacity: 1; transform: scale(1.06) rotate(2deg); } to { transform: none; } }
+@keyframes title-fold { to { transform: translateY(-1.25rem) scale(0.82); opacity: 0; } }
+@keyframes title-in { from { opacity: 0; translate: -50% -30%; } to { opacity: 1; translate: -50% -50%; } }
