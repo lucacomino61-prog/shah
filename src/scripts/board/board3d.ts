@@ -362,6 +362,34 @@ function numberTexture(n: string): CanvasTexture {
 }
 
 /** A soft round glow: the light under a king in check. */
+/** The dark ring where a piece's felt meets the wood: almost black right at the rim of its base, gone a half radius
+ *  out. As alpha (the green channel); the base covers the middle. */
+function contactTexture(): CanvasTexture {
+  const s = 128;
+  const c = document.createElement('canvas');
+  c.width = c.height = s;
+  const g = c.getContext('2d')!;
+  g.fillStyle = '#000';
+  g.fillRect(0, 0, s, s);
+  const r = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+  // the base's rim lies at 0.67 of the radius: a near-black crease just outside it, then a soft shade
+  for (const [at, a] of [
+    [0, 0.85],
+    [0.64, 0.85],
+    [0.675, 0.66],
+    [0.71, 0.34],
+    [0.79, 0.16],
+    [0.9, 0.06],
+    [1, 0],
+  ] as const) {
+    const v = Math.round(a * 255);
+    r.addColorStop(at, `rgb(${v},${v},${v})`);
+  }
+  g.fillStyle = r;
+  g.fillRect(0, 0, s, s);
+  return new CanvasTexture(c);
+}
+
 function glowTexture(): CanvasTexture {
   const c = document.createElement('canvas');
   c.width = c.height = 128;
@@ -888,7 +916,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     const walnut = photo(realism.walnut, true, aniso);
     textures.push(maple, walnut);
     let n = 0;
-    turnedWood = (side) => lit(pieceMaterial(pieceSet, side, { maple, walnut, env: room, grain: new Vector2(((n * 0.618) % 1) * 3, ((n++ * 0.382) % 1) * 3) }));
+    turnedWood = (side) => lit(pieceMaterial(pieceSet, side, { maple, walnut, env: room, grain: new Vector2(((n * 0.618) % 1) * 3, ((n * 0.382) % 1) * 3), shade: ((n++ * 0.7548) % 1) * 2 - 1 }));
   }
   // boxwood: a fine pale grain under a thin lacquer (the lathe's UVs run the grain up the piece)
   const boxwood = grainTexture(256, '#f7ecd4', 'rgba(170,128,80,A)', 'rgba(255,248,230,A)', 41, 60);
@@ -919,6 +947,37 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     b.mesh.rotation.y = kind === 'n' ? knightYaw(b.side) : 0;
   }
 
+  // contact shadows: a soft dark ring on the wood under every standing piece (the shadow map is too soft to draw
+  // the line where the felt meets the board, and without it a piece floats)
+  const contactTex = contactTexture();
+  textures.push(contactTex);
+  const contactGeo = keep(new PlaneGeometry(1, 1).rotateX(-Math.PI / 2));
+  const contacts = new Map<Body, Mesh>();
+  /** where a piece at (x, z) stands: on the squares when the box lies open, else on the table */
+  const groundAt = (x: number, z: number) => (halves[0].position.y === 0 && halves[0].quaternion.w === 1 && Math.abs(x) <= F && Math.abs(z) <= F ? BOARD.top : 0);
+  function ground() {
+    for (const [b, disc] of contacts) {
+      const g = b.group;
+      if (!g.visible) {
+        disc.visible = false;
+        continue;
+      }
+      const q = g.quaternion;
+      // only an upright piece rests on its felt; one lying over, falling or turning keeps the shadow map's shadow
+      const up = 1 - 2 * (q.x * q.x + q.z * q.z);
+      const floor = groundAt(g.position.x, g.position.z);
+      const h = Math.max(0, g.position.y - floor);
+      const k = Math.max(0, Math.min(1, (up - 0.9) / 0.09)) * Math.max(0, 1 - h / 0.45);
+      disc.visible = k > 0.01;
+      if (!disc.visible) continue;
+      // lifted, the ring spreads and fades, as a shadow does
+      const d = girthOf(b.kind) * 3 * (1 + h * 1.2);
+      disc.scale.set(d, 1, d);
+      disc.position.set(g.position.x, floor + 0.003, g.position.z);
+      (disc.material as MeshBasicMaterial).opacity = k;
+    }
+  }
+
   function makeBody(side: Side, kind: Kind): Body {
     const group = new Group();
     const mesh = new Mesh(shapeOf(kind), turnedWood ? turnedWood(side) : side === 'w' ? ivory : ebony);
@@ -945,6 +1004,13 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     };
     setShape(b, kind);
     bodies.push(b);
+    const disc = new Mesh(
+      contactGeo,
+      own(new MeshBasicMaterial({ color: 0x0a0604, alphaMap: contactTex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })),
+    );
+    disc.visible = false;
+    board.add(disc);
+    contacts.set(b, disc);
     return b;
   }
 
@@ -2080,6 +2146,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
 
   const focusAt = new Vector3();
   function render() {
+    ground();
     if (shadowsStale || dirty) {
       renderer.shadowMap.needsUpdate = true;
       shadowsStale = false;
@@ -2333,6 +2400,8 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
         lens.at = { fov, ox: 0, oy: 0 };
         lens.to = { ...lens.at };
         camera.fov = fov;
+        // close enough to touch the pieces: the near plane comes in with it
+        camera.near = 0.3;
         camera.setViewOffset(W, H, 0, 0, W, H);
         camera.updateProjectionMatrix();
         camera.position.set(x, y, z);

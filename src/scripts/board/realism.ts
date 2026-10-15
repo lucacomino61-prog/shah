@@ -213,53 +213,62 @@ export function boxUV<T extends BufferGeometry>(g: T, unit: number): T {
   return g;
 }
 
-/** How each set is finished, White's piece and Black's. */
-const FINISH: Record<
-  PieceSetId,
-  Record<
-    'w' | 'b',
-    {
-      tint: [number, number, number];
-      wood: number;
-      rough: number;
-      coat: number;
-      coatRough: number;
-      env: number;
-      metal?: number;
-      glass?: { rough: number; tint: [number, number, number]; depth: number };
-    }
-  >
-> = {
-  // boxwood: maple taken to the warm pale yellow of the wood; ebony: walnut taken almost to black, a little brown left
+interface Finish {
+  tint: [number, number, number];
+  /** how much of the wood photograph shows (1 bare wood, a little under lacquer, none in glass and metal) */
+  wood: number;
+  /** the photograph's contrast and brightness: maple is pale and flat, turned boxwood shows its grain */
+  contrast: number;
+  gain: number;
+  rough: number;
+  /** how much the grain breaks the gloss: the dark lines of the grain are duller than the wood between them */
+  gloss: number;
+  /** the grain standing a hair proud of the polish, in squares (0: a smooth lacquer or crystal) */
+  relief: number;
+  coat: number;
+  coatRough: number;
+  env: number;
+  /** the soft light along the edges of waxed wood */
+  sheen?: [number, [number, number, number]];
+  metal?: number;
+  glass?: { rough: number; tint: [number, number, number]; depth: number };
+}
+
+/** How each set is finished, White's piece and Black's (Luca, 2026-10-15: "make the pieces look more realistic"). */
+const FINISH: Record<PieceSetId, Record<'w' | 'b', Finish>> = {
+  // boxwood under wax: pale yellow, its grain running up the piece, a soft satin shine that the grain breaks up;
+  // ebony under the same wax: almost black, brown streaks of grain in it, a satin shine (a mirror reads as plastic)
   wood: {
-    w: { tint: [0.92, 0.78, 0.56], wood: 1, rough: 0.42, coat: 0.55, coatRough: 0.14, env: 0.42 },
-    b: { tint: [0.08, 0.058, 0.045], wood: 1, rough: 0.42, coat: 0.6, coatRough: 0.2, env: 0.5 },
+    w: { tint: [0.9, 0.75, 0.5], wood: 1, contrast: 1.8, gain: 1.42, rough: 0.5, gloss: 0.4, relief: 0.0026, coat: 0.3, coatRough: 0.22, env: 0.5, sheen: [0.4, [0.55, 0.45, 0.3]] },
+    b: { tint: [0.1, 0.07, 0.052], wood: 1, contrast: 1.7, gain: 1.45, rough: 0.46, gloss: 0.4, relief: 0.0022, coat: 0.32, coatRough: 0.22, env: 0.42, sheen: [0.3, [0.26, 0.2, 0.15]] },
   },
   // lacquer over the wood: cream and oxblood, a deep wet shine with the grain faint under it
   lacquer: {
-    w: { tint: [0.9, 0.84, 0.7], wood: 0.2, rough: 0.32, coat: 1, coatRough: 0.035, env: 0.62 },
-    b: { tint: [0.17, 0.012, 0.011], wood: 0.22, rough: 0.32, coat: 1, coatRough: 0.035, env: 0.62 },
+    w: { tint: [0.9, 0.84, 0.7], wood: 0.3, contrast: 1.4, gain: 1.25, rough: 0.32, gloss: 0, relief: 0, coat: 1, coatRough: 0.035, env: 0.62 },
+    b: { tint: [0.17, 0.012, 0.011], wood: 0.3, contrast: 1.4, gain: 1.25, rough: 0.32, gloss: 0, relief: 0, coat: 1, coatRough: 0.035, env: 0.62 },
   },
   // clear crystal and frosted ruby
   glass: {
-    w: { tint: [1, 1, 1], wood: 0, rough: 0.06, coat: 0, coatRough: 0, env: 1.35, glass: { rough: 0.06, tint: [0.95, 0.99, 0.98], depth: 2.4 } },
-    b: { tint: [1, 0.92, 0.92], wood: 0, rough: 0.2, coat: 0, coatRough: 0, env: 1, glass: { rough: 0.2, tint: [0.62, 0.035, 0.07], depth: 0.24 } },
+    w: { tint: [1, 1, 1], wood: 0, contrast: 1, gain: 1, rough: 0.06, gloss: 0, relief: 0, coat: 0, coatRough: 0, env: 1.35, glass: { rough: 0.06, tint: [0.95, 0.99, 0.98], depth: 2.4 } },
+    b: { tint: [1, 0.92, 0.92], wood: 0, contrast: 1, gain: 1, rough: 0.2, gloss: 0, relief: 0, coat: 0, coatRough: 0, env: 1, glass: { rough: 0.2, tint: [0.62, 0.035, 0.07], depth: 0.24 } },
   },
-  // polished silver and gold
+  // polished silver and gold, with the faint streaks of the polishing running up the piece
   metal: {
-    w: { tint: [0.93, 0.93, 0.95], wood: 0, rough: 0.17, coat: 0, coatRough: 0, env: 1, metal: 1 },
-    b: { tint: [1, 0.74, 0.32], wood: 0, rough: 0.2, coat: 0, coatRough: 0, env: 1, metal: 1 },
+    w: { tint: [0.93, 0.93, 0.95], wood: 0, contrast: 2, gain: 1.4, rough: 0.17, gloss: 0.55, relief: 0, coat: 0, coatRough: 0, env: 1, metal: 1 },
+    b: { tint: [1, 0.74, 0.32], wood: 0, contrast: 2, gain: 1.4, rough: 0.2, gloss: 0.55, relief: 0, coat: 0, coatRough: 0, env: 1, metal: 1 },
   },
 };
 
 /**
  * A piece of the chosen set. Wood and lacquer take the wood photograph projected from three sides in the piece's
  * own space, its grain turned to run up the axis and blended by the surface direction (no seams, whatever the
- * shape); glass and metal take their colour alone. In every set the hollows of the carving darken by the shape's own
- * `ao` (more in the room's light than under the lamp), and the felt pad under the base stays green baize.
- * `grain` shifts the projection so no two pieces share the same figure.
+ * shape): the colour, a gloss that the grain breaks up, and on bare wood a relief a hair high under the wax. Metal
+ * takes only the streaks. In every set the hollows of the carving darken by the shape's own `ao` (more in the room's
+ * light than under the lamp), and the felt pad under the base stays green baize. `grain` shifts the projection so no
+ * two pieces share the same figure, and `shade` (-1 to 1) makes each a shade lighter or darker, as the pieces of a
+ * real set are.
  */
-export function pieceMaterial(set: PieceSetId, side: 'w' | 'b', opts: { maple: Texture; walnut: Texture; env: Texture; grain: Vector2 }): MeshPhysicalMaterial {
+export function pieceMaterial(set: PieceSetId, side: 'w' | 'b', opts: { maple: Texture; walnut: Texture; env: Texture; grain: Vector2; shade?: number }): MeshPhysicalMaterial {
   const f = FINISH[set][side];
   const m = new MeshPhysicalMaterial({
     color: 0xffffff,
@@ -270,6 +279,11 @@ export function pieceMaterial(set: PieceSetId, side: 'w' | 'b', opts: { maple: T
     envMap: opts.env,
     envMapIntensity: f.env,
   });
+  if (f.sheen) {
+    m.sheen = f.sheen[0];
+    m.sheenRoughness = 0.5;
+    m.sheenColor = new Color(...f.sheen[1]);
+  }
   if (f.glass) {
     m.transmission = 1;
     m.thickness = 0.5;
@@ -279,14 +293,20 @@ export function pieceMaterial(set: PieceSetId, side: 'w' | 'b', opts: { maple: T
     m.attenuationDistance = f.glass.depth;
     m.specularIntensity = 1;
   }
-  const wood = f.wood > 0;
+  const grain = f.wood > 0 || f.gloss > 0;
   const felt = !f.glass;
+  const relief = f.relief > 0;
   // added to the material's own STANDARD and PHYSICAL
-  m.defines = { ...m.defines, ...(wood ? { WOOD: '' } : {}), ...(felt ? { FELT: '' } : {}) };
+  m.defines = { ...m.defines, ...(grain ? { GRAIN: '' } : {}), ...(felt ? { FELT: '' } : {}), ...(relief ? { RELIEF: '' } : {}) };
+  const shade = 1 + 0.06 * (opts.shade ?? 0);
   const uniforms = {
     uWood: { value: side === 'w' ? opts.maple : opts.walnut },
-    uTint: { value: new Color(...f.tint) },
+    uTint: { value: new Color(...f.tint).multiplyScalar(shade) },
     uWoodMix: { value: f.wood },
+    uContrast: { value: f.contrast },
+    uGain: { value: f.gain },
+    uGloss: { value: f.gloss },
+    uRelief: { value: f.relief },
     uGrain: { value: opts.grain },
     uFelt: { value: new Color(0x21402e) },
   };
@@ -298,13 +318,15 @@ export function pieceMaterial(set: PieceSetId, side: 'w' | 'b', opts: { maple: T
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        '#include <common>\nvarying vec3 vObjPos;\nvarying vec3 vObjNormal;\nvarying float vAo;\nuniform sampler2D uWood;\nuniform vec3 uTint;\nuniform float uWoodMix;\nuniform vec2 uGrain;\nuniform vec3 uFelt;',
+        '#include <common>\nvarying vec3 vObjPos;\nvarying vec3 vObjNormal;\nvarying float vAo;\nuniform sampler2D uWood;\nuniform vec3 uTint;\nuniform float uWoodMix;\nuniform float uContrast;\nuniform float uGain;\nuniform float uGloss;\nuniform float uRelief;\nuniform vec2 uGrain;\nuniform vec3 uFelt;',
       )
       .replace(
         '#include <map_fragment>',
         `
         vec3 base = uTint;
-        #ifdef WOOD
+        // the height of the grain, 0 in its dark lines to 1 between them
+        float woodH = 0.5;
+        #ifdef GRAIN
           // the photograph from three sides, its grain (along the picture's width) turned to run up the piece
           vec3 wn = abs(normalize(vObjNormal));
           wn = pow(wn, vec3(4.0));
@@ -313,7 +335,9 @@ export function pieceMaterial(set: PieceSetId, side: 'w' | 'b', opts: { maple: T
           vec3 wx = texture2D(uWood, vec2(vObjPos.y, vObjPos.z) * WOOD_SCALE + uGrain).rgb;
           vec3 wz = texture2D(uWood, vec2(vObjPos.y, vObjPos.x) * WOOD_SCALE + uGrain.yx).rgb;
           vec3 wy = texture2D(uWood, vObjPos.xz * WOOD_SCALE + uGrain * 1.7).rgb;
-          base = mix(uTint, (wx * wn.x + wy * wn.y + wz * wn.z) * uTint * 1.25, uWoodMix);
+          vec3 w = pow(wx * wn.x + wy * wn.y + wz * wn.z, vec3(uContrast)) * uGain;
+          woodH = clamp(dot(w, vec3(0.333)) / uGain * 1.6 - 0.3, 0.0, 1.0);
+          base = mix(uTint, w * uTint, uWoodMix);
         #endif
         float feltPad = 0.0;
         #ifdef FELT
@@ -323,7 +347,31 @@ export function pieceMaterial(set: PieceSetId, side: 'w' | 'b', opts: { maple: T
         diffuseColor.rgb *= mix(base, uFelt, feltPad);
         `,
       )
-      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = mix(roughnessFactor, 1.0, feltPad);')
+      .replace(
+        '#include <roughnessmap_fragment>',
+        `#include <roughnessmap_fragment>
+        // the grain's dark lines hold less shine than the wood between them, so the highlight breaks along the grain
+        roughnessFactor = clamp(roughnessFactor * (1.0 + uGloss * (0.5 - woodH) * 2.0), 0.04, 1.0);
+        roughnessFactor = mix(roughnessFactor, 1.0, feltPad);`,
+      )
+      .replace(
+        '#include <normal_fragment_maps>',
+        `#include <normal_fragment_maps>
+        #ifdef RELIEF
+        {
+          // the grain a hair proud of the wax: a bump from its height, measured across the pixel
+          vec3 dpdx = dFdx(-vViewPosition);
+          vec3 dpdy = dFdy(-vViewPosition);
+          float hx = dFdx(woodH) * uRelief;
+          float hy = dFdy(woodH) * uRelief;
+          vec3 r1 = cross(dpdy, normal);
+          vec3 r2 = cross(normal, dpdx);
+          float det = dot(dpdx, r1);
+          vec3 grad = sign(det) * (hx * r1 + hy * r2);
+          normal = normalize(abs(det) * normal - grad);
+        }
+        #endif`,
+      )
       .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor *= 1.0 - feltPad;')
       .replace('#include <lights_physical_fragment>', '#include <lights_physical_fragment>\n#ifdef USE_CLEARCOAT\nmaterial.clearcoat *= 1.0 - feltPad;\n#endif')
       .replace(
@@ -336,6 +384,9 @@ export function pieceMaterial(set: PieceSetId, side: 'w' | 'b', opts: { maple: T
         #if defined( USE_CLEARCOAT )
           clearcoatSpecularIndirect *= ambientOcclusion;
         #endif
+        #if defined( USE_SHEEN )
+          sheenSpecularIndirect *= ambientOcclusion;
+        #endif
         #if defined( USE_ENVMAP ) && defined( STANDARD )
           float dotNVao = saturate( dot( geometryNormal, geometryViewDir ) );
           reflectedLight.indirectSpecular *= computeSpecularOcclusion( dotNVao, ambientOcclusion, material.roughness );
@@ -343,6 +394,6 @@ export function pieceMaterial(set: PieceSetId, side: 'w' | 'b', opts: { maple: T
         `,
       );
   };
-  m.customProgramCacheKey = () => `shah-piece-${wood ? 1 : 0}${felt ? 1 : 0}`;
+  m.customProgramCacheKey = () => `shah-piece-${grain ? 1 : 0}${felt ? 1 : 0}${relief ? 1 : 0}`;
   return m;
 }
