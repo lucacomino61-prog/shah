@@ -121,10 +121,11 @@ The second command asks for the value; it is in `server/.dev.vars`. The Worker's
 
 ```bash
 node tools/build-realism.mjs <polyhaven-download-dir>   # veneers, table woods, velvet, the four rooms (HDRIs halved)
-node tools/knight-mesh.mjs <knight.glb> [18000] [0]     # the carved knight: simplified, scaled, occlusion baked in
+node tools/knight-mesh.mjs <knight.glb> 8000 0 knight.bin       # the carved knight: simplified, scaled, occlusion baked in
+node tools/knight-mesh.mjs <knight.glb> 1200 0 knight-lo.bin    # its stand-in for the shadow map and the reflection
 ```
 
-The download dir holds the 1k files from api.polyhaven.com: white_maple_veneer, walnut_veneer_02, dark_wood,
+The download dir holds the 1k files from api.polyhaven.com: white_maple_veneer, walnut_veneer_02, rosewood_veneer1, dark_wood,
 lacquered_cherry_wood, oak_veneer_01, smoked_walnut_veneer and velour_velvet (diffuse, nor_gl, rough), and the HDRIs
 billiard_hall, cayley_interior, fireplace and warm_restaurant_night. The knight's GLB was generated on Higgsfield
 (a GPT Image photograph of a boxwood Staunton knight, lifted to 3D with Hunyuan3D v3, geometry only).

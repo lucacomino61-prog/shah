@@ -20,6 +20,13 @@ export interface PieceShape {
 
 type P = [number, number];
 
+/** How finely the set is made: the share of the profile's points kept, and the segments round the axis. The pieces on
+ *  the table are made at about 0.6 and 56 (fine at any size a phone shows them, a third of the triangles of the first
+ *  cut); the stand-ins the shadow map and the lacquer's reflection draw at 0.35 and 24. */
+let detail = 1;
+let segments = 96;
+const steps = (n: number) => Math.max(1, Math.round(n * detail));
+
 /** A turner's profile, drawn from the middle of the base outwards and up: straight runs, arcs, smooth curves. */
 class Pen {
   pts: P[] = [];
@@ -36,12 +43,14 @@ class Pen {
     return this;
   }
   to(r: number, y: number, n = 1) {
+    n = steps(n);
     const [r0, y0] = this.at;
     for (let i = 1; i <= n; i++) this.pts.push([r0 + ((r - r0) * i) / n, y0 + ((y - y0) * i) / n]);
     return this;
   }
   /** an arc round (cr, cy): angles from the outward direction, a quarter turn is straight up */
   arc(cr: number, cy: number, rad: number, a0: number, a1: number, n = 8) {
+    n = Math.max(2, steps(n));
     for (let i = 1; i <= n; i++) {
       const a = a0 + ((a1 - a0) * i) / n;
       this.pts.push([cr + rad * Math.cos(a), cy + rad * Math.sin(a)]);
@@ -50,6 +59,7 @@ class Pen {
   }
   /** a hollow (a cove) from here to (r, y): a quarter ellipse whose centre lies outside the wood */
   cove(r: number, y: number, n = 12) {
+    n = Math.max(2, steps(n));
     const [r0, y0] = this.at;
     for (let i = 1; i <= n; i++) {
       const t = ((Math.PI / 2) * i) / n;
@@ -61,6 +71,7 @@ class Pen {
   }
   /** a rounded shoulder (convex) from here to (r, y) */
   round(r: number, y: number, n = 10) {
+    n = Math.max(2, steps(n));
     const [r0, y0] = this.at;
     for (let i = 1; i <= n; i++) {
       const t = ((Math.PI / 2) * i) / n;
@@ -71,6 +82,7 @@ class Pen {
   }
   /** a long smooth curve through these points */
   curve(points: P[], n = 24) {
+    n = Math.max(3, steps(n));
     const c = new SplineCurve([new Vector2(...this.at), ...points.map(([r, y]) => new Vector2(r, y))]);
     c.getPoints(n)
       .slice(1)
@@ -79,6 +91,7 @@ class Pen {
   }
   /** the stem: narrowing from here to (r, y) along a gentle hollow, as turned stems are */
   stem(r: number, y: number, n = 18, bow = 2.3) {
+    n = Math.max(3, steps(n));
     const [r0, y0] = this.at;
     for (let i = 1; i <= n; i++) {
       const t = i / n;
@@ -148,15 +161,13 @@ function profileNormals(pts: P[]): P[] {
   });
 }
 
-const SEGMENTS = 96;
-
 /** Turn a profile into a closed ring of faces (no seam: the last segment joins the first). `shape` may move the points
  *  of the profile rows between `from` and `to` (theta round the axis, j the row); those rows get their normals from the
  *  moved faces, the rest keep the profile's exact ones. */
 function turn(pen: Pen, shape?: { from: number; to: number; move: (v: [number, number, number], theta: number, j: number) => void }): BufferGeometry {
   const pts = pen.pts;
   const n = pts.length;
-  const S = SEGMENTS;
+  const S = segments;
   const normals = profileNormals(pts);
   const shade = profileShade(pts, normals);
   const pos = new Float32Array(S * n * 3);
@@ -279,7 +290,7 @@ function rook(): BufferGeometry {
     s.absarc(0, 0, r1, a0, a1, false);
     s.lineTo(r0 * Math.cos(a1), r0 * Math.sin(a1));
     s.absarc(0, 0, r0, a1, a0, true);
-    const g = new ExtrudeGeometry(s, { depth: 0.074, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 3, curveSegments: 10 });
+    const g = new ExtrudeGeometry(s, { depth: 0.074, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: Math.max(1, steps(3)), curveSegments: Math.max(2, steps(10)) });
     // the shape lies in x-y and is pushed out along z: stand it up, its foot sunk into the rim
     g.rotateX(-Math.PI / 2).translate(0, 0.906, 0);
     merlons.push(open(g));
@@ -305,7 +316,7 @@ function bishop(): BufferGeometry {
         [0.046, 1.226],
         [0.036, 1.238],
       ],
-      44,
+      72,
     )
     .mark('mitreTop')
     .round(0.046, 1.246, 4)
@@ -383,7 +394,7 @@ function queen(): BufferGeometry {
   const pearls: BufferGeometry[] = [];
   for (let k = 0; k < POINTS; k++) {
     const a = (k / POINTS) * Math.PI * 2;
-    const s = new SphereGeometry(0.021, 14, 10);
+    const s = new SphereGeometry(0.021, Math.max(6, steps(14)), Math.max(4, steps(10)));
     s.translate(0.206 * Math.sin(a), 1.392, 0.206 * Math.cos(a));
     pearls.push(open(s));
   }
@@ -429,7 +440,7 @@ function king(): BufferGeometry {
   s.lineTo(-w0, -w0);
   s.closePath();
   const bevel = 0.01;
-  const cross = new ExtrudeGeometry(s, { depth: 0.044, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 3 });
+  const cross = new ExtrudeGeometry(s, { depth: 0.044, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: Math.max(1, steps(3)) });
   cross.translate(0, 1.42 + low, -0.022);
   return merge([body, open(cross)]);
 }
@@ -484,14 +495,30 @@ const widest = (g: BufferGeometry) => {
   return { r, top };
 };
 
-/** The whole set: the five turned pieces made here, the knight from its file. */
-export function stauntonSet(knight: PieceShape): Record<Kind, PieceShape> {
+function makeAll(fine: number, round: number): Record<Exclude<Kind, 'n'>, BufferGeometry> {
+  detail = fine;
+  segments = round;
   const made = { p: pawn(), r: rook(), b: bishop(), q: queen(), k: king() };
-  const out = { n: knight } as Record<Kind, PieceShape>;
-  for (const [kind, g] of Object.entries(made) as [Kind, BufferGeometry][]) {
+  detail = 1;
+  segments = 96;
+  return made;
+}
+
+/** The whole set: the five turned pieces made here, the knight from its file; and for each piece a coarse stand-in
+ *  that only the shadow map draws (the shadow is soft: it cannot show the difference, and the frame is spared it). */
+export function stauntonSet(knight: PieceShape, knightShadow: PieceShape): { pieces: Record<Kind, PieceShape>; shadows: Record<Kind, BufferGeometry> } {
+  const fine = makeAll(0.6, 56);
+  // fine enough to stand in for the piece in its own reflection too
+  const coarse = makeAll(0.35, 24);
+  const pieces = { n: knight } as Record<Kind, PieceShape>;
+  const shadows = { n: knightShadow.geometry } as Record<Kind, BufferGeometry>;
+  for (const [kind, g] of Object.entries(fine) as [Kind, BufferGeometry][]) {
     g.computeBoundingSphere();
     const { r, top } = widest(g);
-    out[kind] = { geometry: g, girth: r, height: top };
+    pieces[kind] = { geometry: g, girth: r, height: top };
+    const lo = coarse[kind as Exclude<Kind, 'n'>];
+    lo.computeBoundingSphere();
+    shadows[kind] = lo;
   }
-  return out;
+  return { pieces, shadows };
 }

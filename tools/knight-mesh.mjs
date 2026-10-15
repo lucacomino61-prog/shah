@@ -2,7 +2,8 @@
 // for the picture, Hunyuan3D v3 for the geometry, 2026-10-14), cut down to a size a phone draws easily and written
 // as public/realism/knight.bin for src/scripts/board/staunton.ts.
 //
-//   node tools/knight-mesh.mjs <knight.glb> [triangles=18000] [yawDegrees=0]
+//   node tools/knight-mesh.mjs <knight.glb> [triangles=8000] [yawDegrees=0] [out=knight.bin]
+//   node tools/knight-mesh.mjs <knight.glb> 1200 0 knight-lo.bin    (the stand-in the shadow map draws)
 //
 // Steps: read the GLB's triangles, weld the vertices, simplify with meshoptimizer, stand it on y = 0 with its turned
 // base centred on the axis, scale it to HEIGHT squares (yaw 0 leaves the head looking along -x), bake an occlusion
@@ -15,14 +16,14 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { MeshoptSimplifier } from 'meshoptimizer';
 
-const [, , file, trisArg = '18000', yawArg = '0'] = process.argv;
+const [, , file, trisArg = '8000', yawArg = '0', outName = 'knight.bin'] = process.argv;
 if (!file) {
-  console.error('usage: node tools/knight-mesh.mjs <knight.glb> [triangles] [yawDegrees]');
+  console.error('usage: node tools/knight-mesh.mjs <knight.glb> [triangles] [yawDegrees] [out]');
   process.exit(1);
 }
 /** the knight's height and base radius, in squares (a tournament Staunton: 2.9 in on 2.25 in squares) */
 const HEIGHT = 1.28;
-const OUT = new URL('../public/realism/knight.bin', import.meta.url);
+const OUT = new URL('../public/realism/' + outName, import.meta.url);
 
 // ---------------------------------------------------------------- GLB
 const glb = readFileSync(file);
@@ -214,4 +215,4 @@ const head = Buffer.alloc(4);
 head.writeUInt32LE(header.length + pad);
 const out = Buffer.concat([head, header, Buffer.alloc(pad, 0x20), Buffer.from(q.buffer), Buffer.from(n8.buffer), Buffer.from(ind16.buffer), Buffer.from(ao.buffer)]);
 writeFileSync(OUT, out);
-console.log('knight.bin', out.length, 'bytes;', count, 'vertices,', tris.length / 3, 'triangles; girth', girth.toFixed(3), 'base axis at', cx.toFixed(3), cz.toFixed(3));
+console.log(outName, out.length, 'bytes;', count, 'vertices,', tris.length / 3, 'triangles; girth', girth.toFixed(3), 'base axis at', cx.toFixed(3), cz.toFixed(3));

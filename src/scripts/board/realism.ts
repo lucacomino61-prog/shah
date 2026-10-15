@@ -46,9 +46,14 @@ export interface Realism {
   walnutR: HTMLImageElement;
   mahogany: HTMLImageElement;
   mahoganyR: HTMLImageElement;
+  /** the luxury board: dark squares, frame and case */
+  rosewood: HTMLImageElement;
+  rosewoodR: HTMLImageElement;
   velvet: HTMLImageElement;
   velvetN: HTMLImageElement;
   pieces: Record<Kind, PieceShape>;
+  /** the coarse stand-in of each piece that the shadow map draws */
+  shadows: Record<Kind, BufferGeometry>;
   room: Room;
 }
 
@@ -77,22 +82,28 @@ export async function loadRoom(world: WorldId): Promise<Room> {
 
 export async function loadRealism(world: WorldId): Promise<Realism | null> {
   try {
-    const [maple, mapleR, walnut, walnutR, mahogany, mahoganyR, velvet, velvetN, knight, room] = await Promise.all([
+    const bin = (name: string) =>
+      fetch(BASE + name).then((r) => {
+        if (!r.ok) throw new Error(name);
+        return r.arrayBuffer();
+      });
+    const [maple, mapleR, walnut, walnutR, mahogany, mahoganyR, rosewood, rosewoodR, velvet, velvetN, knight, knightLo, room] = await Promise.all([
       image('maple.webp'),
       image('maple-r.webp'),
       image('walnut.webp'),
       image('walnut-r.webp'),
       image('mahogany.webp'),
       image('mahogany-r.webp'),
+      image('rosewood.webp'),
+      image('rosewood-r.webp'),
       image('velvet.webp'),
       image('velvet-n.webp'),
-      fetch(BASE + 'knight.bin').then((r) => {
-        if (!r.ok) throw new Error('knight.bin');
-        return r.arrayBuffer();
-      }),
+      bin('knight.bin'),
+      bin('knight-lo.bin'),
       loadRoom(world),
     ]);
-    return { maple, mapleR, walnut, walnutR, mahogany, mahoganyR, velvet, velvetN, pieces: stauntonSet(parseKnight(knight)), room };
+    const set = stauntonSet(parseKnight(knight), parseKnight(knightLo));
+    return { maple, mapleR, walnut, walnutR, mahogany, mahoganyR, rosewood, rosewoodR, velvet, velvetN, pieces: set.pieces, shadows: set.shadows, room };
   } catch {
     return null;
   }
@@ -105,6 +116,28 @@ export function roomLight(renderer: WebGLRenderer, room: Room): Texture {
   const env = pmrem.fromEquirectangular(room.hdr).texture;
   pmrem.dispose();
   return env;
+}
+
+/**
+ * A lacquered finish that shows the room but not the lamp (Luca, 2026-10-13: "make the light to not reflect on the
+ * board"): the lamp's own highlight on the coat and in the wood is turned down to `keep`, the room's reflection stays.
+ */
+export function noGlare<T extends MeshPhysicalMaterial>(m: T, keep = 0.1): T {
+  const prev = m.onBeforeCompile;
+  m.onBeforeCompile = (shader, renderer) => {
+    prev?.call(m, shader, renderer);
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <lights_fragment_end>',
+      `#include <lights_fragment_end>
+      reflectedLight.directSpecular *= ${keep.toFixed(3)};
+      #ifdef USE_CLEARCOAT
+        clearcoatSpecularDirect *= ${keep.toFixed(3)};
+      #endif`,
+    );
+  };
+  const key = m.customProgramCacheKey.bind(m);
+  m.customProgramCacheKey = () => `${key()}-noglare${keep}`;
+  return m;
 }
 
 /** A photograph as a repeating texture. `gltf`: a map baked for a glTF model, whose UVs start at the top. */
@@ -137,8 +170,8 @@ export function squareMaps(r: Realism, size: number): { map: CanvasTexture; roug
   for (let rank = 0; rank < 8; rank++)
     for (let file = 0; file < 8; file++) {
       const light = (file + rank) % 2 === 1;
-      const img = light ? r.maple : r.walnut;
-      const rimg = light ? r.mapleR : r.walnutR;
+      const img = light ? r.maple : r.rosewood;
+      const rimg = light ? r.mapleR : r.rosewoodR;
       const x = file * cell;
       const y = (7 - rank) * cell;
       // a leaf about a third of the photograph wide: several grain lines to a square, never two squares alike
@@ -147,11 +180,9 @@ export function squareMaps(r: Realism, size: number): { map: CanvasTexture; roug
       const sy = rnd() * (img.height - crop);
       g.drawImage(img, sx, sy, crop, crop, x, y, cell, cell);
       g.globalCompositeOperation = 'multiply';
-      // walnut over itself: deeper, and its grain stands out again
-      if (!light) g.drawImage(img, sx, sy, crop, crop, x, y, cell, cell);
       const v = 0.93 + rnd() * 0.1;
-      // maple to the honey of an oiled board; walnut to the deep brown of an inlaid one
-      g.fillStyle = light ? `rgb(${(236 * v) | 0},${(212 * v) | 0},${(174 * v) | 0})` : `rgb(${(182 * v) | 0},${(132 * v) | 0},${(100 * v) | 0})`;
+      // maple to the honey of a lacquered board; rosewood a shade deeper, its red and its figure kept
+      g.fillStyle = light ? `rgb(${(236 * v) | 0},${(212 * v) | 0},${(174 * v) | 0})` : `rgb(${(196 * v) | 0},${(150 * v) | 0},${(132 * v) | 0})`;
       g.fillRect(x, y, cell, cell);
       g.globalCompositeOperation = 'source-over';
       const rs = rimg.width * 0.3;

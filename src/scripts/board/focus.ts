@@ -1,6 +1,6 @@
 // The lens of a photograph: what lies at the focus is sharp, what lies nearer or further melts away (Chess Ultra and
 // Pure Chess shoot their boards this way; Luca chose it for the home screen and the opening, 2026-10-14). The scene
-// renders once into a target that keeps its depth; a half-size pass gathers each pixel's neighbours over a disc as
+// renders once into a target that keeps its depth; a half-size pass gathers (12 samples) each pixel's neighbours over a disc as
 // wide as its distance from the focus calls for; the last pass lays the blur over the sharp picture by that same
 // distance, and does the tone mapping and colour conversion the screen would have done.
 
@@ -53,8 +53,8 @@ void main() {
   float weight = 1.0;
   // a golden-angle disc of samples; a sample counts if its own blur reaches this pixel, so a sharp piece in front
   // keeps its edge while the room behind it melts
-  for (int i = 0; i < 20; i++) {
-    float r = sqrt(float(i) + 0.5) / sqrt(20.0);
+  for (int i = 0; i < 12; i++) {
+    float r = sqrt(float(i) + 0.5) / sqrt(12.0);
     float a = float(i) * 2.39996;
     vec2 off = vec2(cos(a), sin(a)) * r * max(c, 0.5) * texel;
     vec2 uv = vUv + off;
@@ -85,13 +85,15 @@ export interface Focus {
   /** draw the scene through the lens, focused `distance` from the camera */
   render(scene: Scene, camera: PerspectiveCamera, distance: number): void;
   setSize(width: number, height: number): void;
+  /** compile the scene's programs for the lens's own target (its colour space and tone mapping differ from the screen's) */
+  compile(scene: Scene, camera: PerspectiveCamera): void;
   dispose(): void;
 }
 
 /** `aperture`: how fast things leave focus; `maxBlur`: the widest disc, in pixels on the screen (CSS pixels). */
 export function createFocus(renderer: WebGLRenderer, opts: { aperture: number; maxBlur: number }): Focus {
   const size = new Vector2();
-  const sharp = new WebGLRenderTarget(1, 1, { type: HalfFloatType, samples: 4, depthTexture: new DepthTexture(1, 1, UnsignedIntType) });
+  const sharp = new WebGLRenderTarget(1, 1, { type: HalfFloatType, samples: 2, depthTexture: new DepthTexture(1, 1, UnsignedIntType) });
   const soft = new WebGLRenderTarget(1, 1, { type: HalfFloatType, depthBuffer: false });
   const shared = {
     tDepth: { value: sharp.depthTexture },
@@ -139,6 +141,11 @@ export function createFocus(renderer: WebGLRenderer, opts: { aperture: number; m
       quad.material = compose;
       renderer.setRenderTarget(null);
       renderer.render(stage, cam);
+    },
+    compile(scene, camera) {
+      renderer.setRenderTarget(sharp);
+      renderer.compile(scene, camera);
+      renderer.setRenderTarget(null);
     },
     setSize(width, height) {
       renderer.getDrawingBufferSize(size);

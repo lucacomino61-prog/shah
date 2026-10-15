@@ -16,6 +16,7 @@ import {
   Group,
   HemisphereLight,
   LatheGeometry,
+  Matrix4,
   Mesh,
   MeshBasicMaterial,
   MeshPhysicalMaterial,
@@ -52,7 +53,7 @@ import { BOARD, GIRTH, HEIGHT, KING_CROSS, KNIGHT_HEAD, PROFILES, QUEEN_CROWN, R
 import { boardBounds, frameBounds, rigFor } from './camera.ts';
 import { FILES, planMoves, readFen, type Arrow, type BoardOptions, type BoardView, type Kind, type Marks, type Placed, type Side, type Sq, type UnboxHooks } from './types.ts';
 import { caseSound, fallSound, pieceDownSound, promoteSound } from '../../lib/sound.ts';
-import { boxUV, loadRoom, photo, pieceMaterial, roomLight, squareMaps, type Realism, type Room } from './realism.ts';
+import { boxUV, loadRoom, noGlare, photo, pieceMaterial, roomLight, squareMaps, type Realism, type Room } from './realism.ts';
 import { createFocus, type Focus } from './focus.ts';
 import { bankersLamp, books, candle, chessClock, coffeeCup, deskLamp, mug, notebook, phone, tumbler, type Kit } from './props.ts';
 import { DEFAULT_WORLD, WORLDS, chosenSet, type PieceSetId, type PropId, type WorldDef, type WorldId } from './looks.ts';
@@ -106,6 +107,8 @@ interface Body {
   sq: Sq | null;
   group: Group;
   mesh: Mesh;
+  /** the coarse stand-in the shadow map draws in the piece's place (null on the drawn fallback set) */
+  proxy: Mesh | null;
   hit: Mesh;
   pos: Vector3;
   vel: Vector3;
@@ -656,23 +659,25 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   textures.push(grain);
   let wood: MeshPhysicalMaterial;
   if (realism) {
-    const mahogany = photo(realism.mahogany, true, aniso);
-    const mahoganyR = photo(realism.mahoganyR, false, aniso);
-    textures.push(mahogany, mahoganyR);
-    // French-polished mahogany: a satin shine in the wood, a thin clear coat over it
+    const rose = photo(realism.rosewood, true, aniso);
+    const roseR = photo(realism.rosewoodR, false, aniso);
+    textures.push(rose, roseR);
+    // rosewood under piano lacquer (Luca, 2026-10-15: "the board make it more expensive"): the figure deep in the
+    // wood, a mirror coat over it that shows the room and never the lamp
     wood = own(
-      new MeshPhysicalMaterial({
-        map: mahogany,
-        roughnessMap: mahoganyR,
-        roughness: 0.85,
-        bumpMap: mahoganyR,
-        bumpScale: 0.35,
-        clearcoat: 0.35,
-        clearcoatRoughness: 0.28,
-        specularIntensity: 0.4,
-        envMap: room,
-        envMapIntensity: 0.3,
-      }),
+      noGlare(
+        new MeshPhysicalMaterial({
+          map: rose,
+          color: 0xa88478,
+          roughnessMap: roseR,
+          roughness: 0.5,
+          clearcoat: 1,
+          clearcoatRoughness: 0.07,
+          specularIntensity: 0.5,
+          envMap: room,
+          envMapIntensity: 0.42,
+        }),
+      ),
     );
   } else wood = own(new MeshPhysicalMaterial({ map: grain, roughness: 0.78, specularIntensity: 0.15, envMap: room, envMapIntensity: 0.7 }));
   /** wood grain on a box-like part: real mahogany wants box-projected UVs at its own scale */
@@ -727,13 +732,15 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     felt.position.set(0, frameH - PLATE - 0.002, zc);
     mount(felt, far);
   }
-  // boxwood stringing let into the mahogany: one line round the squares, one near the outer edge; the lines that run
-  // across the hinge are cut in two
+  // boxwood stringing let into the wood: one line near the outer edge; the lines that run across the hinge are cut
+  // in two. Round the squares, on the luxury board, a rope inlay instead (below)
   const brass = own(new MeshStandardMaterial({ color: 0xe9d3a4, roughness: 0.85, envMap: room, envMapIntensity: 0.5 }));
-  for (const [d, w] of [
-    [BOARD.half + 0.075, 0.032],
-    [F - 0.085, 0.022],
-  ] as const) {
+  for (const [d, w] of (realism
+    ? [[F - 0.085, 0.022]]
+    : [
+        [BOARD.half + 0.075, 0.032],
+        [F - 0.085, 0.022],
+      ]) as [number, number][]) {
     const len = 2 * d + w;
     for (const z of [d, -d]) {
       const bar = new Mesh(keep(new BoxGeometry(len, 0.012, w)), brass);
@@ -749,6 +756,64 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
         mount(bar, far);
       }
   }
+  // the rope inlay of a fine board: short slanting leaves of maple and rosewood between two dark lines, all round the
+  // squares under the same lacquer as the frame (each strip's UVs run one tile per ROPE squares along it)
+  if (realism) {
+    const tile = document.createElement('canvas');
+    tile.width = 256;
+    tile.height = 64;
+    const tg = tile.getContext('2d')!;
+    tg.fillStyle = '#5a2414';
+    tg.fillRect(0, 0, 256, 64);
+    for (let i = -2; i < 10; i++) {
+      tg.fillStyle = i % 2 ? '#e8c890' : '#6e2c18';
+      tg.beginPath();
+      tg.moveTo(i * 32, 54);
+      tg.lineTo(i * 32 + 32, 54);
+      tg.lineTo(i * 32 + 56, 10);
+      tg.lineTo(i * 32 + 24, 10);
+      tg.closePath();
+      tg.fill();
+    }
+    tg.fillStyle = '#1e0c06';
+    tg.fillRect(0, 0, 256, 10);
+    tg.fillRect(0, 54, 256, 10);
+    tg.fillStyle = '#e2c48e';
+    tg.fillRect(0, 4, 256, 3);
+    tg.fillRect(0, 57, 256, 3);
+    const ropeTex = new CanvasTexture(tile);
+    ropeTex.colorSpace = SRGBColorSpace;
+    ropeTex.wrapS = RepeatWrapping;
+    ropeTex.anisotropy = aniso;
+    textures.push(ropeTex);
+    const ropeMat = own(noGlare(new MeshPhysicalMaterial({ map: ropeTex, roughness: 0.55, clearcoat: 1, clearcoatRoughness: 0.08, envMap: room, envMapIntensity: 0.4 })));
+    const W2 = 0.075;
+    const d = BOARD.half + 0.012 + W2 / 2;
+    const ROPE = 0.3;
+    /** a strip of rope along x, len long, its pattern running along it */
+    const strip = (len: number) => {
+      const g = new BoxGeometry(len, 0.01, W2);
+      const uv = g.getAttribute('uv') as BufferAttribute;
+      for (let i = 0; i < uv.count; i++) uv.setX(i, uv.getX(i) * (len / ROPE));
+      return keep(g);
+    };
+    const len = 2 * d + W2;
+    for (const z of [d, -d]) {
+      const m = new Mesh(strip(len), ropeMat);
+      m.position.set(0, frameH + 0.002, z);
+      m.receiveShadow = true;
+      mount(m, z < 0);
+    }
+    for (const x of [d, -d])
+      for (const far of [false, true]) {
+        const l = len / 2 - W2 - 0.01;
+        const m = new Mesh(strip(l), ropeMat);
+        m.rotation.y = Math.PI / 2;
+        m.position.set(x, frameH + 0.002, (far ? -1 : 1) * (W2 / 2 + 0.005 + l / 2));
+        m.receiveShadow = true;
+        mount(m, far);
+      }
+  }
   // the case's clasp: a brass plate low on the outer wall of each half; shut, the two meet at the front
   const claspMat = own(new MeshPhysicalMaterial({ color: 0xc9a24a, metalness: 1, roughness: 0.3, envMap: room, envMapIntensity: 0.9 }));
   const claspGeo = keep(new BoxGeometry(0.46, 0.12, 0.035));
@@ -757,6 +822,26 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     clasp.position.set(0, 0.11, far ? -F - 0.017 : F + 0.017);
     clasp.castShadow = true;
     mount(clasp, far);
+  }
+  // brass corner caps on the four outer corners of the case: an angle over the top edge and a strip down the corner
+  if (realism) {
+    const capTop = keep(new BoxGeometry(0.4, 0.012, 0.075));
+    const capSide = keep(new BoxGeometry(0.075, frameH - 0.02, 0.075));
+    for (const sx of [-1, 1])
+      for (const sz of [-1, 1]) {
+        const far = sz < 0;
+        const a = new Mesh(capTop, claspMat);
+        a.position.set(sx * (F - 0.2 + 0.004), frameH + 0.004, sz * (F - 0.0375 + 0.004));
+        const b = new Mesh(capTop, claspMat);
+        b.rotation.y = Math.PI / 2;
+        b.position.set(sx * (F - 0.0375 + 0.004), frameH + 0.004, sz * (F - 0.2 + 0.004));
+        const c = new Mesh(capSide, claspMat);
+        c.position.set(sx * (F - 0.0375 + 0.008), (frameH - 0.02) / 2 + 0.01, sz * (F - 0.0375 + 0.008));
+        for (const m of [a, b, c]) {
+          m.castShadow = true;
+          mount(m, far);
+        }
+      }
   }
   // the bed the squares are laid on: dark, so no pale line shows between the squares and the frame
   const slabMat = own(new MeshStandardMaterial({ color: 0x1c120b, roughness: 0.8 }));
@@ -772,19 +857,23 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     map.anisotropy = rough.anisotropy = aniso;
     textures.push(map, rough);
     // an inlaid board under a satin finish: the grain shows in the sheen, the lamp does not glare off it
+    // maple and rosewood under the same lacquer: the room and the pieces show in it as in a polished board; the lamp
+    // does not (noGlare), so no square is ever washed out
     fieldMat = own(
-      new MeshPhysicalMaterial({
-        map,
-        roughnessMap: rough,
-        roughness: 1,
-        bumpMap: rough,
-        bumpScale: 0.25,
-        specularIntensity: 0.35,
-        clearcoat: 0.18,
-        clearcoatRoughness: 0.45,
-        envMap: room,
-        envMapIntensity: 0.32,
-      }),
+      noGlare(
+        new MeshPhysicalMaterial({
+          map,
+          roughnessMap: rough,
+          roughness: 0.8,
+          bumpMap: rough,
+          bumpScale: 0.12,
+          specularIntensity: 0.35,
+          clearcoat: 1,
+          clearcoatRoughness: 0.1,
+          envMap: room,
+          envMapIntensity: 0.4,
+        }),
+      ),
     );
   } else {
     const fieldMap = woodSquares(Math.min(2048, renderer.capabilities.maxTextureSize));
@@ -934,6 +1023,17 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   };
 
   const bodies: Body[] = [];
+  // a draw skipped in one pass: the shadow stand-ins in the picture, the fine pieces in the shadow map
+  const proxyMat = own(new MeshBasicMaterial());
+  const hideDraw = (...args: unknown[]) => {
+    const g = args.find((a) => (a as BufferGeometry)?.isBufferGeometry) as BufferGeometry;
+    // a range that starts past its end: three.js returns before the draw call
+    g.drawRange.start = Infinity;
+  };
+  const showDraw = (...args: unknown[]) => {
+    const g = args.find((a) => (a as BufferGeometry)?.isBufferGeometry) as BufferGeometry;
+    g.drawRange.start = 0;
+  };
   const bySq = new Map<Sq, Body>();
   const upright = new Quaternion();
   const lying = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -Math.PI / 2);
@@ -943,6 +1043,9 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   function setShape(b: Body, kind: Kind) {
     b.kind = kind;
     b.mesh.geometry = shapeOf(kind);
+    if (b.proxy && realism) b.proxy.geometry = realism.shadows[kind];
+    const refl = reflections.get(b);
+    if (refl && realism) refl.geometry = realism.shadows[kind];
     b.hit.geometry = hitOf(kind);
     b.mesh.rotation.y = kind === 'n' ? knightYaw(b.side) : 0;
   }
@@ -953,9 +1056,79 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   textures.push(contactTex);
   const contactGeo = keep(new PlaneGeometry(1, 1).rotateX(-Math.PI / 2));
   const contacts = new Map<Body, Mesh>();
+  // one ring always drawn (out of sight under the table, fully clear), so its program is compiled for the screen and
+  // for the lens's target alike before any piece needs it; otherwise it compiles the moment the first piece stands
+  const keeper = new Mesh(contactGeo, own(new MeshBasicMaterial({ color: 0x0a0604, alphaMap: contactTex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4, opacity: 0 })));
+  keeper.position.set(0, -2, 0);
+  keeper.scale.setScalar(0.01);
+  board.add(keeper);
   /** where a piece at (x, z) stands: on the squares when the box lies open, else on the table */
   const groundAt = (x: number, z: number) => (halves[0].position.y === 0 && halves[0].quaternion.w === 1 && Math.abs(x) <= F && Math.abs(z) <= F ? BOARD.top : 0);
+  // ---------------------------------------------------------------- the pieces in the lacquer
+  // A polished board shows the pieces standing in it. Each piece's coarse stand-in is drawn mirrored under the board;
+  // the fragment works out where its view ray crosses the lacquer and takes that point's depth, so the board itself
+  // never hides the reflection and anything standing on the board does. Strong where the view grazes the board (the
+  // home screen's low view), faint from the seat, gone a piece's height above the surface.
+  const LACQUER = BOARD.top + 0.0005;
+  const mirror = new Matrix4().makeTranslation(0, 2 * LACQUER, 0).multiply(new Matrix4().makeScale(1, -1, 1));
+  const viewProj = new Matrix4();
+  const REFLECT: Record<PieceSetId, Record<Side, [number, number, number]>> = {
+    wood: { w: [0.62, 0.48, 0.3], b: [0.06, 0.045, 0.035] },
+    lacquer: { w: [0.7, 0.64, 0.52], b: [0.16, 0.012, 0.01] },
+    glass: { w: [0.55, 0.6, 0.6], b: [0.35, 0.03, 0.05] },
+    metal: { w: [0.75, 0.75, 0.78], b: [0.8, 0.58, 0.25] },
+  };
+  const reflMat = () =>
+    own(
+      new ShaderMaterial({
+        uniforms: { uColor: { value: new Color() }, uTop: { value: LACQUER }, uEdge: { value: BOARD.half }, uViewProj: { value: viewProj } },
+        vertexShader: `
+          varying vec3 vWorld;
+          varying vec3 vNormal;
+          void main() {
+            vec4 w = modelMatrix * vec4(position, 1.0);
+            vWorld = w.xyz;
+            vNormal = normalize(mat3(modelMatrix) * normal);
+            gl_Position = projectionMatrix * viewMatrix * w;
+          }`,
+        fragmentShader: `
+          uniform vec3 uColor;
+          uniform float uTop;
+          uniform float uEdge;
+          uniform mat4 uViewProj;
+          varying vec3 vWorld;
+          varying vec3 vNormal;
+          void main() {
+            // where the view ray to this mirrored point crosses the lacquer: only the squares reflect
+            vec3 ray = vWorld - cameraPosition;
+            vec3 q = cameraPosition + ray * ((uTop - cameraPosition.y) / ray.y);
+            if (abs(q.x) > uEdge || abs(q.z) > uEdge) discard;
+            float fade = exp(-(uTop - vWorld.y) * 1.8);
+            float fres = mix(0.1, 0.6, pow(1.0 - abs(normalize(ray).y), 3.0));
+            float shade = 0.55 + 0.45 * clamp(0.4 - vNormal.y * 0.6, 0.0, 1.0);
+            gl_FragColor = vec4(uColor * shade, fres * fade);
+            vec4 clip = uViewProj * vec4(q, 1.0);
+            gl_FragDepth = clip.z / clip.w * 0.5 + 0.5 - 0.00002;
+            #include <tonemapping_fragment>
+            #include <colorspace_fragment>
+          }`,
+        transparent: true,
+        depthWrite: false,
+        side: DoubleSide,
+      }),
+    );
+  const reflMats: Record<Side, ShaderMaterial> | null = realism ? { w: reflMat(), b: reflMat() } : null;
+  const tintReflections = () => {
+    if (!reflMats) return;
+    for (const side of ['w', 'b'] as Side[]) (reflMats[side].uniforms.uColor.value as Color).setRGB(...REFLECT[pieceSet][side]);
+  };
+  const reflections = new Map<Body, Mesh>();
+
   function ground() {
+    if (reflMats) {
+      camera.updateMatrixWorld();
+      viewProj.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    }
     for (const [b, disc] of contacts) {
       const g = b.group;
       if (!g.visible) {
@@ -969,6 +1142,16 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       const h = Math.max(0, g.position.y - floor);
       const k = Math.max(0, Math.min(1, (up - 0.9) / 0.09)) * Math.max(0, 1 - h / 0.45);
       disc.visible = k > 0.01;
+      const refl = reflections.get(b);
+      if (refl) {
+        // in the lacquer only while the box lies open and the piece is over the board
+        refl.visible = disc.visible && floor === BOARD.top;
+        if (refl.visible) {
+          g.updateMatrixWorld(true);
+          refl.matrix.multiplyMatrices(mirror, b.mesh.matrixWorld);
+          refl.matrixWorldNeedsUpdate = true;
+        }
+      }
       if (!disc.visible) continue;
       // lifted, the ring spreads and fades, as a shadow does
       const d = girthOf(b.kind) * 3 * (1 + h * 1.2);
@@ -982,6 +1165,21 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     const group = new Group();
     const mesh = new Mesh(shapeOf(kind), turnedWood ? turnedWood(side) : side === 'w' ? ivory : ebony);
     mesh.castShadow = mesh.receiveShadow = true;
+    // the fine piece is drawn for the eye, a coarse stand-in for the shadow map (a soft shadow cannot show the
+    // difference, and the frame is spared drawing every piece twice in full)
+    let proxy: Mesh | null = null;
+    if (realism) {
+      proxy = new Mesh(realism.shadows[kind], proxyMat);
+      proxy.castShadow = true;
+      proxy.receiveShadow = false;
+      proxy.onBeforeRender = hideDraw;
+      proxy.onAfterRender = showDraw;
+      mesh.castShadow = false;
+      // soft (VSM) shadows draw every receiver into the map as well: not this one
+      mesh.onBeforeShadow = hideDraw;
+      mesh.onAfterShadow = showDraw;
+      mesh.add(proxy);
+    }
     const hit = new Mesh(hitOf(kind), hitMat);
     group.add(mesh, hit);
     board.add(group);
@@ -991,6 +1189,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       sq: null,
       group,
       mesh,
+      proxy,
       hit,
       pos: new Vector3(),
       vel: new Vector3(),
@@ -1011,6 +1210,14 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     disc.visible = false;
     board.add(disc);
     contacts.set(b, disc);
+    if (reflMats && realism) {
+      const refl = new Mesh(realism.shadows[kind], reflMats[side]);
+      refl.matrixAutoUpdate = false;
+      refl.visible = false;
+      refl.frustumCulled = false;
+      scene.add(refl);
+      reflections.set(b, refl);
+    }
     return b;
   }
 
@@ -2049,12 +2256,20 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   // ---------------------------------------------------------------- size, light, colour
   let W = 1;
   let H = 1;
+  let fits = 0;
+  let sized = '';
   function fit() {
+    fits++;
     const r = o.host.getBoundingClientRect();
     W = Math.max(1, Math.round(r.width));
     H = Math.max(1, Math.round(r.height));
-    renderer.setSize(W, H, false);
-    lensFx?.setSize(W, H);
+    // setting the canvas to the size it already has reallocates its buffers (a stall): only a real change
+    const size = `${W}x${H}@${renderer.getPixelRatio()}`;
+    if (size !== sized) {
+      sized = size;
+      renderer.setSize(W, H, false);
+      lensFx?.setSize(W, H);
+    }
     lens.snap = true;
     portrait = W / H < 0.85;
     elevation = preset().el;
@@ -2145,13 +2360,15 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   io.observe(o.host);
 
   const focusAt = new Vector3();
+  /** switches for measuring what a frame costs (set from the development hook __board.exp; all off in use) */
+  const exp = { noShadows: false, noDof: false, noAdapt: false };
   function render() {
     ground();
-    if (shadowsStale || dirty) {
+    if ((shadowsStale || dirty) && !exp.noShadows) {
       renderer.shadowMap.needsUpdate = true;
       shadowsStale = false;
     }
-    if (cinema && lensFx) {
+    if (cinema && lensFx && !exp.noDof) {
       // the focus lies a little in front of the middle of the board, on the player's side
       focusAt.set(0, BOARD.top + 0.5, orientation === 'w' ? 2.2 : -2.2);
       lensFx.render(scene, camera, camera.position.distanceTo(focusAt));
@@ -2224,6 +2441,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   function setPieces(id: PieceSetId) {
     if (!realism || id === pieceSet || !turnedWood) return;
     pieceSet = id;
+    tintReflections();
     for (const b of bodies) {
       const old = b.mesh.material as Material;
       b.mesh.material = turnedWood(b.side);
@@ -2232,15 +2450,23 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     dirty = true;
   }
   applyWorld();
+  tintReflections();
 
   // warm every program the board will use (the pieces of both colours, marks, an arrow) before the first move
   {
-    const warm = [makeBody('w', 'q'), makeBody('b', 'n')];
+    // the whole set, so a page that sets it out (or the opening, all at once) finds every body made, every material
+    // set up and every shape already on the GPU: made at the tap, they stalled its first frame
+    const warm = [...readFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1').entries()].map(([sq, p]) => {
+      const b = makeBody(p.side, p.kind);
+      place(b, sq);
+      return b;
+    });
     drawArrows([{ from: 'e2', to: 'e4', label: '1' }, { from: 'g1', to: 'f3' }]);
     dots[0].visible = true;
     lastTiles[0].visible = true;
     checkGlow.visible = true;
-    warm.forEach((b) => place(b, 'd4'));
+    // the contact shadow's program too, or it compiles the first time a piece stands up (a stall mid-opening)
+    ground();
     renderer.compile(scene, camera);
     render();
     warm.forEach(retire);
@@ -2310,7 +2536,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       frames++;
       if (seconds > 1 / 40) slow++;
       if (frames === 45) {
-        if (slow > 15 && dpr > 1) {
+        if (slow > 15 && dpr > 1 && !exp.noAdapt) {
           dpr = Math.max(1, dpr - 0.5);
           renderer.setPixelRatio(dpr);
           fit();
@@ -2395,6 +2621,10 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
         morphing: bodies.filter((b) => b.morph).length,
       }),
       shadows: () => (vsm ? 'vsm' : 'pcf'),
+      // the shader programs compiled so far, and how many times the canvas was resized (development only)
+      programs: () => (renderer.info.programs ?? []).map((p) => `${p.name} ${(p.cacheKey as string).slice(0, 60)}`),
+      fits: () => `${fits} ${sized}`,
+      exp: (o: Partial<typeof exp>) => Object.assign(exp, o),
       // a free camera for close-up checks of the materials (development only)
       look: (x: number, y: number, z: number, tx: number, ty: number, tz: number, fov = 30) => {
         lens.at = { fov, ox: 0, oy: 0 };
@@ -2447,7 +2677,17 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     topple,
     setCinema(on: boolean) {
       cinema = on;
-      if (on && realism && !lensFx) lensFx = createFocus(renderer, { aperture: 1.0, maxBlur: 9 });
+      if (on && realism && !lensFx) {
+        lensFx = createFocus(renderer, { aperture: 1.0, maxBlur: 9 });
+        sized = '';
+        // every piece's program for the lens's target, with the set briefly out where it last stood
+        const hidden = bodies.filter((b) => !b.group.visible);
+        hidden.forEach((b) => (b.group.visible = true));
+        ground();
+        lensFx.compile(scene, camera);
+        hidden.forEach((b) => (b.group.visible = false));
+        ground();
+      }
       fit();
       shadowsStale = true;
     },

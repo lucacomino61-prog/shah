@@ -1,5 +1,5 @@
 // The real-world materials of the 3D table, from Poly Haven (all CC0): maple and walnut veneers for the squares,
-// mahogany for the frame and the case, velvet for the case lining (veneer is sanded flat: its grain comes through the
+// rosewood for the dark squares, the frame and the case (mahogany before 2026-10-15), velvet for the case lining (veneer is sanded flat: its grain comes through the
 // roughness maps, which also serve as a fine bump); and for each of the four rooms (src/scripts/board/looks.ts) its
 // photograph, which lights the table and shows blurred behind it, and the wood of its table: lacquered cherry by the
 // fire, smoked walnut in the club library, light oak in the day room, dark wood on the night desk. The pieces are made
@@ -36,6 +36,9 @@ const jobs = [
   ['oak_veneer_01_rough_1k.jpg', 'oak-r.webp', 512, 0.75, true],
   ['smoked_walnut_veneer_diff_1k.jpg', 'smoked.webp', 1024, 0.82, false],
   ['smoked_walnut_veneer_rough_1k.jpg', 'smoked-r.webp', 512, 0.75, true],
+  // the luxury board: rosewood for the dark squares, the frame and the box
+  ['rosewood_veneer1_diff_1k.jpg', 'rosewood.webp', 1024, 0.84, false],
+  ['rosewood_veneer1_rough_1k.jpg', 'rosewood-r.webp', 512, 0.75, true],
 ];
 const browser = await puppeteer.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
 const page = await browser.newPage();
