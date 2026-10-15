@@ -45,6 +45,17 @@ import arrowsClockwise from '@phosphor-icons/core/assets/regular/arrows-clockwis
 import handshake from '@phosphor-icons/core/assets/regular/handshake.svg?raw';
 import handTap from '@phosphor-icons/core/assets/regular/hand-tap.svg?raw';
 import palette from '@phosphor-icons/core/assets/regular/palette.svg?raw';
+// the medals on Progresi: filled, so the symbol reads as struck into the metal
+import trophy from '@phosphor-icons/core/assets/fill/trophy-fill.svg?raw';
+import crownSimple from '@phosphor-icons/core/assets/fill/crown-simple-fill.svg?raw';
+import shieldCheck from '@phosphor-icons/core/assets/fill/shield-check-fill.svg?raw';
+import target from '@phosphor-icons/core/assets/fill/target-fill.svg?raw';
+import puzzleFill from '@phosphor-icons/core/assets/fill/puzzle-piece-fill.svg?raw';
+import bookOpen from '@phosphor-icons/core/assets/fill/book-open-fill.svg?raw';
+import graduationCap from '@phosphor-icons/core/assets/fill/graduation-cap-fill.svg?raw';
+import sealCheck from '@phosphor-icons/core/assets/fill/seal-check-fill.svg?raw';
+import key from '@phosphor-icons/core/assets/fill/key-fill.svg?raw';
+import calendarFill from '@phosphor-icons/core/assets/fill/calendar-check-fill.svg?raw';
 
 const raw = {
   arrowCounterClockwise,
@@ -92,6 +103,16 @@ const raw = {
   handshake,
   handTap,
   palette,
+  trophy,
+  crownSimple,
+  shieldCheck,
+  target,
+  puzzleFill,
+  bookOpen,
+  graduationCap,
+  sealCheck,
+  key,
+  calendarFill,
 };
 export type IconName = keyof typeof raw;
 

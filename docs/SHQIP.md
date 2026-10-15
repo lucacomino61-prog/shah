@@ -147,3 +147,81 @@ jep, por rrallë sheh rrezikun për të vetat." · **Arta** "Mbron figurat më s
 mbrojtje." · **Agimi** (new note) "Luan si fillestar që di parimet, por gabon kur loja ndërlikohet." · While a bot
 thinks the status reads "Lea po mendon…" (was "Kundërshtari po mendon…"). The stronger bots (from Besniku up) resign a lost game:
 "Besniku u dorëzua. E pa që loja ishte e humbur." Please check "E pa që loja ishte e humbur" (it saw the game was lost).
+
+## New on 2026-10-15, please check
+
+The interface pass: opponents with faces who speak, the first-visit question, the deck of player cards, the course,
+the progress page's charts and medals, the dashboard on the home screen.
+
+**What the opponents say** (`src/lib/bots.ts`). None of them puts an adjective on the learner, because Albanian
+adjectives agree in gender and the app does not know who is playing. Please check the tone of each.
+
+- **Lea** (a girl who has just learned the moves): "Përshëndetje! Sapo mësova si lëvizin figurat." · "Luajmë? Jam ende
+  e re në këtë." · "Hmm… nga lëviz kali?" · "Prit, po mendoj." · "Kjo shkon drejt, apo jo?" · "Oh! Mund ta marr këtë?" ·
+  "Uau, faleminderit!" · "Oj, nuk e pashë!" · "Hmm, ma more…" · "Sot po më shkon mirë!" · "Luan shumë mirë…" ·
+  "Fitova! Luajmë përsëri?" · "Bravo! Më mësove diçka." · "Barazim! Nuk ishte keq." · "Dorëzohem. Bravo!"
+- **Ermali** (a cheeky teenager): "Hajde, të shohim çfarë di!" · "Gati? Unë marr çdo gjë që lë." · "Diçka po ma kap
+  syri…" · "Hmm, çfarë mund të marr?" · "Ha! E mora!" · "Falas? Faleminderit!" · "Ëh, këtë nuk e pashë." · "Mirë, mirë,
+  ma ktheve." · "Sot është dita ime." · "Prit, si ndodhi kjo?" · "Fitova! Revansh?" · "Mirë, kësaj radhe fitove ti." ·
+  "Barazim. Herën tjetër fitoj unë." · "Mirë, dorëzohem."
+- **Arta** (a careful student): "Mirë se erdhe. Kujdes figurat pa mbrojtje." · "Fillojmë? Unë i kontrolloj të gjitha." ·
+  "Një moment, po kontrolloj." · "Çfarë kërcënon ti këtu?" · "Kjo figurë mbeti pa mbrojtje." · "Këtë e pashë." · "Ah,
+  këtë duhej ta shihja." · "Po shkon sipas planit." · "Po luan mirë sot." · "Lojë e mirë. Shiko gabimet me trajnerin." ·
+  "Bravo, e meritove." · "Barazim i drejtë." · "Dorëzohem. Bravo."
+- **Agimi**: "Fillojmë me qendrën, si gjithmonë." · "Mirë se erdhe. Gati për lojë?" · "Zhvilloj figurat, pastaj
+  shohim." · "Hmm, pozicion interesant." · "Këtë nuk e lë pa e marrë." · "Uh, u ngatërrova pak këtu." · "Parimet po
+  funksionojnë." · "Më zure në befasi." · "Lojë e mirë! Edhe një?" · "Bravo! Më tregove rrugën." · "Barazim. E meritonim
+  të dy." · "Dorëzohem. Lojë e mirë."
+- **Drita**: "Ngadalë dhe me kujdes. Fillojmë?" · "Le ta shoh edhe një herë." · "Pa nxitim." · "Faleminderit, e marr me
+  kënaqësi." · "Hm, kjo ishte e nxituar nga unë." · "Durimi po shpërblehet." · "Po luan shumë saktë." · "Lojë e mirë. Me
+  durim do fitosh." · "Të lumtë! Fitore e merituar." · "Barazim. Lojë e qetë." · "Dorëzohem. Të lumtë."
+- **Besniku** (the club regular): "Ulu, ulu. Prisja një kundërshtar." · "Hajde, një lojë e shpejtë." · "Kjo më kujton një
+  lojë të vjetër…" · "Hmm, hmm." · "Këtë nuk ta fal dot." · "Plaku po fle pak sot." · "Përvoja flet." · "Po më vë në
+  vështirësi." · "Lojë e mirë. Eja prapë nesër." · "Të lumtë! Rrallë më mundin kështu." · "Barazim. Shtrëngojmë duart." ·
+  "E di kur duhet dorëzuar. Bravo."
+- **Teuta** (curt and strong): "Mos prit dhurata." · "Fillojmë." · "Po llogaris." · "Interesante." · "Gabim." · "Kjo të
+  kushton." · "Hm. Pasaktësi e imja." · "Pozicioni flet vetë." · "Mirë. Shumë mirë." · "Lojë e mirë. Rishiko momentin
+  kyç." · "Respekt. E fitove ndershëm." · "Barazim i drejtë." · "Dorëzohem. Luajte shkëlqyeshëm."
+- **Ardiani** (the old master): "Çdo lojë është një mësim. Fillojmë." · "Shahu kërkon durim." · "Le të shohim…" ·
+  "Shiko përsëri fushën që lëshove." · "Edhe mjeshtrit gabojnë." · "Qetësia fiton." · "Shumë bukur. Vazhdo kështu." ·
+  "Faleminderit për lojën. Mëso nga ajo." · "E fitove me mjeshtëri." · "Barazim. Lojë fisnike." · "Dorëzohem. Fitore e
+  bukur."
+- **Stockfish** (the automaton): "Gati." · "Po llogaris…" · "Vlerësimi ndryshoi." · "Po rillogaris." · "Avantazh i qartë." ·
+  "Pozicion i vështirë." · "Mat. Loja mbaroi." · "Rezultat i pazakontë. Bravo." · "Barazim." · "Dorëzohem."
+
+The taglines on the cards and the home screen: "Sapo mësoi si lëvizin figurat." · "Merr gjithçka që i lë pa mbrojtje." ·
+"Mbron figurat dhe ndëshkon çdo harresë." · "Di parimet; ngatërrohet kur loja ndërlikohet." · "Luan me kujdes, por gabon
+qartë." · "I rregullti i klubit. Rrallë fal diçka." · "Zgjedh pothuajse gjithmonë më të mirën." · "Mjeshtri i vjetër i
+klubit." · "Motori, me gjithë forcën që ka në shfletues."
+
+**The new-game sheet:** "Zgjidh lojtarin" (choose the player) above the deck; on each card "Niveli 3, shumë i lehtë" and
+the record "2 fitore, 1 humbje" / "1 fitore, 1 barazim, 2 humbje" / "Ende pa lojë".
+
+**The first visit** (home): "Mirë se erdhe në Shah" · "Sa e njeh shahun?" · "Zgjidh njërën: të gjej kundërshtarin e parë
+dhe mësimin nga ku të nisësh. Mund t’i ndryshosh kur të duash." · the answers "Sapo i mësova rregullat", "Luaj
+ndonjëherë me shokët", "Luaj shpesh", each with "Kundërshtari: Lea, niveli 1. Mësimi: Vlera e figurave." · "Fillo
+lojën" · "Fillo me mësimin" · "Më vonë" · "Zgjidh njërën nga të trija." Is "Sa e njeh shahun?" natural?
+
+**The home screen:** "Kundërshtari yt" · "Loja të pret" · "Lëvizja 12, ti me të bardhat" · "Ushtrimi i ditës" · "Seria:
+3 ditë" · "Fillo serinë sot" · "U zgjidh sot" · "Gabimet e tua" · "3 presin sot" · "Mësimi i radhës".
+
+**Mësime as a course:** "11 mësime në 5 kapituj." · "3 nga 11 të kryera" · "Fillo / Vazhdo / Përsërit: Piruni" ·
+"Kapitulli I Bazat: Sa vlen secila figurë, dhe si nis një lojë e mirë." · "Kapitulli II Taktikat: Goditjet e shkurtra që
+fitojnë material." · "Kapitulli III Mati: Dy mënyrat e para për ta mbaruar lojën." · "Kapitulli IV Fundloja: Kur kanë
+mbetur pak figura: mbreti lufton." · "Kapitulli V Hapjet: Një hapje e vërtetë nga fillimi." · "Mësimi 4" · "Kryer" ·
+"Vazhdo këtu" · "Trajneri: Trajno hapjet" · "Me të bardhat / Me të zezat".
+
+**Progresi:** the figures "Lojëra", "Saktësia" ("mesatarja e lojërave", "Pas lojës së parë"), "Ushtrimet" ("vlerësimi;
+14 nga 19 pa ndihmë", "vlerësimi fillestar") · "Saktësia, lojë pas loje" · "Lojërat e fundit, e para majtas. Vija me
+pika është mesatarja jote." · "12 lojërat e fundit: nga 58% te 84%. Mesatarja 71%." · "Kundër lojtarëve të klubit" ·
+"Fitore, barazime dhe humbje kundër secilit, nga më i lehti te më i forti." · "Medaljet" · "6 nga 12 medalje të
+fituara." · "E fituar" · "3 nga 7" · "Ende jo". The dates of past games are now written by the app ("13 tet, 20:00")
+because the browser has no Albanian month names; please check the short months: jan, shk, mar, pri, maj, qer, korr,
+gush, sht, tet, nën, dhj.
+
+The medals: **Fitorja e parë** "Fito një lojë kundër cilitdo." · **Përtej fillestarëve** "Fito kundër Agimit ose dikujt
+më të fortë." · **Pa gabim të rëndë** "Një lojë prej 20 lëvizjesh pa asnjë gabim të rëndë." · **Saktësi 90%** "Një lojë
+prej 20 lëvizjesh me saktësi 90% ose më shumë." · **10 ushtrime / 50 ushtrime** "Zgjidh 10 ushtrime pa ndihmë." · **3
+ditë rresht** "Zgjidh ushtrimin e ditës 3 ditë rresht." · **Një javë** "… 7 ditë rresht." · **Mësimi i parë** "Mbaro
+një mësim." · **Kursi i plotë** "Mbaro të 11 mësimet." · **Gabime të mësuara** "Zgjidh 5 nga gabimet e tua aq herë sa të
+mos kthehen më." · **Hapja e parë** "Mëso një linjë hapjeje përmendsh (3 herë rresht pa gabim)."

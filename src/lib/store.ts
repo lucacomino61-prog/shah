@@ -43,6 +43,8 @@ export interface Progress {
   daily: Daily | null;
   /** days in a row with the daily puzzle solved; last = the latest such day */
   streak: { count: number; last: string };
+  /** the longest run of days the streak has reached (kept for the badges after a run ends) */
+  bestStreak: number;
   /** the best score in the three-minute race */
   rushBest: number;
   /** who sits across the table: the engine, or a friend on the same phone */
@@ -98,6 +100,7 @@ export function solveDaily(id: string): Progress {
     p.daily.solved = true;
     const count = p.streak.last === today() ? p.streak.count : p.streak.last === addDays(-1) ? p.streak.count + 1 : 1;
     p.streak = { count, last: today() };
+    p.bestStreak = Math.max(p.bestStreak ?? 0, count);
   });
 }
 
@@ -162,6 +165,7 @@ export const fresh = (): Progress => ({
   cards: [],
   daily: null,
   streak: { count: 0, last: '' },
+  bestStreak: 0,
   rushBest: 0,
   opponent: 'engine',
   updated: '',

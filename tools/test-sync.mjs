@@ -62,8 +62,8 @@ await B.waitForFunction(() => !document.querySelector('[data-sync-on]').hidden, 
 let pb = await progress(B);
 ok(pb.games?.length === 2 && pb.lessons.join(',') === 'lidhja,piruni' && pb.puzzleRating === 1040 && pb.rushBest === 12, 'B now holds both phones’ progress', `${pb.games?.length} games, ${pb.lessons?.join(',')}, ${pb.puzzleRating}`);
 ok((await note(B)).includes('U lidh'), 'and says so', await note(B));
-const summary = await B.$$eval('[data-summary] dd', (l) => l.map((e) => e.textContent));
-ok(summary[0].startsWith('2 '), 'the summary on the page is drawn again with both games', summary[0]);
+const games = await B.$eval('[data-fig="games"]', (e) => e.textContent);
+ok(games === '2', 'the summary on the page is drawn again with both games', games);
 
 // A picks up B's half on its next look
 await A.reload({ waitUntil: 'networkidle0' });

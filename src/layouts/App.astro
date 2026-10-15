@@ -9,12 +9,14 @@ interface Props {
   tab: 'luaj' | 'ushtrime' | 'mesime' | 'analizo' | 'progresi' | null;
   /** the page is the lit table: dark studio throughout, whatever the system theme */
   stage?: boolean;
+  /** a reading page that sits in the same room as the table (a still of it behind the page) */
+  room?: boolean;
   /** kept out of search results (the 404) */
   noindex?: boolean;
   /** the home page carries the app's structured data */
   home?: boolean;
 }
-const { title, description, tab, stage = false, noindex = false, home = false } = Astro.props;
+const { title, description, tab, stage = false, room = false, noindex = false, home = false } = Astro.props;
 const site = Astro.site!;
 const canonical = new URL(Astro.url.pathname, site).href;
 const ogImage = new URL('/og.png', site).href;
@@ -43,15 +45,16 @@ import LookPicker from '../components/LookPicker.astro';
 ---
 
 <!doctype html>
-<html lang="sq" data-motion="on" data-stage={stage ? '' : undefined}>
+<html lang="sq" data-motion="on" data-stage={stage ? '' : undefined} data-room={room ? '' : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
-    {stage ? <meta name="theme-color" content="#090d0a" /> : <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)" />}
-    {!stage && <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />}
+    {stage || room ? <meta name="theme-color" content={stage ? '#090d0a' : '#140d09'} /> : <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)" />}
+    {!stage && !room && <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />}
+    <link rel="preload" href="/fonts/bodoni-moda.woff2" as="font" type="font/woff2" crossorigin />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Shah" />
     <meta property="og:locale" content="sq_AL" />
@@ -73,12 +76,16 @@ import LookPicker from '../components/LookPicker.astro';
         if (localStorage.getItem('shah.motion') === 'off') document.documentElement.dataset.motion = 'off';
         var g = parseFloat(localStorage.getItem('shah.glass'));
         if (g >= 0 && g <= 1) document.documentElement.style.setProperty('--glass-level', String(g));
-        // the bright room takes the light glass before the page paints (looks.ts keeps it in step afterwards)
-        if (localStorage.getItem('shah.world') === 'day') document.documentElement.dataset.worldTone = 'light';
+        // the room (the reading pages show a still of it) and the bright room's light glass, before the page paints
+        // (looks.ts keeps both in step afterwards)
+        var world = localStorage.getItem('shah.world');
+        if (world === 'day' || world === 'fire' || world === 'night') document.documentElement.dataset.world = world;
+        if (world === 'day') document.documentElement.dataset.worldTone = 'light';
       } catch (e) {}
     </script>
   </head>
   <body>
+    {room && <div class="room-bg" aria-hidden="true"></div>}
     <a class="skip-link" href="#main">Kalo te përmbajtja</a>
     <Fragment set:html={pieceSprite()} />
     <header class="mast">

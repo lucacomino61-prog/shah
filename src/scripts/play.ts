@@ -3,7 +3,7 @@
 // engine now threatens. "Shiko pse" leaves the game and plays the line on the board, then the pieces fly back.
 
 import { Chess, type Square } from 'chess.js';
-import { GRADES, TAG_NAMES, afterReply, gameAccuracy, judge, passTurn, threatWarning, uciSan, winChance, type Grade, type Verdict } from '../lib/coach.ts';
+import { GRADES, TAG_NAMES, afterReply, gameAccuracy, judge, lineScore, passTurn, threatWarning, uciSan, winChance, type Grade, type Verdict } from '../lib/coach.ts';
 import { Engine, type Analysis } from '../lib/engine.ts';
 import { LEVELS, hopeless, levelOf, pickMove, thinkTime, type Level } from '../lib/levels.ts';
 import { sanHtml, sentenceHtml, sentenceText } from '../lib/notation.ts';
@@ -15,6 +15,9 @@ import { createBoard, keepBoardStill, keyboard, mateFall, type BoardView } from 
 import type { Arrow, Side, Sq } from './board/types.ts';
 import { gsap, motionOn, onMotion, onTick } from './shell.ts';
 import { takenIcons, writeTaken } from './celebrate.ts';
+import { portrait } from '../lib/bots.ts';
+import { scoreVs, scoreWords } from '../lib/record.ts';
+import { fly, resetChatter, seat as seatOpponent, speak } from './seat.ts';
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const START = new Chess().fen();
@@ -92,6 +95,11 @@ let board: BoardView;
 let lastVerdict: Verdict | null = null;
 /** the bot's moves in a row with its game lost beyond hope (a person resigns after a few) */
 let hopelessRun = 0;
+/** the bot's own value of the position before its last move (centipawns, its side): a big drop after it is a slip it notices */
+let botBefore: number | null = null;
+/** the bot says once a game that it is ahead, and once that it is behind */
+let saidAhead = false;
+let saidBehind = false;
 let boardReady = false;
 /** the position's value after each move, centipawns for white (mate is +-1000) */
 let evals: (number | null)[] = [];
@@ -231,6 +239,10 @@ function newGame(s: Side, lv: Level, clk: string = prefs.clock, withFriend = fal
   side = s;
   level = lv;
   hopelessRun = 0;
+  botBefore = null;
+  saidAhead = saidBehind = false;
+  seatOpponent(withFriend ? null : lv.id);
+  resetChatter();
   clock = makeClock(clk);
   evals = [];
   orientation = s;
@@ -365,6 +377,7 @@ async function userMove(from: Sq, to: Sq) {
   evals[evals.length - 1] = over ? finalCp() : whiteCp(after, fen());
   renderReview();
   lastVerdict = v;
+  if (!friend && !study && botBefore !== null && b.lines[0] && !BAD.includes(v.grade) && lineScore(b.lines[0]) + botBefore >= 250) speak(level.id, 'oops', ucis.length, 0.75);
   renderVerdict(v, true);
   renderSheet();
   persist();
@@ -404,12 +417,16 @@ async function engineMove(given?: Analysis) {
   }
   const uci = pickMove(a, level, fen(), legal);
   if (!uci) return endGame();
+  const botCp = a.lines[0] ? lineScore(a.lines[0]) : null;
+  botBefore = botCp;
   // a person's time over the move: quick on a recapture or with one move, longer when it is hard (and never less
   // than a beat, so the learner sees their own move land)
   const last = chess.history({ verbose: true }).at(-1);
   const recapture = !!last?.captured && uci.slice(2, 4) === last.to;
   const think = study ? 250 : thinkTime(level, a, legal.length, chess.history().length, recapture);
   const wait = Math.max(0, Math.max(motionOn() ? 650 : 250, think) - (performance.now() - started));
+  // a long think, now and then, comes with a thought
+  if (!study && !friend && wait > 2400) speak(level.id, 'think', ucis.length, 0.3);
   await new Promise((r) => setTimeout(r, wait));
   if (g !== gen) return;
   const m = chess.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] || undefined });
@@ -431,6 +448,18 @@ async function engineMove(given?: Analysis) {
   const mine = verdicts[verdicts.length - 2];
   if (mine && mine === lastVerdict && BAD.includes(mine.grade) && mine.refutation[1] === uci && !study && phase !== 'over') {
     ui.reasons.innerHTML = afterReply(mine, uci).map((r) => `<li>${sentenceHtml(r)}</li>`).join('');
+  }
+  if (!study && !friend && !chess.isGameOver()) {
+    // the learner's slip punished: they say so; otherwise, once a game, when it turns
+    const ply = ucis.length;
+    if (mine && BAD.includes(mine.grade) && mine.grade !== 'inaccuracy' && mine.refutation[1] === uci) speak(level.id, 'pounce', ply, 0.8);
+    else if (botCp !== null && botCp >= 400 && !saidAhead) {
+      saidAhead = true;
+      speak(level.id, 'ahead', ply, 0.9);
+    } else if (botCp !== null && botCp <= -400 && !saidBehind) {
+      saidBehind = true;
+      speak(level.id, 'behind', ply, 0.9);
+    }
   }
   renderSheet();
   say(`Kundërshtari: ${sentenceText(`[[${m.san}]]`)}${chess.inCheck() ? ', shah' : ''}.`);
@@ -514,6 +543,7 @@ function endGame(resigned = false, flagged: Side | null = null, botResigned = fa
           : 'Pesëdhjetë lëvizje pa kapje dhe pa lëvizje ushtari.';
   }
   result = res;
+  if (!friend) speak(level.id, botResigned ? 'resign' : res === 'win' ? 'lost' : res === 'draw' ? 'draw' : 'won', ucis.length);
   if (res === 'win') winSound();
   if (chess.isCheckmate()) mateFall(() => board, chess.fen(), fen);
   const mine = verdicts.filter((v): v is Verdict => !!v);
@@ -1045,7 +1075,9 @@ function openSetup() {
   ui.setupDialog.showModal();
   ui.setup.querySelector<HTMLInputElement>(`input[name="opponent"][value="${prefs.opponent}"]`)!.checked = true;
   ui.setup.querySelector<HTMLInputElement>(`input[name="side"][value="${prefs.side}"]`)!.checked = true;
+  deal();
   ui.setup.querySelector<HTMLInputElement>(`input[name="level"][value="${level.id}"]`)!.checked = true;
+  requestAnimationFrame(() => centreCard(false));
   ui.setup.querySelector<HTMLInputElement>(`input[name="clock"][value="${prefs.clock}"]`)!.checked = true;
   ui.setup.querySelector<HTMLElement>('[data-setup-title]')?.focus();
 }
@@ -1067,16 +1099,42 @@ ui.setup.addEventListener('submit', (e) => {
     }
     p.clock = clk;
   });
+  const card = ui.setup.querySelector<HTMLImageElement>('input[name="level"]:checked ~ .card__art img');
+  const from = opponent === 'engine' && picked !== 'online' ? (card?.getBoundingClientRect() ?? null) : null;
   ui.setupDialog.close();
   // a friend on their own phone: the online page makes the room and hands over the link
   if (picked === 'online') return void (location.href = `/online/?krijo=1&ana=${s}&ora=${encodeURIComponent(clk)}`);
   if (opponent === 'friend') return newGame('w', levelOf(n), clk, true);
   newGame(s === 'random' ? (Math.random() < 0.5 ? 'w' : 'b') : s, levelOf(n));
+  void fly(from, card?.currentSrc || card?.src || '').then(() => speak(level.id, 'hello', 0));
 });
-ui.setup.querySelector('[data-levels]')!.innerHTML = LEVELS.map(
-  (l) =>
-    `<label class="choice choice--bot"><input type="radio" name="level" value="${l.id}"><span class="bot" style="--hue: ${l.hue}" aria-hidden="true">${l.bot[0]}</span><span class="choice__body"><b>${l.bot}</b><span>Niveli ${l.n}, ${l.name.toLowerCase()}. ${l.note}</span></span></label>`,
-).join('');
+/** The deck of player cards: each opponent's portrait, level, how they play, and the learner's score against them. */
+function deal() {
+  const p = load();
+  ui.setup.querySelector('[data-levels]')!.innerHTML = LEVELS.map((l) => {
+    const sc = scoreVs(p, l.id);
+    const played = sc.won + sc.drawn + sc.lost;
+    return `<label class="card"><input type="radio" name="level" value="${l.id}" aria-describedby="card-${l.id}"><span class="card__art"><img src="${portrait(l.id, 320)}" srcset="${portrait(l.id, 320)} 320w, ${portrait(l.id, 560)} 560w" sizes="12rem" width="320" height="400" alt="" decoding="async"></span><span class="card__n" aria-hidden="true">${l.n}</span><span class="card__body"><b class="card__name">${l.bot}</b><span class="card__level">Niveli ${l.n}, ${l.name.toLowerCase()}</span><span class="card__note" id="card-${l.id}">${l.note}</span><span class="card__score${played ? '' : ' card__score--none'}">${scoreWords(sc)}</span></span></label>`;
+  }).join('');
+}
+deal();
+const deck = ui.setup.querySelector<HTMLElement>('[data-levels]')!;
+/** the chosen card in the middle of the deck */
+function centreCard(smooth: boolean) {
+  const c = deck.querySelector<HTMLElement>('input:checked')?.closest<HTMLElement>('.card');
+  if (!c) return;
+  deck.scrollTo({ left: c.offsetLeft - (deck.clientWidth - c.offsetWidth) / 2, behavior: smooth && motionOn() ? 'smooth' : 'instant' });
+}
+deck.addEventListener('change', () => centreCard(true));
+ui.setup.querySelectorAll<HTMLButtonElement>('[data-deck-step]').forEach((b) =>
+  b.addEventListener('click', () => {
+    const radios = [...deck.querySelectorAll<HTMLInputElement>('input')];
+    const i = radios.findIndex((r) => r.checked);
+    const next = radios[Math.max(0, Math.min(radios.length - 1, i + Number(b.dataset.deckStep)))];
+    next.checked = true;
+    centreCard(true);
+  }),
+);
 
 // the game so far, opened on the analysis board
 $('[data-analyse]').addEventListener('click', () => {
@@ -1128,7 +1186,11 @@ ui.resign.addEventListener('click', () => {
   endGame(true);
 });
 
-ui.end.querySelector('[data-again]')!.addEventListener('click', () => (friend ? newGame('w', level, prefs.clock, true) : newGame(side, level)));
+ui.end.querySelector('[data-again]')!.addEventListener('click', () => {
+  if (friend) return newGame('w', level, prefs.clock, true);
+  newGame(side, level);
+  speak(level.id, 'hello', 0);
+});
 ui.end.querySelector('[data-review]')!.addEventListener('click', () => {
   ui.review.open = true;
   ui.review.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto', block: 'start' });
@@ -1165,6 +1227,7 @@ keyboard(ui.host, () => board, () => orientation);
     side = prefs.side === 'b' ? 'b' : 'w';
     orientation = side;
   }
+  seatOpponent(friend ? null : level.id);
   await mountBoard();
   boardReady = true;
   // the table is what the intro hides; the engine can finish loading behind it (the live bug says so)
@@ -1178,6 +1241,8 @@ keyboard(ui.host, () => board, () => orientation);
   if (chess.isGameOver()) endGame();
   else if (turn() === side) userTurn();
   else void engineMove();
+  // a fresh table: the opponent says hello once the intro has gone
+  if (!saved?.ucis.length && !friend) setTimeout(() => !ucis.length && speak(level.id, 'hello', 0), 1400);
 })();
 
 if (import.meta.env.DEV) {

@@ -12,6 +12,7 @@ import { gsap, motionOn, onMotion, onTick } from './shell.ts';
 import { missSound, moveSound, winSound } from '../lib/sound.ts';
 import { remindDone } from '../lib/remind.ts';
 import { rollStreak } from './celebrate.ts';
+import { pickDaily } from '../lib/daily.ts';
 
 interface Puzzle {
   id: string;
@@ -107,10 +108,7 @@ function dailyPuzzle(): Puzzle {
     const kept = ALL.find((p) => p.id === prefs.daily!.id);
     if (kept) return kept;
   }
-  const near = [...ALL].sort((a, b) => Math.abs(a.rating - prefs.puzzleRating) - Math.abs(b.rating - prefs.puzzleRating)).slice(0, 60);
-  let h = 0;
-  for (const c of t) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  const p = near[h % near.length];
+  const p = pickDaily(ALL, prefs.puzzleRating, t);
   prefs = update((x) => (x.daily = { date: t, id: p.id, solved: false }));
   return p;
 }

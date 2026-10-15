@@ -51,6 +51,7 @@ node tools/test-extras.mjs                # threats, sounds, puzzle of the day, 
 node --experimental-strip-types tools/test-levels.ts [games] [top]   # each bot beats the one below it; how each plays
 node --experimental-strip-types tools/check-human.ts            # the starters' eye on fixed positions (free queen, mate in one)
 node tools/test-resign.mjs                # a stronger bot resigns a lost game (dev server)
+node tools/test-club.mjs                  # first-visit question, deck of player cards, the seat and voice, course, progress (dev)
 node tools/test-analyse.mjs               # the analysis board and game review (dev server)
 node tools/test-animations.mjs            # the box opening, the fallen king, the promotion, captured pieces, the streak (dev)
 npm run server:check                      # the server's types (generates server/worker-configuration.d.ts first)
@@ -86,6 +87,10 @@ The second command asks for the value; it is in `server/.dev.vars`. The Worker's
 
 - `src/lib/coach.ts`: grading (win-chance loss, Lichess thresholds) and the Albanian explanations.
 - `src/lib/engine.ts`: Stockfish in a Web Worker, spoken to in UCI.
+- `src/lib/bots.ts`: the opponents as people: portrait, tagline and the short lines they say; `src/scripts/seat.ts`
+  seats them in the score capsule, speaks their lines and flies the chosen card to the seat.
+- `src/lib/record.ts`: the record against each opponent, accuracy over the games, the medals (from stored progress only).
+- `src/lib/miniboard.ts`: the small printed diagrams (the course, the dashboard).
 - `src/lib/levels.ts`: the nine strengths and their bots. The three starters play from a person's eye
   (`src/lib/human.ts`: they grab loose pieces, often miss that their own can be taken); from Agimi up the bots weigh
   the engine's lines as a person does and slip now and then with a natural move. Each takes a person's time to move.
@@ -111,7 +116,7 @@ The second command asks for the value; it is in `server/.dev.vars`. The Worker's
 - `src/scripts/trainer.ts`, `src/data/repertoires.ts`: the opening trainer and its lines.
 - `src/data/puzzles.json`: 1,120 puzzles from the Lichess database (CC0), each solution checked with the engine.
   Rebuilt with `tools/fetch-puzzles.mjs` and `tools/build-puzzles.mjs`.
-- `src/data/lessons.ts`: the lessons.
+- `src/data/lessons.ts`: the lessons, and `COURSE`, their five chapters in the order a learner meets them.
 - `server/src/`: the Worker.
   - `room.ts`: one online game; it checks moves with chess.js and keeps the clocks.
   - `vault.ts`: one encrypted progress copy.
@@ -135,10 +140,20 @@ lacquered_cherry_wood, oak_veneer_01, smoked_walnut_veneer and velour_velvet (di
 billiard_hall, cayley_interior, fireplace and warm_restaurant_night. The knight's GLB was generated on Higgsfield
 (a GPT Image photograph of a boxwood Staunton knight, lifted to 3D with Hunyuan3D v3, geometry only).
 
+## Portraits, rooms and the title face
+
+```bash
+node tools/bot-portraits.mjs <folder of 0-lea.png … 8-stockfish.png>   # the opponents' cards and faces (public/bots/)
+node tools/room-backdrops.mjs                                          # the room stills behind Mësime and Progresi (dev server)
+```
+
+Where each comes from, with the prompts: `docs/ASSETS.md`.
+
 ## Licences
 
 - This app: GPL-3.0-or-later (`LICENSE`), because it ships Stockfish.
 - Stockfish.js (`public/engine/`): GPL-3.0; its licence is in `public/engine/COPYING.txt`.
 - Puzzle data: Lichess puzzle database, CC0.
 - Phosphor icons: MIT. chess.js: BSD-2-Clause. three.js: MIT. GSAP: its own standard licence (free).
-- Textures and room photographs: Poly Haven, CC0. The knight: generated for this app on Higgsfield (Luca's account).
+- Textures and room photographs: Poly Haven, CC0. The knight and the nine portraits (invented people): generated for this app on Higgsfield (Luca's account).
+- Bodoni Moda (titles): SIL Open Font License 1.1, `public/fonts/OFL.txt`.

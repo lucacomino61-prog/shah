@@ -160,5 +160,6 @@ export function choose(look: { world?: WorldId; pieces?: PieceSetId }) {
     if (look.pieces) localStorage.setItem(SET_KEY, look.pieces);
   } catch {}
   document.documentElement.dataset.worldTone = WORLDS[chosenWorld()].tone;
+  document.documentElement.dataset.world = chosenWorld();
   window.dispatchEvent(new CustomEvent('shah:look', { detail: { world: chosenWorld(), pieces: chosenSet() } }));
 }

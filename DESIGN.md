@@ -1,6 +1,6 @@
 ---
 name: Shah
-description: An Albanian chess coach in the iOS 27 idiom, Liquid Glass floating over a lit wooden board.
+description: An Albanian chess coach in the iOS 27 idiom, Liquid Glass floating over a lit wooden board, titled in a Didone, with a club of painted opponents.
 colors:
   bg: "#f2f2f7"
   cell: "#ffffff"
@@ -46,29 +46,52 @@ colors:
   piece-edge-w: "#111214"
   piece-fill-b: "#17181b"
   piece-edge-b: "#f1efe9"
+  brass: "#d9b26f"
+  brass-ink: "#e2c48c"
+  brass-light-ink: "#8a5a22"
+  win: "#d9b26f"
+  draw: "#b9b2a6"
+  loss: "#e0675c"
+  room-glass: "rgb(28 21 16 / 0.64)"
+  room-glass-light: "rgb(252 250 247 / 0.74)"
+  card-ground: "#1b130e"
+  card-ink: "#f6efe4"
+  diagram-light: "#ead3a6"
+  diagram-dark: "#8d5338"
 typography:
   wordmark:
-    fontFamily: "ui-rounded, 'SF Pro Rounded', -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI Variable Display', 'Segoe UI', Roboto, sans-serif"
-    fontSize: "clamp(5rem, 2rem + 17vw, 9.5rem)"
-    fontWeight: 800
-    lineHeight: 0.92
-    letterSpacing: "-0.04em"
-  large-title:
+    fontFamily: "'Bodoni Moda', 'Bodoni 72', Didot, 'Bodoni MT', Georgia, serif"
+    fontSize: "clamp(5.5rem, 2rem + 18vw, 10.5rem)"
+    fontWeight: 600
+    lineHeight: 0.9
+    letterSpacing: "-0.035em"
+  display-title:
+    fontFamily: "'Bodoni Moda', 'Bodoni 72', Didot, 'Bodoni MT', Georgia, serif"
+    fontSize: "clamp(3.25rem, 2.25rem + 4.5vw, 6rem)"
+    fontWeight: 600
+    lineHeight: 0.98
+    letterSpacing: "-0.025em"
+  kicker:
     fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+    fontSize: "0.75rem"
+    fontWeight: 600
+    letterSpacing: "0.05em"
+  large-title:
+    fontFamily: "'Bodoni Moda', 'Bodoni 72', Didot, 'Bodoni MT', Georgia, serif"
     fontSize: "2.125rem"
-    fontWeight: 700
+    fontWeight: 600
     lineHeight: 1.08
     letterSpacing: "-0.022em"
   title1:
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+    fontFamily: "'Bodoni Moda', 'Bodoni 72', Didot, 'Bodoni MT', Georgia, serif"
     fontSize: "1.75rem"
-    fontWeight: 700
+    fontWeight: 600
     lineHeight: 1.12
     letterSpacing: "-0.02em"
   title2:
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+    fontFamily: "'Bodoni Moda', 'Bodoni 72', Didot, 'Bodoni MT', Georgia, serif"
     fontSize: "1.375rem"
-    fontWeight: 700
+    fontWeight: 600
   title3:
     fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
     fontSize: "1.25rem"
@@ -236,17 +259,17 @@ components:
 
 **Creative North Star: "The Native Table"**
 
-Shah should feel like an app that shipped with an iPhone running iOS 27. Two places make up the whole app. The table pages (home, Luaj, Ushtrime, lessons, the opening trainer) fill the screen with a lit wooden board in a dark room, and everything else floats over it as Liquid Glass: a status capsule and score card top left, a round glass menu button top right, the coach as one glass card, a slim accessory carrying the headlines and the move rail above a floating capsule tab bar. Away from the table (Mësime, Progresi, 404) the app is an inset-grouped iOS list on the grouped background, under a large title.
+Shah should feel like an app that shipped with an iPhone running iOS 27. Two places make up the whole app. The table pages (home, Luaj, Ushtrime, lessons, the opening trainer) fill the screen with a lit wooden board in a dark room, and everything else floats over it as Liquid Glass: a status capsule and score card top left, a round glass menu button top right, the coach as one glass card, a slim accessory carrying the headlines and the move rail above a floating capsule tab bar. Away from the table the reading pages (Mësime, Progresi) sit in the same room: a still of the table in the chosen room behind the page, dimmed, with the lists as tinted glass (Luca, 2026-10-15: "one look everywhere"); only the 404 keeps the plain grouped background.
 
-The system font and the iOS system colours carry the interface. One tint blue does actions and selection; red, orange and green appear only as status (live, verdict grades, done marks). The board is an object, not a theme: maple and walnut squares, a mahogany frame with boxwood stringing, boxwood and ebony pieces, and a warm yellow on the last move, the same in both appearances. The broadcast world that came before this one (stone and ink bars, poster Mona Sans, the orange pointer) is gone; Luca replaced it on 2026-10-13 with "make now everything more like iOS 27 theme".
+The system font and the iOS system colours carry the interface; one web font, Bodoni Moda, sets the titles (Luca, 2026-10-15: "a classic display typeface for titles"), the Didone of the Staunton years. Across the table sits a club of nine opponents, each an oil portrait of an invented person, chosen from a fanned deck of player cards (the signature moment) and seated in the score capsule, where they speak now and then. One tint blue does actions and selection; red, orange and green appear only as status (live, verdict grades, done marks). The board is an object, not a theme: maple and walnut squares, a mahogany frame with boxwood stringing, boxwood and ebony pieces, and a warm yellow on the last move, the same in both appearances. The broadcast world that came before this one (stone and ink bars, poster Mona Sans, the orange pointer) is gone; Luca replaced it on 2026-10-13 with "make now everything more like iOS 27 theme".
 
 **Key Characteristics:**
 - The lit table fills the screen on table pages; controls float over it as glass and never sit beside it in a sidebar.
 - Liquid Glass is one recipe: tinted base, top sheen, lit rim, hairline, lifting shadow, heavy blur. The learner sets its tint from clear to tinted.
 - Table pages always use the dark token set; list pages follow the system appearance.
-- The system font, no web font. Hierarchy comes from the iOS text styles.
+- The system font for everything read; Bodoni Moda for titles, names and figures at display sizes.
 - Capsules for every control, continuous large radii for cards, lists and sheets.
-- One tint for action, status colours only for status, yellow only for the last move.
+- One tint for action, status colours only for status, yellow only for the last move, brass only for what was earned.
 
 ## Colors
 
@@ -278,34 +301,45 @@ The iOS system palette in light and dark, a dark glass for the table, and the wa
 - **Mahogany, Edge, Boxwood Stringing, Coordinate Inlay** (mahogany, mahogany-edge, boxwood-stringing, coord-inlay): the frame, its stroke, the two pale lines, the inlaid coordinates (rgba(236, 214, 170, 0.9) in 3D).
 - **Boxwood and Ebony** (boxwood, ebony): the 3D pieces. Flat pieces use piece-fill-w with piece-edge-w and piece-fill-b with piece-edge-b.
 
+### Brass: what was earned
+- **Brass** (brass #d9b26f, brass-ink #e2c48c; brass-light-ink #8a5a22 in the day room): the metal of the board's corner caps, used for achievement only: the course path walked so far, done marks, chapter numerals, the course progress bars (a #c99a52 to #ecd29c gradient), wins in charts and the ladder, the medals. Never an action, never a selection.
+- **Results** (win #d9b26f, draw #b9b2a6, loss #e0675c; a step deeper in the day room): the accuracy chart's dots and the ladder's bars, always with the numbers or a key beside them.
+- **Player card** (card-ground #1b130e, card-ink #f6efe4, level in #e6c891): the deck's cards keep their own dark ground in every room, like a printed card.
+- **Diagram** (diagram-light #ead3a6, diagram-dark #8d5338, a #3b1a0e frame with a pale stringing ring): the small boards printed in the course and on the dashboard.
+
 ### Named Rules
 **The One Tint Rule.** Blue means "you can act here" or "this is chosen". Status colours never stand in for it, and it never decorates.
 
 **The Table Is A Place Rule.** Table pages use the dark token set whatever the system appearance; the room decides, not the page: the bright day room (Dritë dite) takes the light glass and dark ink (`data-world-tone="light"` on the root, set before paint from `shah.world`). Only the list pages follow the system light and dark.
 
+**The Earned Brass Rule.** Brass appears only where the progress shows something done. A medal is struck only when its condition is met by the stored progress; nothing is estimated or given.
+
 **The White-On-Fill Rule.** White text sits only on tint-fill or red-fill, never on the brighter system tint or red.
 
 ## Typography
 
-**Display Font:** the system rounded face (ui-rounded, SF Pro Rounded, then the system sans) for the wordmark only
+**Display Font:** Bodoni Moda (Indestructible Type, SIL OFL 1.1), self-hosted from `public/fonts/` as two variable WOFF2 files (roman 46 KB, italic 54 KB; Latin subset, which holds ë and ç; weight 400-900 and optical size 6-96 axes), the roman preloaded, `font-display: swap`. Fallbacks: Bodoni 72, Didot, Bodoni MT, Georgia.
 **Body Font:** the system font (-apple-system, BlinkMacSystemFont, SF Pro Text, system-ui, Segoe UI Variable Text, Segoe UI, Roboto, Helvetica Neue, Arial)
 **Label/Mono Font:** none; clocks, counts and move numbers use tabular figures
 
-**Character:** SF Pro where it exists and the platform sans elsewhere; no web font is loaded. The page sets body at 1.0625rem with -0.012em tracking, as iOS does.
+**Character:** a Didone at display sizes over the system sans, the way a luxury label sets its name over plain print. The page sets body at 1.0625rem with -0.012em tracking, as iOS does. The Didone's thin hairlines are only ever set large (from Title 3 up), where they hold over the room.
 
 ### Hierarchy
-- **Wordmark** (800 rounded, clamp(5rem, 2rem + 17vw, 9.5rem), 0.92): "Shah" on home, white at 0.9 over the table like the Lock Screen clock. The intro mark is the same face at clamp(3.75rem, 2rem + 9vw, 6.5rem); the navigation mark is rounded 700 at body size (title3 on desktop).
-- **Large Title** (700, 2.125rem; 2.75rem from 768px, 1.08): list page titles.
-- **Title 1** (700, 1.75rem, 1.12; 2rem on desktop): the move in the coach card. Non-move states (intro, note, end, solved, wrong, good) drop to Title 2 and wrap.
-- **Title 2** (700, 1.375rem): the scoresheet and new-game sheet titles.
-- **Title 3** (700, 1.25rem): group headers, title-case and bold in the iOS 26 manner; the end accuracy figure.
+- **Wordmark** (Bodoni Moda 600, clamp(5.5rem, 2rem + 18vw, 10.5rem), 0.9, -0.035em): "Shah" on home at poster size, white at 0.9 over the table. The intro mark is the same at clamp(4.5rem, 2rem + 12vw, 8rem); the navigation mark is Bodoni 700 at Title 3 (Title 2 on desktop).
+- **Display Title** (Bodoni 600, clamp(3.25rem, 2.25rem + 4.5vw, 6rem), 0.98, -0.025em): the reading pages' titles (Mësime, Progresi), lifted off the room by a soft shade.
+- **Figures** (Bodoni 600, clamp(2.25rem, 1.5rem + 3.5vw, 3.25rem), tabular): the three numbers at the head of Progresi; the course count at 1.625rem.
+- **Title 1** (Bodoni 600, 1.75rem; 2rem on desktop): the move in the coach card, the new-game sheet title, chapter titles, the dashboard's opponent (1.625rem), the deck's names (1.75rem). Non-move coach states drop to Title 2 and wrap.
+- **Title 2** (Bodoni 600, 1.375rem): group headers on the reading pages.
+- **Title 3** (Bodoni 600, 1.25rem): lesson titles on the path, the ladder's names, the first-run answers.
+- **Chapter numeral** (Bodoni 500, 3.25rem, roman, brass-ink): I to V before each chapter; upright, because the italic capitals read as slashes at this size.
+- **Kicker** (system 600, 0.75rem, uppercase, 0.05-0.06em tracking, label-2): the small label above a Didone title ("Kapitulli II", "Kundërshtari yt", "Lojëra"), as a book sets a part title.
 - **Body** (400, 1.0625rem, 1.4): list rows, buttons (600), guide rows.
 - **Subhead** (0.9375rem): coach reasons (1.38, 60ch; callout 1rem on desktop), cues (600), segmented cells, ledes (46ch).
 - **Footnote** (0.8125rem, 400 to 700): status text, score rows, grade pills, secondary row lines, group notes.
 - **Caption / Caption 2** (0.75rem 700; 0.6875rem 600): the Live tag and lesson meta; tab labels.
 
 ### Named Rules
-**The Text Styles Rule.** Sizes come from the iOS text-style ladder (--t-large to --t-cap2); no in-between sizes, no uppercase captions, no letter-spaced labels.
+**The Text Styles Rule.** Read text keeps to the iOS text-style ladder (--t-large to --t-cap2). The Didone takes the display sizes above it. Uppercase appears only as the kicker over a Didone title, never as a section header or on a button.
 
 **The Figurine Rule.** Moves are written as figurine plus square (piece silhouette inline at 0.95em, 0.82em in the coach headline, then the square in 600 tabular figures), never as letter notation.
 
@@ -315,9 +349,9 @@ Phone first. A table page is a stage of 100svh (min 36rem) with every glass surf
 
 The board frames itself inside the stage insets `--inset-top / bottom / left / right` (phone 7.25 / 19 / 0.5 / 0.5rem; home 16 / 17rem). They must stay plain lengths, never calc(): the 3D board reads them with parseFloat.
 
-From 1024px the iPad idiom takes over: the tab bar hides and the tabs float as one glass capsule in the middle of a 4.25rem navigation bar, fixed over the table on table pages; gutter 2rem. The status capsule and score card (21rem) sit at the top of a left column at 1.5rem, the coach card below them (21rem, 25rem from 1400px), the last moves as a glass card at the column foot, tools as a row of round glass buttons top right, the accessory spanning the foot. Insets become 5.5 / 5 / 24 (28 from 1400px) / 4.75rem. Home puts its guide on the right at 26rem.
+From 1024px the iPad idiom takes over: the tab bar hides and the tabs float as one glass capsule in the middle of a 4.25rem navigation bar, fixed over the table on table pages; gutter 2rem. The status capsule and score card (21rem) sit at the top of a left column at 1.5rem, the coach card below them (21rem, 25rem from 1400px), the last moves as a glass card at the column foot, tools as a row of round glass buttons top right, the accessory spanning the foot. Insets become 5.5 / 5 / 24 (28 from 1400px) / 4.75rem. Home puts its dashboard on the right at 27rem.
 
-List pages are a single column (max 46rem for lessons and progress) with a 1rem gutter, inset-grouped lists, group headers 2.25rem above their group. The scoresheet below the stage is capped at 40rem. Spacing steps: 0.375 / 0.625 / 1 / 1.5 / 2.25 / 3rem. Breakpoints: 640px (the sheet centres), 768px (larger large title), 1024px (desktop shell), 1400px (wider column). Tap targets are at least 44px; primary buttons 50px.
+Reading pages are a single column (max 46rem for lessons and progress) with a 1rem gutter over the room still (`.room-bg`, fixed, cover, dimmed by a 0.78 / 0.46 / 0.62 gradient of rgb(12 8 6), or a white wash in the day room), lists as room glass, group headers 2.25rem above their group, chapters 3rem apart. The scoresheet below the stage is capped at 40rem. Spacing steps: 0.375 / 0.625 / 1 / 1.5 / 2.25 / 3rem. Breakpoints: 640px (the sheet centres), 768px (larger large title), 1024px (desktop shell), 1400px (wider column). Tap targets are at least 44px; primary buttons 50px.
 
 ## Elevation & Depth
 
@@ -398,9 +432,27 @@ The coach card's capsule buttons: 44px, subhead 600, fill background with label 
 
 - **Online game** (`/online/`): the play page's table without the coach's voice. The card carries the room: the four-letter code in monospace at 1.6em with 0.18em tracking while the room waits (so it can be read aloud across a table), then "Radha jote" / "Radha e shokut", the friend's last move, a draw offer, or the result ("Fitove", "Humbe", "Barazim" with the reason). One primary cue at a time (Krijo lojën, Hyr në lojë, Dërgo lidhjen, Prano barazimin, Merr fitoren, Revansh), the rest as symbol buttons on phones, except "Hyr me kod", which keeps its words (`cue--label`). The friend's name on the score card reads "Shoku · larg" while their phone is away. The page title gains "● Radha jote" when it is the learner's move in a background tab.
 
+### The club (signature: the player deck)
+Borrowed from the award sites' fanned cards (Lando Norris's), as a hand of player cards.
+- **Player deck** (new-game sheet, "Zgjidh lojtarin"): a sideways scroll-snap row of cards, 10.5rem wide, centred on the chosen one, with the cards either side leaning away like a fan held in the hand (a CSS scroll-driven animation, `view(inline)`: rotate 9deg, scale 0.88, drop 1.5rem at the edges, from a pivot below the card; off with the Stop-animations switch and reduced motion). Each card: the oil portrait at 4:5, the level number in Bodoni top left, the name in Bodoni 1.75rem over a gradient into the card ground, the level in #e6c891, how they play (3 lines), and the learner's record against them under a hairline ("2 fitore, 1 humbje" or "Ende pa lojë"). Chosen: a 3px tint ring and a tint check badge. The cards are radios: arrow keys move along the deck; fine pointers get two round glass step buttons at the sides.
+- **The flight to the seat:** "Fillo lojën" closes the sheet and a copy of the chosen painting flies from the card to the opponent's face in the score capsule (620ms, the ease-in-out curve, an arc that lifts and turns -4deg at mid-flight, shrinking and rounding to a circle, fading at the end), then the face settles from scale 1.25. With motion off it is simply there.
+- **The seat:** the opponent's face (1.75rem, round, a 1.5px light ring) leads their side of the score capsule and replaces the turn dot: while it is their move a green ring breathes round it.
+- **The voice:** a strong-glass capsule with their face (1.625rem) and one line in footnote 600. On phones it takes the move strip's place (the strip fades out under it), on wide screens the status capsule's, so it never covers the board. It enters in 240ms from scale 0.96 and fades out in 160ms; a tap dismisses it; it stays 70ms a character (at least 3s; 6s for the last word of a game). They speak at the moments a person would: hello at a new game, a thought on a long think (30%), pouncing on a punished slip (80%), noticing their own slip when the learner punishes it (75%), once a game when it turns (±4 pawns), and at the end (won, lost, draw, resigned). Never two lines within four half-moves, except the hello and the last word. Lines live in `src/lib/bots.ts` and never put an adjective on the learner (Albanian adjectives agree in gender).
+
+### The reading pages
+- **Course path (Mësime):** the count ("3 nga 11 të kryera", the figure in Bodoni) over a brass bar, and one primary button ("Fillo / Vazhdo / Përsërit: <lesson>"). Five chapters (Bazat, Taktikat, Mati, Fundloja, Hapjet; `COURSE` in `src/data/lessons.ts`), each opened by its roman numeral in brass, a kicker and the chapter title, its note, and a "k/n" capsule that turns brass when complete. The lessons hang on a rail down the left: a node per lesson (dark ring; brass when done, the rail below it gilded; tint with a halo for the next one, whose card gets a tint ring and "Vazhdo këtu"). Each lesson card: a printed diagram of its first position that is not the start (5.25rem, 6rem from 768px), "Mësimi n", the title in Bodoni, a two-line lede, then "Kryer" in brass and the steps. The opening trainer follows as a sixth section with the repertoires' diagrams after three moves each, from the learner's side.
+- **Figures (Progresi):** one glass card of three columns divided by hairlines: Lojëra, Saktësia, Ushtrimet, each a kicker, a Bodoni figure and a caption line; below it a short list (lessons done, the streak, the race record).
+- **Accuracy chart:** an SVG in a glass card (400 x 168 viewBox, at most 12rem tall): gridlines at 25/50/75/100 with tick labels, the mean as a dotted line, the games as a trace with a dot each in its result's colour, a caption that reads it in words, and a key. Data the learner reads: it never animates.
+- **The club ladder:** all nine opponents easiest first: face (2.5rem), name in Bodoni with the level beside it, the score as "w – d – l" (its accessible name in words), and a capsule bar split into win, draw and loss. Opponents not yet met are greyed with "Ende pa lojë".
+- **Medals:** a grid (auto-fill, 6.75rem minimum) in a glass card. Earned: a struck brass disc (a radial gradient from #fff5d6 to #5d3d14, an inner rim and a bottom shade) with a filled Phosphor symbol embossed into it, "E fituar" in brass. To win: an engraved ring with the symbol at 42% brass and the count ("3 nga 7"). A medal won since the last visit is struck in front of the learner once (900ms, rotateY from 80deg with an overshoot; rare enough to bounce; off with motion off). Twelve medals, each from stored progress only (`src/lib/record.ts`).
+
+### The front screen
+- **Dashboard (home):** one glass card. Top: the next opponent (the 4:5 portrait at 3.5 x 4.375rem, a kicker, the name in Bodoni, "Niveli n · w – d – l" or their tagline), or the game that waits ("Loja të pret", the move number and side, and a diagram of the position). Below, two tiles on fill-2: today's puzzle as a diagram of the position the learner will face (the opponent's setup move marked; loaded after the page) with the streak, and the next lesson in course order with its chapter numeral and a brass bar of the course. The streak capsule beside Luaj drops its word on screens under 420px.
+- **First-run sheet:** for a newcomer only (no games, lessons or puzzles, asked once per phone): the setup sheet's chrome, a kicker "Mirë se erdhe në Shah", "Sa e njeh shahun?" in Bodoni, and three answers, each with the face of the opponent it brings and the first lesson ("Kundërshtari: Lea, niveli 1. Mësimi: Vlera e figurave."). "Fillo lojën" or "Fillo me mësimin" act on the choice (an inline error if none is picked; the buttons are never disabled); "Më vonë" closes it for good.
+
 ### Inputs
 - **Segmented control:** capsule fill track with 0.1875rem padding, 2.5rem cells, the choice on a seg-thumb capsule with a soft shadow.
-- **Checkmark list:** inset-grouped rows (min 3.25rem) with a tint check drawn by the `--check` mask (Phosphor check, bold) on the chosen row; used for levels and puzzle themes.
+- **Checkmark list:** inset-grouped rows (min 3.25rem) with a tint check drawn by the `--check` mask (Phosphor check, bold) on the chosen row; used for puzzle themes. The opponents are the player deck.
 - **Slider (Pamja):** a 4px capsule track filled in tint to a white 1.75rem thumb; it sets `--glass-level` live.
 - **Switch:** the iOS switch (green on), 0.45 opacity when it cannot be used (the reminder in a browser without push).
 - **Value row:** a select inside a row, its value trailing in label-2 with a caret-up-down, as an iOS menu row (the reminder's hour).
@@ -410,13 +462,13 @@ The coach card's capsule buttons: 44px, subhead 600, fill background with label 
 Inset-grouped groups on cell, radius 1.375rem, rows min 2.875rem with 0.6875rem 1rem padding, pressed in cell-press, hover a 55% mix on fine pointers. Disclosure uses the `--chevron` mask (Phosphor caret-right) in label-3, rotated 90 degrees when a disclosure group opens. Lesson rows lead with a 2.25rem tile at 0.625rem radius: tint-fill with the white step number, or white or black for the side a repertoire trains. Results sit in small tinted capsules (win green, loss red).
 
 ### Sheets and overlays
-- **New-game sheet:** the opponent is a three-way segmented control (Motori, Shok këtu, Shok online) when the server is there; online hides the levels and the button reads "Krijo lojën online". The online page's own sheets (Lojë online, Hyr me kod) are the same dialog. A strong-glass dialog at 2.25rem radius with a 2.25rem grabber on phones, rising from the bottom over 460ms on the sheet curve; from 640px it centres and pops (scale 0.94, blur 8px, 320ms). Backdrop rgb(0 0 0 / 0.42). Title 2 centred, footnote legends, segmented control, checkmark list, full-width capsule buttons.
+- **New-game sheet:** the opponent is a three-way segmented control (Motori, Shok këtu, Shok online) when the server is there, then the player deck; online hides the deck and the button reads "Krijo lojën online". The title is Title 1 in Bodoni. The online page's own sheets (Lojë online, Hyr me kod) are the same dialog. A strong-glass dialog at 2.25rem radius with a 2.25rem grabber on phones, rising from the bottom over 460ms on the sheet curve; from 640px it centres and pops (scale 0.94, blur 8px, 320ms). Backdrop rgb(0 0 0 / 0.42). Title 2 centred, footnote legends, segmented control, checkmark list, full-width capsule buttons.
 - **Pamja sheet:** the same dialog, opened by the palette button (on home beside the actions, last among the board tools): "Dhoma" and "Figurat", each a two-column grid of tiles (1.125rem radius on cell, a hairline ring; chosen: a 2px tint ring and a tint check badge). A room tile shows the room's two colours split on the diagonal, a set tile two pawn heads in its two finishes. A choice applies at once; "Mbaro" closes. The same tiles stand in Progresi > Pamja, four across on wide screens.
-- **Intro:** black, the rounded mark, and an 11rem 4px capsule progress bar filled in tint from the script's `--p`.
+- **Intro:** black, the Bodoni mark, and an 11rem 4px capsule progress bar filled in tint from the script's `--p`.
 - **Promotion:** glass tiles at 1.25rem radius over a 42% black scrim.
 
 ### Navigation
-- **Phone:** a floating capsule tab bar of glass, five tabs (Luaj, Ushtrime, Mësime, Analizo, Progresi) with a 1.625rem icon over a caption2 label; the current tab is tint-ink in a glass-press lens; press scales 0.94. No navigation bar on table pages; elsewhere the rounded mark sits left and the round motion button right, over the scroll-edge blur.
+- **Phone:** a floating capsule tab bar of glass, five tabs (Luaj, Ushtrime, Mësime, Analizo, Progresi) with a 1.625rem icon over a caption2 label; the current tab is tint-ink in a glass-press lens; press scales 0.94. No navigation bar on table pages; elsewhere the Bodoni mark sits left and the round motion button right, over the scroll-edge blur.
 - **Desktop:** the tabs float as one glass capsule centred in the navigation bar, 40px items with icon and subhead label, current in tint-ink on glass-press, hover fill-2; the motion switch becomes a labelled glass capsule.
 
 ### Board
@@ -427,7 +479,7 @@ The board is always the 3D table on every page (Luca, 2026-10-13: "i want the bo
 ### Do:
 - **Do** fill table pages with the lit board and float every control over it as Liquid Glass by the shared recipe.
 - **Do** use the dark token set on every table page, whatever the system appearance.
-- **Do** use the system font and the iOS text-style ladder; the rounded face only for the wordmark and intro mark.
+- **Do** use the system font and the iOS text-style ladder for everything read, and Bodoni Moda for titles, names and figures from Title 3 up.
 - **Do** put white text only on tint-fill (#0066d6) or red-fill (#d70015), and keep light label-2 at rgb(60 60 67 / 0.78).
 - **Do** use the tint for action and selection, red, orange and green only for status, and yellow only for the last move.
 - **Do** keep `--inset-*` on the stage as plain lengths; the 3D board parses them with parseFloat.
@@ -436,7 +488,9 @@ The board is always the 3D table on every page (Luca, 2026-10-13: "i want the bo
 
 ### Don't:
 - **Don't** build the flat green-and-cream board widget with a grey eval bar and a sidebar of tabs.
-- **Don't** add web-dashboard chrome: cards in grids, hairline-bordered panels, uppercase captions.
+- **Don't** add web-dashboard chrome: cards in grids, hairline-bordered panels, uppercase section headers. (The medal grid is a case of objects, not a grid of cards.)
 - **Don't** give the table a light theme: felt, wood and pieces keep their tones in both appearances.
-- **Don't** load a web font or set text as an icon glyph; icons are Phosphor SVG, and list symbols are CSS masks.
+- **Don't** load a second web font or set the Didone small; don't set text as an icon glyph: icons are Phosphor SVG, and list symbols are CSS masks.
+- **Don't** let the opponent chatter: one line at a time, four half-moves apart, never over the board.
+- **Don't** strike a medal or gild a step the stored progress does not show.
 - **Don't** put a solid bar under the navigation; the scroll edge is a fading blur.

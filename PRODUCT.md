@@ -37,7 +37,7 @@ the daily reminder. It holds no accounts, and it cannot read the synced progress
 ## Operating Context
 
 - Short sessions on a phone: one game, or a handful of puzzles.
-- Games against Stockfish at six strengths, each a named bot, from one that blunders on purpose to full strength.
+- Games against nine opponents, a club of invented people each with a painted portrait, from a child who has just learned the moves to Stockfish at full strength; the learner picks them from a deck of player cards that shows their record against each.
 - Games with a friend: on the same phone, or online with a four-letter code, each on their own phone.
 - A move-by-move review, built while the game is played; any game (chess.com, Lichess, pasted PGN) reviewed on Analizo.
 - Progress (games, puzzles, recurring mistake types) stays in the browser's own storage on that device. With sync on,
@@ -90,9 +90,14 @@ the daily reminder. It holds no accounts, and it cannot read the synced progress
   Ermali.
 - The board is always the 3D table, on every page (Luca, 2026-10-13: "i want the board to be always 3d"); the
   flat 2D board is kept only as the fallback where WebGL fails. Its pieces are the side profiles of the turned pieces.
-- Kept from the award-site vocabulary of Luca's other builds: one signature moment (the wooden board), a
-  Stop-animations switch, and a loader with a skip. Poster type, the two-colour rule and the broadcast graphics gave
-  way to the iOS look.
+- The interface pass of 2026-10-15 (Luca chose all eight: "bots with faces + chat", "first-time setup", "bot picker
+  as cards", "one look everywhere", "richer Progresi", "lessons as a course path", "home as a dashboard", "classic
+  title typeface"), built with the awwwards-blueprints vocabulary at his request ("use awwwards website skill"): titles
+  in a Didone at poster size (Bodoni Moda), one signature moment named before building (the player deck: the chosen
+  card flies to the seat across the table), the reading pages in the same room as the board, and the craft rules and
+  audit as the gate. The opponents speak a short line now and then; badges and records come only from the stored
+  progress. A newcomer is asked once how well they know the game, which picks the first opponent and lesson.
+- Kept from the award-site vocabulary of Luca's other builds: a Stop-animations switch, and a loader with a skip.
 
 ## Evidence on Hand
 

@@ -37,6 +37,7 @@ import '../styles/play.css';
 
     <div class="bug bug--score" data-board-ui aria-label="Lojtarët">
       <div class="score__row" data-them>
+        <img class="score__face" data-face src="/bots/ermali-face.webp" alt="" width="28" height="28" hidden />
         <span class="score__name" data-name>Motori</span>
         <span class="score__taken" data-taken></span>
         <span class="score__clock tabular" data-clock hidden></span>
@@ -49,6 +50,11 @@ import '../styles/play.css';
     </div>
 
     <ol class="strip" data-strip data-board-ui aria-label="Lëvizjet e lojës"><li class="strip__empty">Lëvizjet shfaqen këtu.</li></ol>
+
+    <div class="say" data-say data-board-ui role="status" hidden>
+      <img class="say__face" data-say-face src="/bots/ermali-face.webp" alt="" width="26" height="26" />
+      <p class="say__text" data-say-text></p>
+    </div>
 
     <div class="tools" data-board-ui>
       <button type="button" class="tool tool--menu" data-tools-toggle aria-expanded="false" aria-controls="tools-list" aria-label="Mjetet"><Fragment set:html={icon('dotsThreeVertical')} /></button>
@@ -145,6 +151,14 @@ import '../styles/play.css';
           {hasServer && <label><input type="radio" name="opponent" value="online" /><span>Shok online</span></label>}
         </div>
       </fieldset>
+      <fieldset class="deck-field" data-engine-only data-not-online>
+        <legend>Zgjidh lojtarin</legend>
+        <div class="deck" data-levels></div>
+        <div class="deck__steps">
+          <button type="button" class="deck__step" data-deck-step="-1" tabindex="-1" aria-hidden="true"><Fragment set:html={icon('caretLeft')} /></button>
+          <button type="button" class="deck__step" data-deck-step="1" tabindex="-1" aria-hidden="true"><Fragment set:html={icon('caretRight')} /></button>
+        </div>
+      </fieldset>
       <fieldset data-engine-only>
         <legend>Luaj me</legend>
         <div class="segmented">
@@ -161,10 +175,6 @@ import '../styles/play.css';
           <label><input type="radio" name="clock" value="5+3" /><span>5+3</span></label>
           <label><input type="radio" name="clock" value="3+2" /><span>3+2</span></label>
         </div>
-      </fieldset>
-      <fieldset data-engine-only data-not-online>
-        <legend>Niveli i kundërshtarit</legend>
-        <div class="choices" data-levels></div>
       </fieldset>
       <div class="setup__actions">
         <button type="submit" class="btn btn--solid" value="start"><span data-when-local>Fillo lojën</span><span data-when-online>Krijo lojën online</span></button>

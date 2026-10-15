@@ -310,3 +310,30 @@ LESSONS.push({
 });
 
 export const lessonOf = (slug: string) => LESSONS.find((l) => l.slug === slug);
+
+/** The lessons as a course: chapters in the order a learner meets them (the path on Mësime, the next lesson on the
+ *  home screen). A lesson missing from every chapter still shows, at the end of the last one. */
+export interface Chapter {
+  n: string;
+  title: string;
+  note: string;
+  lessons: Lesson[];
+}
+const chapter = (n: string, title: string, note: string, slugs: string[]): Chapter => ({ n, title, note, lessons: slugs.map((s) => lessonOf(s)!).filter(Boolean) });
+export const COURSE: Chapter[] = [
+  chapter('I', 'Bazat', 'Sa vlen secila figurë, dhe si nis një lojë e mirë.', ['vlera-e-figurave', 'parimet-e-hapjes']),
+  chapter('II', 'Taktikat', 'Goditjet e shkurtra që fitojnë material.', ['piruni', 'lidhja', 'helli', 'sulmi-i-zbuluar']),
+  chapter('III', 'Mati', 'Dy mënyrat e para për ta mbaruar lojën.', ['mat-ne-rreshtin-e-fundit', 'mati-me-dy-torra']),
+  chapter('IV', 'Fundloja', 'Kur kanë mbetur pak figura: mbreti lufton.', ['opozita', 'fundloja']),
+  chapter('V', 'Hapjet', 'Një hapje e vërtetë nga fillimi.', ['mbrojtja-siciliane']),
+];
+{
+  const placed = new Set(COURSE.flatMap((c) => c.lessons.map((l) => l.slug)));
+  COURSE[COURSE.length - 1].lessons.push(...LESSONS.filter((l) => !placed.has(l.slug)));
+}
+/** Every lesson in course order. */
+export const COURSE_ORDER: Lesson[] = COURSE.flatMap((c) => c.lessons);
+/** The first lesson not yet done, in course order (the first one again when all are done). */
+export const nextLesson = (done: string[]) => COURSE_ORDER.find((l) => !done.includes(l.slug)) ?? COURSE_ORDER[0];
+/** Where a lesson's diagram comes from: its first position that is not the starting one. */
+export const lessonFen = (l: Lesson) => (l.steps.find((s) => !s.fen.startsWith('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR')) ?? l.steps[0]).fen;

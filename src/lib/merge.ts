@@ -76,6 +76,7 @@ export function merge(a: Progress, b: Progress): Progress {
     daily: daily ? { ...daily } : null,
     streak: { ...streak },
     rushBest: Math.max(a.rushBest, b.rushBest),
+    bestStreak: Math.max(a.bestStreak ?? 0, b.bestStreak ?? 0, streak.count),
     updated: a.updated > b.updated ? a.updated : b.updated,
     settingsAt: newer.settingsAt,
     resetAt: a.resetAt,
