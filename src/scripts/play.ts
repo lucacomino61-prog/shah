@@ -5,7 +5,7 @@
 import { Chess, type Square } from 'chess.js';
 import { GRADES, TAG_NAMES, afterReply, gameAccuracy, judge, passTurn, threatWarning, uciSan, winChance, type Grade, type Verdict } from '../lib/coach.ts';
 import { Engine, type Analysis } from '../lib/engine.ts';
-import { LEVELS, levelOf, pickMove, thinkTime, type Level } from '../lib/levels.ts';
+import { LEVELS, hopeless, levelOf, pickMove, thinkTime, type Level } from '../lib/levels.ts';
 import { sanHtml, sentenceHtml, sentenceText } from '../lib/notation.ts';
 import { openingOf } from '../lib/openings.ts';
 import { addCard, load, loadGame, saveGame, update, type Progress } from '../lib/store.ts';
@@ -90,6 +90,8 @@ const colourName = (s: Side) => (s === 'w' ? 'të bardhat' : 'të zezat');
 const Cap = (t: string) => t[0].toUpperCase() + t.slice(1);
 let board: BoardView;
 let lastVerdict: Verdict | null = null;
+/** the bot's moves in a row with its game lost beyond hope (a person resigns after a few) */
+let hopelessRun = 0;
 let boardReady = false;
 /** the position's value after each move, centipawns for white (mate is +-1000) */
 let evals: (number | null)[] = [];
@@ -228,6 +230,7 @@ function newGame(s: Side, lv: Level, clk: string = prefs.clock, withFriend = fal
   engine.newGame();
   side = s;
   level = lv;
+  hopelessRun = 0;
   clock = makeClock(clk);
   evals = [];
   orientation = s;
@@ -391,6 +394,14 @@ async function engineMove(given?: Analysis) {
   const a = given ?? (await engine.analyse(fen(), { ...coachSearch(), multipv: Math.max(1, level.lines) }));
   if (g !== gen) return;
   const legal = chess.moves({ verbose: true }).map((m) => m.from + m.to + (m.promotion ?? ''));
+  // a lost game: the stronger bots resign after a few moves of it, as people do (never inside a replayed line)
+  // one move that looks a little less bad does not undo the others
+  hopelessRun = level.resigns && !study ? (hopeless(a) ? hopelessRun + 1 : Math.max(0, hopelessRun - 1)) : 0;
+  if (hopelessRun >= 3) {
+    await new Promise((r) => setTimeout(r, 900));
+    if (g !== gen) return;
+    return endGame(false, null, true);
+  }
   const uci = pickMove(a, level, fen(), legal);
   if (!uci) return endGame();
   // a person's time over the move: quick on a recapture or with one move, longer when it is hard (and never less
@@ -459,7 +470,7 @@ function takeBack(message: string) {
   else void engineMove();
 }
 
-function endGame(resigned = false, flagged: Side | null = null) {
+function endGame(resigned = false, flagged: Side | null = null, botResigned = false) {
   if (study) leaveStudy();
   phase = 'over';
   gen++;
@@ -475,6 +486,10 @@ function endGame(resigned = false, flagged: Side | null = null) {
     res = 'win';
     headline = `Fitojnë ${colourName(winner)}`;
     line = resigned ? `${Cap(colourName(loser))} u dorëzuan.` : flagged ? `${Cap(colourName(loser))} mbetën pa kohë.` : 'Shah mat.';
+  } else if (botResigned) {
+    res = 'win';
+    headline = 'Fitore';
+    line = `${level.bot} u dorëzua. E pa që loja ishte e humbur.`;
   } else if (resigned) {
     res = 'resigned';
     headline = 'Dorëzim';

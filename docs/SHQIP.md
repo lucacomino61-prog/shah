@@ -145,4 +145,5 @@ i lehtë · mesatarisht i lehtë · mesatar · i fortë · shumë i fortë · mo
 **Lea** "Sapo mësoi lëvizjet. Lë figura pa mbrojtje dhe shpesh harron të marrë." · **Ermali** "Merr çdo figurë që i
 jep, por rrallë sheh rrezikun për të vetat." · **Arta** "Mbron figurat më shpesh dhe të ndëshkon kur lë diçka pa
 mbrojtje." · **Agimi** (new note) "Luan si fillestar që di parimet, por gabon kur loja ndërlikohet." · While a bot
-thinks the status reads "Lea po mendon…" (was "Kundërshtari po mendon…").
+thinks the status reads "Lea po mendon…" (was "Kundërshtari po mendon…"). The stronger bots (from Besniku up) resign a lost game:
+"Besniku u dorëzua. E pa që loja ishte e humbur." Please check "E pa që loja ishte e humbur" (it saw the game was lost).

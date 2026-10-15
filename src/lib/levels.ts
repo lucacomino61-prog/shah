@@ -42,6 +42,8 @@ export interface Level {
   mate: number;
   /** a person's time to move, milliseconds: the usual and the longest */
   think: [number, number];
+  /** resigns a lost game as a person does (from Besniku up; the starters play on, so a learner practises finishing) */
+  resigns?: boolean;
 }
 
 const EYES = {
@@ -135,10 +137,10 @@ export const LEVELS: Level[] = [
   },
   { id: 1, n: 4, bot: 'Agimi', hue: '#34c759', name: 'I lehtë', note: 'Luan si fillestar që di parimet, por gabon kur loja ndërlikohet.', depth: 12, eye: EYES.learning, lines: 6, temper: 130, slip: 0.14, mate: 0.9, think: [1500, 3400] },
   { id: 2, n: 5, bot: 'Drita', hue: '#30b0c7', name: 'Mesatarisht i lehtë', note: 'Luan me kujdes, por bën gabime të qarta.', depth: 12, eye: EYES.club, lines: 5, temper: 75, slip: 0.07, mate: 1, think: [1700, 3800] },
-  { id: 3, n: 6, bot: 'Besniku', hue: '#007aff', name: 'Mesatar', note: 'Rrallë lë diçka falas. Duhet të luash mirë.', depth: 12, eye: EYES.club, lines: 4, temper: 40, slip: 0.03, mate: 1, think: [1900, 4200] },
-  { id: 4, n: 7, bot: 'Teuta', hue: '#5856d6', name: 'I fortë', note: 'Zgjedh pothuajse gjithmonë një nga lëvizjet më të mira.', depth: 12, eye: EYES.club, lines: 3, temper: 18, slip: 0.01, mate: 1, think: [2000, 4400] },
-  { id: 5, n: 8, bot: 'Ardiani', hue: '#af52de', name: 'Shumë i fortë', note: 'Luan lëvizjen më të mirë që gjen.', depth: 14, lines: 1, temper: 0, slip: 0, mate: 1, think: [1800, 4000] },
-  { id: 6, n: 9, bot: 'Stockfish', hue: '#8e8e93', name: 'Motori i plotë', note: 'Stockfish me gjithë forcën që ka në shfletues.', depth: 18, movetime: 2500, lines: 1, temper: 0, slip: 0, mate: 1, think: [600, 1200] },
+  { id: 3, n: 6, bot: 'Besniku', hue: '#007aff', name: 'Mesatar', note: 'Rrallë lë diçka falas. Duhet të luash mirë.', depth: 12, eye: EYES.club, lines: 4, temper: 40, slip: 0.03, mate: 1, think: [1900, 4200], resigns: true },
+  { id: 4, n: 7, bot: 'Teuta', hue: '#5856d6', name: 'I fortë', note: 'Zgjedh pothuajse gjithmonë një nga lëvizjet më të mira.', depth: 12, eye: EYES.club, lines: 3, temper: 18, slip: 0.01, mate: 1, think: [2000, 4400], resigns: true },
+  { id: 5, n: 8, bot: 'Ardiani', hue: '#af52de', name: 'Shumë i fortë', note: 'Luan lëvizjen më të mirë që gjen.', depth: 14, lines: 1, temper: 0, slip: 0, mate: 1, think: [1800, 4000], resigns: true },
+  { id: 6, n: 9, bot: 'Stockfish', hue: '#8e8e93', name: 'Motori i plotë', note: 'Stockfish me gjithë forcën që ka në shfletues.', depth: 18, movetime: 2500, lines: 1, temper: 0, slip: 0, mate: 1, think: [600, 1200], resigns: true },
 ];
 
 /** The level a stored id names (an unknown one, from an older copy, falls back to the second starter). */
@@ -149,6 +151,14 @@ export const FIRST_LEVEL = 8;
 
 /** Does this level choose its moves from the engine's lines (and so need them)? */
 export const usesEngine = (l: Level) => !l.eye || l.slip < 1;
+
+/** Is the bot's game lost beyond hope here (from its side): a mate against it it can see, or about a queen down? */
+export function hopeless(a: Analysis): boolean {
+  const top = a.lines[0];
+  if (!top) return false;
+  if (top.mate !== undefined) return top.mate < 0 && top.mate >= -3;
+  return lineScore(top) <= -900;
+}
 
 /** The bot's move at this level in the position `fen`, from the engine's search with `lines` lines. */
 export function pickMove(a: Analysis, level: Level, fen: string, legal: string[], rnd: () => number = Math.random): string | null {

@@ -49,6 +49,8 @@ node tools/test-flow.mjs                  # clock, blunder, graph, the blunder b
 node tools/test-trainer.mjs               # opening trainer and the endgame play-out (dev server)
 node tools/test-extras.mjs                # threats, sounds, puzzle of the day, race, backup, bots, two on one phone (dev)
 node --experimental-strip-types tools/test-levels.ts [games] [top]   # each bot beats the one below it; how each plays
+node --experimental-strip-types tools/check-human.ts            # the starters' eye on fixed positions (free queen, mate in one)
+node tools/test-resign.mjs                # a stronger bot resigns a lost game (dev server)
 node tools/test-analyse.mjs               # the analysis board and game review (dev server)
 node tools/test-animations.mjs            # the box opening, the fallen king, the promotion, captured pieces, the streak (dev)
 npm run server:check                      # the server's types (generates server/worker-configuration.d.ts first)
