@@ -138,3 +138,11 @@ llambë, dritat e qytetit". Please check "llamba" against "llamba e gjelbër" (t
 The sets: **Dru** "Bush dhe eben, si në turne" (boxwood and ebony) · **Llak** "Krem dhe e kuqe, me shkëlqim"
 (lacquer) · **Xham** "I tejdukshëm dhe rubin" (glass: clear and ruby) · **Metal** "Argjend dhe ar". Is "bush" the word
 Albanian woodworkers use for boxwood?
+
+**The bots, nine now** (Luca, 2026-10-15: "make more starter levels"): three starters first, then the six there were.
+The level names (they follow "Niveli 3, ..."): **për fillestarë të plotë** · **për fillestarë** · **shumë i lehtë** ·
+i lehtë · mesatarisht i lehtë · mesatar · i fortë · shumë i fortë · motori i plotë.
+**Lea** "Sapo mësoi lëvizjet. Lë figura pa mbrojtje dhe shpesh harron të marrë." · **Ermali** "Merr çdo figurë që i
+jep, por rrallë sheh rrezikun për të vetat." · **Arta** "Mbron figurat më shpesh dhe të ndëshkon kur lë diçka pa
+mbrojtje." · **Agimi** (new note) "Luan si fillestar që di parimet, por gabon kur loja ndërlikohet." · While a bot
+thinks the status reads "Lea po mendon…" (was "Kundërshtari po mendon…").

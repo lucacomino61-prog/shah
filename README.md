@@ -1,6 +1,6 @@
 # Shah
 
-An Albanian chess coach. You play Stockfish at a strength you can beat, against six named bots. After every move the
+An Albanian chess coach. You play Stockfish at a strength you can beat, against nine named bots, the first three made for someone who has just learned the moves. After every move the
 coach grades it, says why in plain Albanian, and can replay the better line on the board ("Shiko pse"). Your own
 mistakes come back as spaced puzzles. There are also 1,120 Lichess puzzles with a puzzle of the day, a streak and a
 three-minute race, eleven short lessons, and an opening trainer for five repertoires. The analysis board reviews any
@@ -48,6 +48,7 @@ node tools/test-taps.mjs                  # tapping and dragging on both boards 
 node tools/test-flow.mjs                  # clock, blunder, graph, the blunder back as a puzzle (dev server)
 node tools/test-trainer.mjs               # opening trainer and the endgame play-out (dev server)
 node tools/test-extras.mjs                # threats, sounds, puzzle of the day, race, backup, bots, two on one phone (dev)
+node --experimental-strip-types tools/test-levels.ts [games] [top]   # each bot beats the one below it; how each plays
 node tools/test-analyse.mjs               # the analysis board and game review (dev server)
 node tools/test-animations.mjs            # the box opening, the fallen king, the promotion, captured pieces, the streak (dev)
 npm run server:check                      # the server's types (generates server/worker-configuration.d.ts first)
@@ -83,7 +84,9 @@ The second command asks for the value; it is in `server/.dev.vars`. The Worker's
 
 - `src/lib/coach.ts`: grading (win-chance loss, Lichess thresholds) and the Albanian explanations.
 - `src/lib/engine.ts`: Stockfish in a Web Worker, spoken to in UCI.
-- `src/lib/levels.ts`: the six strengths and their bots. The weak ones pick worse lines on purpose.
+- `src/lib/levels.ts`: the nine strengths and their bots. The three starters play from a person's eye
+  (`src/lib/human.ts`: they grab loose pieces, often miss that their own can be taken); from Agimi up the bots weigh
+  the engine's lines as a person does and slip now and then with a natural move. Each takes a person's time to move.
 - `src/lib/store.ts`: progress in localStorage, and the spaced-repetition cards of your own mistakes.
 - `src/lib/sync.ts`, `src/lib/merge.ts`: sync between phones (AES-GCM with a key derived from the sync code) and the
   merge rules.

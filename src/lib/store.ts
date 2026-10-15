@@ -151,7 +151,8 @@ export const fresh = (): Progress => ({
   seen: [],
   tags: {},
   lessons: [],
-  level: 2,
+  // a new player starts with a starter bot (Ermali, levels.ts FIRST_LEVEL)
+  level: 8,
   side: 'w',
   warnings: true,
   threats: true,

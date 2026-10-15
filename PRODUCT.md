@@ -81,6 +81,11 @@ the daily reminder. It holds no accounts, and it cannot read the synced progress
 - The play, puzzle and lesson screens keep their structure: the lit table fills the screen, a status capsule and a
   score card sit at the top, the coach is one glass card with the verdict as a status pill, and the headlines run in
   an accessory above the tab bar.
+- The opponents (Luca, 2026-10-15: "make more starter levels bcs they are very hard for some1 that dose not know and
+  make the bot to act more like a human"): nine bots. The three starters (Lea, Ermali, Arta) play from a person's
+  eye rather than the engine: they grab a piece left loose, often miss that their own can be taken, like checks and
+  an early queen, and sometimes walk past a mate. The others weigh the engine's lines as a person does and slip now and
+  then with a natural move; none plays a random move. Every bot takes a person's time. A new player starts on Ermali.
 - The board is always the 3D table, on every page (Luca, 2026-10-13: "i want the board to be always 3d"); the
   flat 2D board is kept only as the fallback where WebGL fails. Its pieces are the side profiles of the turned pieces.
 - Kept from the award-site vocabulary of Luca's other builds: one signature moment (the wooden board), a

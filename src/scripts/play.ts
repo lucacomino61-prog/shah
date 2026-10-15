@@ -5,7 +5,7 @@
 import { Chess, type Square } from 'chess.js';
 import { GRADES, TAG_NAMES, afterReply, gameAccuracy, judge, passTurn, threatWarning, uciSan, winChance, type Grade, type Verdict } from '../lib/coach.ts';
 import { Engine, type Analysis } from '../lib/engine.ts';
-import { LEVELS, levelOf, pickMove, type Level } from '../lib/levels.ts';
+import { LEVELS, levelOf, pickMove, thinkTime, type Level } from '../lib/levels.ts';
 import { sanHtml, sentenceHtml, sentenceText } from '../lib/notation.ts';
 import { openingOf } from '../lib/openings.ts';
 import { addCard, load, loadGame, saveGame, update, type Progress } from '../lib/store.ts';
@@ -219,7 +219,7 @@ function rebuild() {
 }
 
 function persist() {
-  saveGame(result ? null : { fens, sans, ucis, side, level: level.n, verdicts, evals, clock, friend });
+  saveGame(result ? null : { fens, sans, ucis, side, level: level.id, verdicts, evals, clock, friend });
 }
 
 function newGame(s: Side, lv: Level, clk: string = prefs.clock, withFriend = false) {
@@ -355,7 +355,7 @@ async function userMove(from: Sq, to: Sq) {
   const lv = level;
   const after: Analysis = over
     ? { fen: fen(), bestmove: null, depth: 0, lines: [] }
-    : await engine.analyse(fen(), { ...coachSearch(), multipv: Math.max(1, lv.weights.length) });
+    : await engine.analyse(fen(), { ...coachSearch(), multipv: Math.max(1, lv.lines) });
   if (g !== gen) return;
   const v = judge({ fen: fenBefore, uci, history, before: b, after });
   verdicts[verdicts.length - 1] = v;
@@ -388,13 +388,17 @@ async function engineMove(given?: Analysis) {
   status();
   const g = gen;
   const started = performance.now();
-  const a = given ?? (await engine.analyse(fen(), { ...coachSearch(), multipv: Math.max(1, level.weights.length) }));
+  const a = given ?? (await engine.analyse(fen(), { ...coachSearch(), multipv: Math.max(1, level.lines) }));
   if (g !== gen) return;
   const legal = chess.moves({ verbose: true }).map((m) => m.from + m.to + (m.promotion ?? ''));
-  const uci = pickMove(a, level, legal);
+  const uci = pickMove(a, level, fen(), legal);
   if (!uci) return endGame();
-  // a beat before the answer, so the learner sees their own move land
-  const wait = Math.max(0, (motionOn() ? 650 : 250) - (performance.now() - started));
+  // a person's time over the move: quick on a recapture or with one move, longer when it is hard (and never less
+  // than a beat, so the learner sees their own move land)
+  const last = chess.history({ verbose: true }).at(-1);
+  const recapture = !!last?.captured && uci.slice(2, 4) === last.to;
+  const think = study ? 250 : thinkTime(level, a, legal.length, chess.history().length, recapture);
+  const wait = Math.max(0, Math.max(motionOn() ? 650 : 250, think) - (performance.now() - started));
   await new Promise((r) => setTimeout(r, wait));
   if (g !== gen) return;
   const m = chess.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] || undefined });
@@ -508,7 +512,7 @@ function endGame(resigned = false, flagged: Side | null = null) {
     p.games.push({
       date: new Date().toISOString(),
       side,
-      level: level.n,
+      level: level.id,
       result: res,
       moves: Math.ceil(ucis.length / 2),
       accuracy: acc === null ? null : Math.round(acc),
@@ -547,7 +551,7 @@ function status() {
   if (engine.state === 'loading') t = 'Motori po ngarkohet…';
   else if (phase === 'over') t = 'Loja mbaroi.';
   else if (phase === 'thinking') t = 'Trajneri po e shikon lëvizjen…';
-  else if (phase === 'engine') t = 'Kundërshtari po mendon…';
+  else if (phase === 'engine') t = `${level.bot} po mendon…`;
   else if (phase === 'study') t = 'Loja pret.';
   else if (friend) t = `${chess.inCheck() ? 'Shah! ' : ''}Radha e ${turn() === 'w' ? 'të bardhave' : 'të zezave'}.`;
   else t = chess.inCheck() ? 'Shah! Radha jote.' : 'Radha jote.';
@@ -1026,7 +1030,7 @@ function openSetup() {
   ui.setupDialog.showModal();
   ui.setup.querySelector<HTMLInputElement>(`input[name="opponent"][value="${prefs.opponent}"]`)!.checked = true;
   ui.setup.querySelector<HTMLInputElement>(`input[name="side"][value="${prefs.side}"]`)!.checked = true;
-  ui.setup.querySelector<HTMLInputElement>(`input[name="level"][value="${level.n}"]`)!.checked = true;
+  ui.setup.querySelector<HTMLInputElement>(`input[name="level"][value="${level.id}"]`)!.checked = true;
   ui.setup.querySelector<HTMLInputElement>(`input[name="clock"][value="${prefs.clock}"]`)!.checked = true;
   ui.setup.querySelector<HTMLElement>('[data-setup-title]')?.focus();
 }
@@ -1056,7 +1060,7 @@ ui.setup.addEventListener('submit', (e) => {
 });
 ui.setup.querySelector('[data-levels]')!.innerHTML = LEVELS.map(
   (l) =>
-    `<label class="choice choice--bot"><input type="radio" name="level" value="${l.n}"><span class="bot" style="--hue: ${l.hue}" aria-hidden="true">${l.bot[0]}</span><span class="choice__body"><b>${l.bot}</b><span>Niveli ${l.n}, ${l.name.toLowerCase()}. ${l.note}</span></span></label>`,
+    `<label class="choice choice--bot"><input type="radio" name="level" value="${l.id}"><span class="bot" style="--hue: ${l.hue}" aria-hidden="true">${l.bot[0]}</span><span class="choice__body"><b>${l.bot}</b><span>Niveli ${l.n}, ${l.name.toLowerCase()}. ${l.note}</span></span></label>`,
 ).join('');
 
 // the game so far, opened on the analysis board
@@ -1163,7 +1167,7 @@ keyboard(ui.host, () => board, () => orientation);
 
 if (import.meta.env.DEV) {
   (window as unknown as Record<string, unknown>).__play = {
-    state: () => ({ phase, fen: fen(), sans: [...sans], side, friend, level: level.n, verdicts: verdicts.map((v) => v && { grade: v.grade, reasons: v.reasons }) }),
+    state: () => ({ phase, fen: fen(), sans: [...sans], side, friend, level: level.id, verdicts: verdicts.map((v) => v && { grade: v.grade, reasons: v.reasons }) }),
     engine: () => engine.state,
     move: (from: Sq, to: Sq) => userMove(from, to),
     // tests: play the engine at another strength without touching the saved preference

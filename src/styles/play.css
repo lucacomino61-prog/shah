@@ -416,6 +416,8 @@ html[data-motion="off"] .ticker__track { animation: none; }
   display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%;
   background: linear-gradient(180deg, color-mix(in srgb, var(--hue) 82%, #fff), var(--hue));
   color: #fff; font-weight: 700; font-size: var(--t-title3);
+  /* the white initial stays legible on the lighter hues */
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
 }
 .choice__body b { font-weight: 500; }
 .choice__body span { color: var(--label-2); font-size: var(--t-foot); }
