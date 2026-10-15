@@ -118,22 +118,34 @@ export function roomLight(renderer: WebGLRenderer, room: Room): Texture {
   return env;
 }
 
+/** How bright a light in the room's photograph may look in the lacquer (see noGlare); one uniform shared by every
+ *  lacquered material, so a single value holds the whole board. */
+export const GLARE = { uGlareCap: { value: 0.035 } };
+
 /**
- * A lacquered finish that shows the room but not the lamp (Luca, 2026-10-13: "make the light to not reflect on the
- * board"): the lamp's own highlight on the coat and in the wood is turned down to `keep`, the room's reflection stays.
+ * A lacquered finish that shows the room but not its lights (Luca, 2026-10-13: "make the light to not reflect on the
+ * board"; 2026-10-15, of the night room: "fix the light reflecting on the board in natën"). The lamp's own highlight
+ * on the coat and in the wood is turned down to `keep`. The room's reflection stays, but a bright light in its
+ * photograph (the restaurant's lamps at night, a window by day) is compressed toward `GLARE.uGlareCap`, so it shows as
+ * a soft glow of the room and never as a shining spot.
  */
 export function noGlare<T extends MeshPhysicalMaterial>(m: T, keep = 0.1): T {
   const prev = m.onBeforeCompile;
   m.onBeforeCompile = (shader, renderer) => {
     prev?.call(m, shader, renderer);
-    shader.fragmentShader = shader.fragmentShader.replace(
-      '#include <lights_fragment_end>',
-      `#include <lights_fragment_end>
+    shader.uniforms.uGlareCap = GLARE.uGlareCap;
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\nuniform float uGlareCap;\nvec3 glareHold(vec3 c) { return c / (1.0 + max(c.r, max(c.g, c.b)) / uGlareCap); }')
+      .replace(
+        '#include <lights_fragment_end>',
+        `#include <lights_fragment_end>
       reflectedLight.directSpecular *= ${keep.toFixed(3)};
+      reflectedLight.indirectSpecular = glareHold(reflectedLight.indirectSpecular);
       #ifdef USE_CLEARCOAT
         clearcoatSpecularDirect *= ${keep.toFixed(3)};
+        clearcoatSpecularIndirect = glareHold(clearcoatSpecularIndirect);
       #endif`,
-    );
+      );
   };
   const key = m.customProgramCacheKey.bind(m);
   m.customProgramCacheKey = () => `${key()}-noglare${keep}`;

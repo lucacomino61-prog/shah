@@ -53,7 +53,7 @@ import { BOARD, GIRTH, HEIGHT, KING_CROSS, KNIGHT_HEAD, PROFILES, QUEEN_CROWN, R
 import { boardBounds, frameBounds, rigFor } from './camera.ts';
 import { FILES, planMoves, readFen, type Arrow, type BoardOptions, type BoardView, type Kind, type Marks, type Placed, type Side, type Sq, type UnboxHooks } from './types.ts';
 import { caseSound, fallSound, pieceDownSound, promoteSound } from '../../lib/sound.ts';
-import { boxUV, loadRoom, noGlare, photo, pieceMaterial, roomLight, squareMaps, type Realism, type Room } from './realism.ts';
+import { GLARE, boxUV, loadRoom, noGlare, photo, pieceMaterial, roomLight, squareMaps, type Realism, type Room } from './realism.ts';
 import { createFocus, type Focus } from './focus.ts';
 import { bankersLamp, books, candle, chessClock, coffeeCup, deskLamp, mug, notebook, phone, tumbler, type Kit } from './props.ts';
 import { DEFAULT_WORLD, WORLDS, chosenSet, type PieceSetId, type PropId, type WorldDef, type WorldId } from './looks.ts';
@@ -2625,6 +2625,11 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       programs: () => (renderer.info.programs ?? []).map((p) => `${p.name} ${(p.cacheKey as string).slice(0, 60)}`),
       fits: () => `${fits} ${sized}`,
       exp: (o: Partial<typeof exp>) => Object.assign(exp, o),
+      // how bright a light in the room may look in the lacquer (development only, for tuning noGlare)
+      glare: (cap: number) => {
+        GLARE.uGlareCap.value = cap;
+        dirty = true;
+      },
       // a free camera for close-up checks of the materials (development only)
       look: (x: number, y: number, z: number, tx: number, ty: number, tz: number, fov = 30) => {
         lens.at = { fov, ox: 0, oy: 0 };
