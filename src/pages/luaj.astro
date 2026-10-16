@@ -62,10 +62,12 @@ import '../styles/play.css';
         <button type="button" class="tool" data-new><span class="tool__icon"><Fragment set:html={icon('plus')} /></span><span class="tool__label" data-label>Lojë e re</span></button>
         <button type="button" class="tool" data-undo><span class="tool__icon"><Fragment set:html={icon('arrowCounterClockwise')} /></span><span class="tool__label" data-label>Kthe lëvizjen</span></button>
         <button type="button" class="tool" data-flip><span class="tool__icon"><Fragment set:html={icon('arrowsDownUp')} /></span><span class="tool__label" data-label>Rrotullo tabelën</span></button>
+        <button type="button" class="tool" data-panel-open="record"><span class="tool__icon"><Fragment set:html={icon('listNumbers')} /></span><span class="tool__label">Fleta e lojës</span></button>
         <button type="button" class="tool" data-analyse><span class="tool__icon"><Fragment set:html={icon('magnifyingGlass')} /></span><span class="tool__label">Analizo lojën</span></button>
         <button type="button" class="tool" data-threats aria-pressed="true"><span class="tool__icon"><Fragment set:html={icon('shieldWarning')} /></span><span class="tool__label">Trego rreziqet</span></button>
         <button type="button" class="tool" data-angle><span class="tool__icon"><Fragment set:html={icon('videoCamera')} /></span><span class="tool__label" data-label>Këndi i kamerës</span></button>
         <button type="button" class="tool" data-look-open><span class="tool__icon"><Fragment set:html={icon('palette')} /></span><span class="tool__label">Pamja</span></button>
+        <button type="button" class="tool tool--danger" data-resign data-keep-open><span class="tool__icon"><Fragment set:html={icon('flag')} /></span><span class="tool__label" data-label>Dorëzohu</span></button>
         <button type="button" class="tool tool--motion" data-motion-switch aria-pressed="false"><span class="tool__icon" data-when="on"><Fragment set:html={icon('pause')} /></span><span class="tool__icon" data-when="off"><Fragment set:html={icon('play')} /></span><span class="tool__label">Ndal animacionet</span></button>
       </div>
     </div>
@@ -123,8 +125,12 @@ import '../styles/play.css';
     </div>
   </div>
 
-  <section class="record" aria-labelledby="sheet-title">
-    <h2 class="record__title wide" id="sheet-title">Fleta e lojës</h2>
+  <dialog class="setup panel" data-panel="record" aria-labelledby="sheet-title">
+    <div class="panel__head">
+      <h2 class="panel__title" id="sheet-title" tabindex="-1">Fleta e lojës</h2>
+      <button type="button" class="panel__close" data-panel-close aria-label="Mbyll"><Fragment set:html={icon('x')} /></button>
+    </div>
+    <div class="panel__body">
     <p class="record__opening" data-opening hidden></p>
     <details class="review" data-review-box>
       <summary class="review__sum">Grafiku i lojës</summary>
@@ -135,10 +141,8 @@ import '../styles/play.css';
       <button type="button" class="btn" data-turning hidden><Fragment set:html={icon('eye')} />Shiko momentin kyç</button>
     </details>
     <ol class="sheet" data-sheet></ol>
-    <div class="record__actions">
-      <button type="button" class="btn btn--danger" data-resign><Fragment set:html={icon('flag')} /><span data-label>Dorëzohu</span></button>
     </div>
-  </section>
+  </dialog>
 
   <dialog class="setup" data-setup-dialog aria-labelledby="setup-title">
     <form class="setup__form" data-setup method="dialog">

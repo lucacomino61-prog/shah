@@ -113,7 +113,7 @@ fs1 = await page.evaluate(() => window.__play.state());
 ok(fs1.sans.length === 1 && fs1.side === 'b', 'a take-back with a friend undoes one move', fs1.sans.join(' '));
 
 // settings: the switches write the store; the backup loads back what it holds
-await page.goto(base + '/progresi/', { waitUntil: 'networkidle0' });
+await page.goto(base + '/progresi/cilesimet/', { waitUntil: 'networkidle0' });
 await page.click('[data-sound]');
 await sleep(200);
 ok((await store()).sound === false, 'the sound switch turns sound off');

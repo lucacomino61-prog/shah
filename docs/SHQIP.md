@@ -225,3 +225,32 @@ prej 20 lëvizjesh me saktësi 90% ose më shumë." · **10 ushtrime / 50 ushtri
 ditë rresht** "Zgjidh ushtrimin e ditës 3 ditë rresht." · **Një javë** "… 7 ditë rresht." · **Mësimi i parë** "Mbaro
 një mësim." · **Kursi i plotë** "Mbaro të 11 mësimet." · **Gabime të mësuara** "Zgjidh 5 nga gabimet e tua aq herë sa të
 mos kthehen më." · **Hapja e parë** "Mëso një linjë hapjeje përmendsh (3 herë rresht pa gabim)."
+
+## New on 2026-10-16, please check
+
+Every page now fits one screen, like an app. Long parts page sideways under tabs, or open as a sheet over the board.
+
+**Sheets over the board:** "Fleta e lojës" (the moves of the game) · "Ushtrimet", opened from "Tema dhe mënyrat" ·
+"Rishiko lojërat e tua", opened from "Hap një lojë" and from the empty move row: "Luaj një lëvizje, ose hap një lojë." ·
+"Linjat" (the lines of an opening) · "Mbyll" (the close button's name) · "Zgjidh temën" (the theme name in the puzzle
+capsule) · "Mënyrat" · "Lëvizjet" (the move row's name). Resigning has moved into the tools menu as "Dorëzohu".
+
+**Mësime:** "3 nga 11 të kryera, në 5 kapituj" · the button reads only "Fillo", "Vazhdo" or "Përsërit" · the tab row's
+name is "Kapitujt", the last tab is "Trajneri" · the trainer page: "Motori luan përgjigjet, ti lëvizjet e tua, derisa
+t’i dish përmendsh." Is "derisa t’i dish përmendsh" natural?
+
+**Progresi:**
+- The sub-line "Ruhet vetëm në këtë shfletues." and the gear button "Cilësimet".
+- The four tabs: "Pasqyra" (overview), "Lojtarët", "Medaljet", "Lojërat".
+- The short facts: "Mësime: 3 nga 11", "Seria: 4 ditë" or "Pa filluar", and "Gara: 12 pikë" or "Ende pa garë".
+- The figures' captions are shorter: "3 fitore" under the number of games, and "mesatarja" under the accuracy (it was
+  "mesatarja e lojërave").
+- "Gabimet që përsërit" now stands on the Lojërat page, over the games. Each game reads "Agimi", then "9 tet, 20:00, të
+  zezat, 48 lëvizje, saktësia 87%".
+- With nothing yet: "Ende asnjë. Pas lojës së parë, trajneri i mbledh këtu. Luaj një lojë".
+- "Grafiku shfaqet pas lojës së parë."
+
+Is "Pasqyra" right for an overview page?
+
+**Cilësimet** (its own page now): the back link "‹ Progresi" and the title "Cilësimet". The settings inside are
+unchanged.

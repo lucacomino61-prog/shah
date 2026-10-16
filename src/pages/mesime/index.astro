@@ -16,87 +16,98 @@ let n = 0;
 ---
 
 <App title="Mësime · Shah" description="Mësime të shkurtra për lojtarin që di rregullat: vlera e figurave, piruni, lidhja, mati, hapja." tab="mesime" room>
-  <div class="page course">
-    <h1 class="page-title poster">Mësime</h1>
-    <p class="lede">{LESSONS.length} mësime në {COURSE.length} kapituj. Secili shpjegon një ide në tabelë dhe të lë ta luash vetë.</p>
-
-    <div class="course__now glass-card" data-now>
-      <div class="course__tally">
-        <p><b class="tabular" data-done-n>0</b> nga {LESSONS.length} të kryera</p>
-        <span class="course__bar" aria-hidden="true"><span data-bar></span></span>
+  <div class="screen screen--split course">
+    <header class="screen__head">
+      <div>
+        <h1 class="screen__title poster">Mësime</h1>
+        <p class="screen__sub"><b class="tabular" data-done-n>0</b> nga {LESSONS.length} të kryera, në {COURSE.length} kapituj</p>
       </div>
       <a class="btn btn--solid course__go" href={`/mesime/${COURSE[0].lessons[0].slug}/`} data-next-link>
-        <span class="course__go-title"><span data-next-verb>Fillo</span>: <span data-next-title>{COURSE[0].lessons[0].title}</span></span>
+        <Fragment set:html={icon('play')} /><span data-next-verb>Fillo</span>
       </a>
+    </header>
+    <span class="course__bar" aria-hidden="true"><span data-bar></span></span>
+
+    <div class="pager-tabs" role="tablist" aria-label="Kapitujt" data-pager-tabs="course">
+      {COURSE.map((ch, i) => (
+        <button type="button" role="tab" data-pager-tab={i} aria-controls={`ch-${ch.n}`}>
+          <span class="tab__n">{ch.n}</span>{ch.title}
+        </button>
+      ))}
+      <button type="button" role="tab" data-pager-tab={COURSE.length} aria-controls="ch-reps"><Fragment set:html={icon('bookOpenText', 'icon tab__icon tab__icon--keep')} />Trajneri</button>
     </div>
 
-    {COURSE.map((ch) => (
-      <section class="chapter" aria-labelledby={`ch-${ch.n}`}>
-        <header class="chapter__head">
-          <span class="chapter__n" aria-hidden="true">{ch.n}</span>
-          <div class="chapter__words">
-            <h2 class="chapter__title" id={`ch-${ch.n}`}><span class="chapter__k">Kapitulli {ch.n}</span> {ch.title}</h2>
-            <p class="chapter__note">{ch.note}</p>
+    <div class="pager" data-pager="course">
+      {COURSE.map((ch) => (
+        <section class="pager__page" role="tabpanel" id={`ch-${ch.n}`} aria-labelledby={`ch-${ch.n}-t`}>
+          <div class="chapter glass-card">
+            <header class="chapter__head">
+              <span class="chapter__n" aria-hidden="true">{ch.n}</span>
+              <div class="chapter__words">
+                <h2 class="chapter__title" id={`ch-${ch.n}-t`}><span class="visually-hidden">Kapitulli {ch.n}: </span>{ch.title}</h2>
+                <p class="chapter__note">{ch.note}</p>
+              </div>
+              <span class="chapter__count tabular" data-chapter-count data-total={ch.lessons.length}>0/{ch.lessons.length}</span>
+            </header>
+            <ol class="stops stagger">
+              {ch.lessons.map((l, i) => {
+                n++;
+                return (
+                  <li class="stop" data-lesson={l.slug} style={`--i: ${i}`}>
+                    <a href={`/mesime/${l.slug}/`} class="stop__link">
+                      <span class="stop__board"><Fragment set:html={miniBoard(lessonFen(l))} /></span>
+                      <span class="stop__body">
+                        <span class="stop__k tabular">Mësimi {n} · {l.steps.length} hapa</span>
+                        <b class="stop__title">{l.title}</b>
+                        <span class="stop__lede">{l.lede}</span>
+                      </span>
+                      <span class="stop__state">
+                        <span class="stop__done" data-done hidden><Fragment set:html={icon('check')} /><span class="visually-hidden">Kryer</span></span>
+                        <span class="stop__next" data-next hidden>Vazhdo</span>
+                        <Fragment set:html={icon('caretRight', 'icon stop__go')} />
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
-          <span class="chapter__count tabular" data-chapter-count data-total={ch.lessons.length}>0/{ch.lessons.length}</span>
-        </header>
-        <ol class="path">
-          {ch.lessons.map((l) => {
-            n++;
-            return (
-              <li class="stop" data-lesson={l.slug}>
-                <a href={`/mesime/${l.slug}/`} class="stop__link glass-card">
-                  <span class="stop__board"><Fragment set:html={miniBoard(lessonFen(l))} /></span>
+        </section>
+      ))}
+      <section class="pager__page" role="tabpanel" id="ch-reps" aria-labelledby="ch-reps-t">
+        <div class="chapter glass-card">
+          <header class="chapter__head">
+            <span class="chapter__n chapter__n--sym" aria-hidden="true"><Fragment set:html={icon('bookOpenText')} /></span>
+            <div class="chapter__words">
+              <h2 class="chapter__title" id="ch-reps-t">Trajno hapjet</h2>
+              <p class="chapter__note">Motori luan përgjigjet, ti lëvizjet e tua, derisa t’i dish përmendsh.</p>
+            </div>
+          </header>
+          <ol class="stops stagger">
+            {REPERTOIRES.map((r, i) => (
+              <li class="stop" style={`--i: ${i}`}>
+                <a href={`/mesime/hapje/${r.slug}/`} class="stop__link" data-rep={r.slug} data-lines={r.lines.length}>
+                  <span class="stop__board"><Fragment set:html={miniBoard(repFen(r.lines[0].moves), { side: r.side })} /></span>
                   <span class="stop__body">
-                    <span class="stop__k tabular">Mësimi {n}</span>
-                    <b class="stop__title">{l.title}</b>
-                    <span class="stop__lede">{l.lede}</span>
-                    <span class="stop__meta">
-                      <span class="stop__done" data-done hidden><Fragment set:html={icon('check')} />Kryer</span>
-                      <span class="stop__next" data-next hidden>Vazhdo këtu</span>
-                      <span>{l.steps.length} hapa</span>
-                    </span>
+                    <span class="stop__k" data-rep-state>{r.side === 'w' ? 'Me të bardhat' : 'Me të zezat'} · {r.lines.length} linja</span>
+                    <b class="stop__title">{r.title.replace(/^Me të (bardhat|zezat)( kundër [^:]+)?: /, '')}</b>
+                    <span class="stop__lede">{r.lede}</span>
                   </span>
-                  <span class="stop__go" aria-hidden="true"><Fragment set:html={icon('caretRight')} /></span>
+                  <span class="stop__state"><Fragment set:html={icon('caretRight', 'icon stop__go')} /></span>
                 </a>
               </li>
-            );
-          })}
-        </ol>
-      </section>
-    ))}
-
-    <section class="chapter" aria-labelledby="reps-title">
-      <header class="chapter__head">
-        <span class="chapter__n chapter__n--sym" aria-hidden="true"><Fragment set:html={icon('bookOpenText')} /></span>
-        <div class="chapter__words">
-          <h2 class="chapter__title" id="reps-title"><span class="chapter__k">Trajneri</span> Trajno hapjet</h2>
-          <p class="chapter__note">Zgjidh një repertor. Motori luan përgjigjet e kundërshtarit, ti luan lëvizjet e tua derisa t’i dish përmendsh.</p>
+            ))}
+          </ol>
         </div>
-      </header>
-      <ol class="path path--plain">
-        {REPERTOIRES.map((r) => (
-          <li class="stop">
-            <a href={`/mesime/hapje/${r.slug}/`} class="stop__link glass-card" data-rep={r.slug} data-lines={r.lines.length}>
-              <span class="stop__board"><Fragment set:html={miniBoard(repFen(r.lines[0].moves), { side: r.side })} /></span>
-              <span class="stop__body">
-                <span class="stop__k">{r.side === 'w' ? 'Me të bardhat' : 'Me të zezat'}</span>
-                <b class="stop__title">{r.title.replace(/^Me të (bardhat|zezat)( kundër [^:]+)?: /, '')}</b>
-                <span class="stop__lede">{r.lede}</span>
-                <span class="stop__meta"><span data-rep-state>{r.lines.length} linja</span></span>
-              </span>
-              <span class="stop__go" aria-hidden="true"><Fragment set:html={icon('caretRight')} /></span>
-            </a>
-          </li>
-        ))}
-      </ol>
-    </section>
+      </section>
+    </div>
   </div>
   <script>
-    import { COURSE_ORDER, nextLesson } from '../../data/lessons';
+    import { COURSE, COURSE_ORDER, nextLesson } from '../../data/lessons';
     import { load } from '../../lib/store';
+    import { initPagers, pagerOf } from '../../scripts/pager';
 
-    function paint() {
+    function paint(first: boolean) {
       const p = load();
       const done = new Set(p.lessons);
       const next = nextLesson(p.lessons);
@@ -118,90 +129,101 @@ let n = 0;
       const k = COURSE_ORDER.filter((l) => done.has(l.slug)).length;
       document.querySelector('[data-done-n]')!.textContent = String(k);
       document.querySelector<HTMLElement>('[data-bar]')!.style.transform = `scaleX(${k / COURSE_ORDER.length})`;
-      document.querySelector<HTMLAnchorElement>('[data-next-link]')!.href = `/mesime/${next.slug}/`;
+      const go = document.querySelector<HTMLAnchorElement>('[data-next-link]')!;
+      go.href = `/mesime/${next.slug}/`;
       document.querySelector('[data-next-verb]')!.textContent = all ? 'Përsërit' : k ? 'Vazhdo' : 'Fillo';
-      document.querySelector('[data-next-title]')!.textContent = next.title;
+      go.setAttribute('aria-label', `${all ? 'Përsërit' : k ? 'Vazhdo' : 'Fillo'}: ${next.title}`);
       const reps = p.reps;
       document.querySelectorAll<HTMLElement>('[data-rep]').forEach((a) => {
         const n = Number(a.dataset.lines);
         const learnt = Array.from({ length: n }, (_, i) => reps[`${a.dataset.rep}:${i}`]?.streak ?? 0).filter((x) => x >= 3).length;
         a.querySelector('[data-rep-state]')!.textContent = `${learnt} nga ${n} linja të mësuara`;
       });
+      // the course opens on the chapter of the next lesson
+      if (first) {
+        initPagers();
+        pagerOf('course')?.go(Math.max(0, COURSE.findIndex((c) => c.lessons.includes(next))), false);
+      }
     }
-    paint();
-    window.addEventListener('shah:synced', paint);
+    paint(true);
+    window.addEventListener('shah:synced', () => paint(false));
   </script>
 </App>
 
 <style>
-  .course { max-width: 46rem; margin-inline: auto; }
-  .course .lede { max-width: 40ch; }
-  .glass-card { border-radius: 1.375rem; }
-
-  /* where the learner stands: the count, a thin bar, and the way back in */
-  .course__now { display: grid; gap: 0.875rem; margin-top: var(--space-m); padding: 1rem; }
-  .course__tally { display: grid; gap: 0.5rem; font-size: var(--t-sub); color: var(--label-2); }
-  .course__tally b { font-family: var(--font-display); font-size: 1.625rem; font-weight: 600; color: var(--label); }
+  .course__go { flex: none; min-height: 44px; padding-inline: 1.125rem; }
+  .course__go :global(.icon) { width: 1rem; height: 1rem; }
   .course__bar { display: block; height: 0.25rem; border-radius: 999px; background: var(--fill); overflow: hidden; }
-  .course__bar span { display: block; height: 100%; background: linear-gradient(90deg, #c99a52, #ecd29c); transform: scaleX(0); transform-origin: left; transition: transform 600ms var(--ease-out); }
-  .course__go { justify-self: start; max-width: 100%; }
-  .course__go-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  @media (min-width: 640px) { .course__now { grid-template-columns: minmax(0, 1fr) auto; align-items: center; } }
+  .course__bar span { display: block; height: 100%; background: linear-gradient(90deg, #c99a52, #ecd29c); transform: scaleX(0); transform-origin: left; transition: transform 700ms var(--ease-out) 200ms; }
+  .tab__n { font-family: var(--font-display); font-size: 1rem; font-weight: 600; color: #e2c48c; }
+  :global(html[data-world-tone='light']) .tab__n { color: #8a5a22; }
+  .pager-tabs :global(.icon) { width: 1rem; height: 1rem; }
 
-  /* a chapter: its roman numeral large, as a book sets the opening of a part */
-  .chapter { margin-top: var(--space-xl); }
-  .chapter__head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: 0.875rem; margin-bottom: var(--space-s); padding-inline: 0.25rem; }
-  .chapter__n { font-family: var(--font-display); font-size: 3.25rem; font-weight: 500; line-height: 0.8; letter-spacing: 0.02em; color: #e2c48c; min-width: 2.75rem; }
-  html[data-world-tone='light'] .chapter__n { color: #8a5a22; }
-  .chapter__n--sym { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; }
-  .chapter__n--sym :global(.icon) { width: 2rem; height: 2rem; }
-  .chapter__title { display: grid; font-family: var(--font-display); font-size: var(--t-title1); font-weight: 600; letter-spacing: -0.01em; line-height: 1.05; }
-  .chapter__k { font-family: var(--font); font-size: var(--t-cap); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--label-2); }
-  .chapter__note { margin-top: 0.25rem; font-size: var(--t-foot); color: var(--label-2); }
-  .chapter__count { align-self: start; padding: 0.25rem 0.625rem; border-radius: 999px; background: var(--fill-2); font-size: var(--t-foot); font-weight: 600; color: var(--label-2); }
+  /* a chapter is one card: its numeral, its name and its lessons, each with the diagram it opens on */
+  .chapter { display: flex; flex-direction: column; height: 100%; border-radius: 1.5rem; padding: 0.875rem 0.75rem 0.5rem; }
+  .chapter__head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.75rem; padding: 0 0.25rem 0.625rem; }
+  .chapter__n { min-width: 2.5rem; font-family: var(--font-display); font-size: 2.5rem; font-weight: 500; line-height: 0.85; color: #e2c48c; text-align: center; }
+  :global(html[data-world-tone='light']) .chapter__n { color: #8a5a22; }
+  .chapter__n--sym { display: grid; place-items: center; height: 2.5rem; }
+  .chapter__n--sym :global(.icon) { width: 1.75rem; height: 1.75rem; }
+  .chapter__title { font-family: var(--font-display); font-size: var(--t-title1); font-weight: 600; letter-spacing: -0.01em; line-height: 1.05; }
+  .chapter__note { margin-top: 0.125rem; font-size: var(--t-foot); line-height: 1.3; color: var(--label-2); }
+  .chapter__count { padding: 0.25rem 0.625rem; border-radius: 999px; background: var(--fill-2); font-size: var(--t-foot); font-weight: 600; color: var(--label-2); }
   .chapter[data-complete] .chapter__count { background: color-mix(in srgb, #d9b26f 26%, transparent); color: #f0d9a8; }
-  html[data-world-tone='light'] .chapter[data-complete] .chapter__count { color: #7a4c16; }
+  :global(html[data-world-tone='light']) .chapter[data-complete] .chapter__count { color: #7a4c16; }
 
-  /* the path: a rail down the left joins the lessons; the stretch already walked is gilded */
-  .path { position: relative; display: grid; gap: 0.75rem; padding-inline-start: 1.5rem; }
-  .stop { position: relative; }
-  .path:not(.path--plain) .stop::before {
-    content: ''; position: absolute; z-index: 1; left: -1.5rem; top: 50%; width: 0.875rem; height: 0.875rem; translate: 0.0625rem -50%;
-    border-radius: 50%; background: #2a1d14; box-shadow: 0 0 0 2px rgb(226 196 140 / 0.45);
-  }
-  .path:not(.path--plain) .stop:not(:last-child)::after {
-    content: ''; position: absolute; left: -1.0625rem; top: 50%; height: calc(100% + 0.75rem); width: 2px; background: rgb(226 196 140 / 0.22);
-  }
-  .stop[data-state='done']::before { background: #d9b26f; box-shadow: 0 0 0 2px #d9b26f; }
-  .stop[data-state='done']:not(:last-child)::after { background: linear-gradient(#d9b26f, rgb(217 178 111 / 0.5)); }
-  .stop[data-state='next']::before { background: var(--tint); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tint) 35%, transparent); }
-  html[data-world-tone='light'] .path:not(.path--plain) .stop::before { background: #fff; box-shadow: 0 0 0 2px rgb(138 90 34 / 0.45); }
-  html[data-world-tone='light'] .stop[data-state='done']::before { background: #b88a3e; box-shadow: 0 0 0 2px #b88a3e; }
-  html[data-world-tone='light'] .stop[data-state='next']::before { background: var(--tint); }
-  .path--plain { padding-inline-start: 0; }
-
+  /* the lessons: they share the card's height and never scroll it */
+  .stops { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; justify-content: flex-start; gap: 0.25rem; }
+  /* a row keeps its height: what does not fit is never squeezed into the row below (the rules under it make it fit) */
+  .stop { flex: none; }
   .stop__link {
-    display: grid; grid-template-columns: 5.25rem minmax(0, 1fr) auto; align-items: center; gap: 0.875rem;
-    padding: 0.75rem 0.875rem 0.75rem 0.75rem; color: var(--label); text-decoration: none;
-    transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-ui) ease;
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.75rem;
+    padding: 0.5rem 0.5rem 0.5rem 0.375rem; border-radius: 1.125rem; color: var(--label); text-decoration: none;
+    transition: background-color var(--dur-ui) ease, transform var(--dur-press) var(--ease-out);
   }
-  .stop__link:active { transform: scale(0.985); }
-  @media (hover: hover) and (pointer: fine) { .stop__link:hover { background-color: color-mix(in srgb, var(--room-glass) 70%, var(--glass-press)); } }
-  .stop[data-state='next'] .stop__link { box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 0 1.5px color-mix(in srgb, var(--tint) 70%, transparent), var(--glass-depth); }
-  .stop__board { display: block; padding: 3px; }
-  .stop__body { display: grid; gap: 0.125rem; min-width: 0; }
-  .stop__k { font-size: var(--t-cap); font-weight: 600; color: var(--label-2); }
-  .stop__title { font-family: var(--font-display); font-size: var(--t-title3); font-weight: 600; line-height: 1.15; letter-spacing: -0.005em; }
-  .stop__lede { font-size: var(--t-foot); line-height: 1.35; color: var(--label-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .stop__meta { display: flex; flex-wrap: wrap; gap: 0.125rem 0.75rem; margin-top: 0.25rem; font-size: var(--t-cap); color: var(--label-2); }
-  .stop__done { display: inline-flex; align-items: center; gap: 0.25rem; color: #e2c48c; font-weight: 600; }
-  html[data-world-tone='light'] .stop__done { color: #7a4c16; }
+  .stop__link:active { transform: scale(0.985); background: var(--glass-press); }
+  @media (hover: hover) and (pointer: fine) { .stop__link:hover { background: var(--glass-press); } }
+  .stop[data-state='next'] .stop__link { background: color-mix(in srgb, var(--tint) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 45%, transparent); }
+  .stop__board { display: block; width: clamp(2.75rem, 1.2rem + 4.6dvh, 4rem); padding: 2px; }
+  .stop__body { display: grid; gap: 0.0625rem; min-width: 0; }
+  .stop__k { font-size: var(--t-cap); font-weight: 600; color: var(--label-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stop__title { font-family: var(--font-display); font-size: var(--t-title3); font-weight: 600; line-height: 1.12; letter-spacing: -0.005em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .stop__lede { font-size: var(--t-foot); line-height: 1.3; color: var(--label-2); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+  .stop__state { display: inline-flex; align-items: center; gap: 0.375rem; }
+  .stop__done { display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: color-mix(in srgb, #d9b26f 30%, transparent); color: #f0d9a8; }
+  :global(html[data-world-tone='light']) .stop__done { color: #7a4c16; }
   .stop__done[hidden], .stop__next[hidden] { display: none; }
   .stop__done :global(.icon) { width: 0.875rem; height: 0.875rem; }
-  .stop__next { color: var(--tint-ink); font-weight: 700; }
-  .stop__go :global(.icon) { width: 0.875rem; height: 0.875rem; color: var(--label-3); }
-  @media (min-width: 768px) {
-    .stop__link { grid-template-columns: 6rem minmax(0, 1fr) auto; gap: 1.125rem; padding: 0.875rem 1.125rem 0.875rem 0.875rem; }
-    .stop__lede { -webkit-line-clamp: 3; }
+  .stop__next { padding: 0.1875rem 0.5rem; border-radius: 999px; background: var(--tint-fill); color: #fff; font-size: var(--t-cap); font-weight: 700; }
+  .stop__state :global(.stop__go) { width: 0.875rem; height: 0.875rem; color: var(--label-3); }
+  /* a short phone keeps the title and the diagram and lets the line under them go; a page of four or five keeps
+     each title to one line */
+  @media (max-height: 700px) and (max-width: 1023px) {
+    .stop__lede, .chapter__note { display: none; }
+    .chapter__n { font-size: 2rem; }
+    .stops:has(> .stop:nth-child(4)) .stop__title { -webkit-line-clamp: 1; }
+    .stop__board { width: 2.5rem; }
+    .stop__link { padding-block: 0.25rem; }
+  }
+  /* a very short phone: on a page of four or five, the tab above already names the chapter, so the card gives its
+     head to the lessons */
+  @media (max-height: 640px) and (max-width: 1023px) {
+    .chapter:has(.stop:nth-child(4)) .chapter__head { display: none; }
+    .chapter:has(.stop:nth-child(4)) { padding-top: 0.5rem; }
+    .stops { gap: 0.125rem; }
+    .stop__board { width: 2.375rem; }
+    .stop__link { padding-block: 0.1875rem; }
+    .stops:has(> .stop:nth-child(4)) .stop__title { font-size: 1.125rem; }
+  }
+
+  .pager-tabs :global(.tab__icon--keep) { display: block; }
+  /* a wide screen: the chapters down the side (screen--split), the chosen one tall enough for every lesson with its
+     diagram and its line */
+  @media (min-width: 1024px) {
+    .course { grid-template-rows: auto auto minmax(0, 1fr); }
+    .pager-tabs .tab__n { min-width: 1.75rem; font-size: 1.25rem; text-align: center; }
+    .pager-tabs :global(.icon) { width: 1.25rem; height: 1.25rem; margin-inline: 0.25rem; }
+    .chapter { padding: 1.125rem 1rem 0.75rem; }
+    .stop__board { width: clamp(2.75rem, 0.5rem + 5.5dvh, 3.75rem); }
   }
 </style>

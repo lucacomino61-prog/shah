@@ -41,6 +41,7 @@ for (const v of views) {
     ['/mesime/', 'mesime', 1200],
     ['/mesime/piruni/', 'mesim', 2500],
     ['/progresi/', 'progresi', 1000],
+    ['/progresi/cilesimet/', 'cilesimet', 1000],
   ]) {
     await page.goto(base + path, { waitUntil: 'networkidle0' });
     await sleep(wait);

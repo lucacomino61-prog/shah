@@ -12,6 +12,7 @@ import { addCard } from '../lib/store.ts';
 import { createBoard, keepBoardStill, keyboard, type BoardView } from './board/index.ts';
 import type { Arrow, Side, Sq } from './board/types.ts';
 import { motionOn, onMotion, onTick } from './shell.ts';
+import { closePanels } from './panel.ts';
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const START = new Chess().fen();
@@ -321,7 +322,7 @@ function render() {
 
 function renderStrip() {
   if (!line.length) {
-    ui.strip.innerHTML = `<li class="strip__empty">${editing ? 'Vendos figurat në tabelë.' : 'Luaj një lëvizje, ose hap një lojë më poshtë.'}</li>`;
+    ui.strip.innerHTML = `<li class="strip__empty">${editing ? 'Vendos figurat në tabelë.' : 'Luaj një lëvizje, ose <button type="button" class="strip__open" data-panel-open="games">hap një lojë</button>.'}</li>`;
     return;
   }
   let num = Number(root.split(' ')[5]);
@@ -669,7 +670,7 @@ ui.games.addEventListener('click', (e) => {
     return;
   }
   void openGame(p.start, p.moves, `${g.white} – ${g.black}, ${dateText(g.date)}`, g.me);
-  document.querySelector('.stage')?.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto' });
+  closePanels();
 });
 
 // ------------------------------------------------------------------ the review
@@ -809,7 +810,7 @@ ui.turning.addEventListener('click', () => {
   const t = turning();
   if (t !== null) {
     goTo(t);
-    document.querySelector('.stage')?.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto' });
+    closePanels();
   }
 });
 ui.reviewSvg.addEventListener('click', (e) => {

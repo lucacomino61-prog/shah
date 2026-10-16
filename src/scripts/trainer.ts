@@ -11,6 +11,7 @@ import { createBoard, keepBoardStill, keyboard, type BoardView } from './board/i
 import type { Side, Sq } from './board/types.ts';
 import { gsap, motionOn, onMotion, onTick } from './shell.ts';
 import { missSound, moveSound, winSound } from '../lib/sound.ts';
+import { closePanels } from './panel.ts';
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const stageEl = $('[data-stage-box]');
@@ -212,7 +213,7 @@ ui.lines.addEventListener('click', (e) => {
   const b = (e.target as Element).closest<HTMLButtonElement>('[data-pick]');
   if (!b) return;
   void start(Number(b.dataset.pick));
-  document.querySelector('.stage')?.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto' });
+  closePanels();
 });
 
 /** The count of learnt lines, the rail of lines and the list below the stage. */

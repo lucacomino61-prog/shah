@@ -12,6 +12,7 @@ import { gsap, motionOn, onMotion, onTick } from './shell.ts';
 import { missSound, moveSound, winSound } from '../lib/sound.ts';
 import { remindDone } from '../lib/remind.ts';
 import { rollStreak } from './celebrate.ts';
+import { closePanels } from './panel.ts';
 import { pickDaily } from '../lib/daily.ts';
 
 interface Puzzle {
@@ -459,11 +460,11 @@ document.querySelector('[data-daily]')?.addEventListener('click', () => {
   stopRush();
   mode = 'daily';
   void deal();
-  document.querySelector('.stage')?.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto' });
+  closePanels();
 });
 document.querySelector('[data-rush]')?.addEventListener('click', () => {
   startRush();
-  document.querySelector('.stage')?.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto' });
+  closePanels();
 });
 
 // ------------------------------------------------------------------ help
@@ -588,7 +589,7 @@ ui.themes.addEventListener('change', (e) => {
   stopRush();
   mode = 'theme';
   void deal();
-  document.querySelector('.stage')?.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto' });
+  closePanels();
 });
 
 // ------------------------------------------------------------------ board and start

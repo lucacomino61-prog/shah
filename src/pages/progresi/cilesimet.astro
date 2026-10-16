@@ -1,0 +1,261 @@
+---
+import App from '../../layouts/App.astro';
+import { icon } from '../../lib/icons';
+import { hasServer } from '../../lib/server';
+import LookPicker from '../../components/LookPicker.astro';
+
+const hours = Array.from({ length: 24 }, (_, h) => (h + 6) % 24);
+---
+
+<App title="Cilësimet · Shah" description="Pamja, tingujt, kujtesa, sinkronizimi dhe kopja rezervë e progresit." tab="progresi" room scroll>
+  <div class="page progress settings-page">
+    <a class="back" href="/progresi/"><Fragment set:html={icon('caretLeftBold')} />Progresi</a>
+    <h1 class="page-title poster">Cilësimet</h1>
+    <p class="lede" data-lede>Gjithçka ruhet vetëm në këtë shfletues. Askush tjetër nuk e sheh.</p>
+
+    <section aria-labelledby="pamja-title">
+      <h2 class="group-h" id="pamja-title">Pamja</h2>
+      <p class="group-note">Dhoma ku qëndron tabela dhe figurat me të cilat luan. Ndryshon menjëherë në çdo faqe me tabelë.</p>
+      <LookPicker />
+    </section>
+
+    <section aria-labelledby="look-title">
+      <h2 class="group-h" id="look-title">Cilësimet</h2>
+      <div class="group settings">
+        <label class="row"><span>Tingujt dhe dridhja</span><input type="checkbox" class="switch" data-sound /></label>
+        <label class="row"><span>Trego rreziqet në lojë</span><input type="checkbox" class="switch" data-threats-pref /></label>
+        <div class="look">
+        <label class="look__label" for="glass-level">Xhami</label>
+        <div class="look__range">
+          <span aria-hidden="true">I qartë</span>
+          <input id="glass-level" type="range" min="0" max="1" step="0.05" value="0.5" data-glass aria-valuetext="Mesatar" />
+          <span aria-hidden="true">I ngjyrosur</span>
+        </div>
+        </div>
+      </div>
+      <p class="group-note look__note">Rreziqet: një rreth i kuq rreth figurave të tua që kundërshtari mund t’i marrë në lëvizjen tjetër. Xhami: sa shihet tabela përmes menyve dhe kartave; majtas më e qartë, djathtas më e lexueshme.</p>
+    </section>
+
+    {hasServer && (
+      <section aria-labelledby="remind-title" data-remind-box>
+        <h2 class="group-h" id="remind-title">Kujtesa</h2>
+        <div class="group settings">
+          <label class="row"><span>Kujtesa e përditshme</span><input type="checkbox" class="switch" data-remind /></label>
+          <label class="row" data-remind-hour-row hidden>
+            <span>Ora</span>
+            <span class="pick">
+              <select data-remind-hour aria-label="Ora e kujtesës">
+                {hours.map((h) => <option value={h} selected={h === 19}>{String(h).padStart(2, '0')}:00</option>)}
+              </select>
+              <Fragment set:html={icon('caretUpDown')} />
+            </span>
+          </label>
+        </div>
+        <p class="group-note look__note" data-remind-note role="status">Një njoftim në orën që zgjedh, vetëm në ditët kur ushtrimi i ditës nuk është zgjidhur ende.</p>
+      </section>
+    )}
+
+    {hasServer && (
+      <section aria-labelledby="sync-title" data-sync>
+        <h2 class="group-h" id="sync-title">Telefonat e tu</h2>
+        <div class="group sync" data-sync-off>
+          <button type="button" class="row" data-sync-start><span>Ndiz sinkronizimin</span><Fragment set:html={icon('deviceMobile')} /></button>
+          <button type="button" class="row" data-sync-join-open aria-expanded="false" aria-controls="sync-join"><span>Kam një kod nga telefoni tjetër</span><Fragment set:html={icon('caretRight', 'icon chev')} /></button>
+        </div>
+        <form class="group sync-join" id="sync-join" data-sync-join hidden>
+          <label class="field-row">
+            <span class="visually-hidden">Kodi i sinkronizimit</span>
+            <input class="field code-field" name="code" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="24" required />
+          </label>
+          <div class="field-row"><button type="submit" class="btn btn--solid sync__go">Lidhu</button></div>
+        </form>
+        <div class="group sync" data-sync-on hidden>
+          <div class="row sync__code"><span>Kodi</span><b class="code tabular" data-sync-code></b></div>
+          <button type="button" class="row" data-sync-share><span>Dërgo kodin në telefonin tjetër</span><Fragment set:html={icon('shareNetwork')} /></button>
+          <button type="button" class="row" data-sync-now><span>Sinkronizo tani</span><span class="row__value" data-sync-when></span></button>
+          <button type="button" class="row" data-sync-stop><span>Fik në këtë telefon</span></button>
+          <button type="button" class="row reset" data-sync-wipe><span data-label>Fshi kopjen nga serveri</span></button>
+        </div>
+        <p class="group-note look__note" data-sync-note role="status">Me një kod, progresi bashkohet në të gjithë telefonat e tu. Kopja në server është e koduar: pa kodin nuk e lexon dot askush, as serveri.</p>
+      </section>
+    )}
+
+    <section aria-labelledby="backup-title">
+      <h2 class="group-h" id="backup-title">Kopja rezervë</h2>
+      <div class="group backup">
+        <button type="button" class="row" data-export><span>Ruaj një kopje</span><Fragment set:html={icon('downloadSimple')} /></button>
+        <button type="button" class="row" data-import><span>Ngarko një kopje</span><Fragment set:html={icon('uploadSimple')} /></button>
+      </div>
+      <input type="file" accept="application/json,.json" hidden data-import-file />
+      <p class="group-note look__note" data-backup-note role="status">Progresi ruhet vetëm në këtë shfletues. Ruaj një kopje për ta çuar në një telefon tjetër, ose për ta pasur të sigurt.</p>
+    </section>
+
+    <section aria-labelledby="about-title">
+      <h2 class="group-h" id="about-title">Rreth aplikacionit</h2>
+      <p class="group about">
+        Shah është softuer i lirë me licencën GPL-3.0. Motori është <a href="https://stockfishchess.org/">Stockfish</a>, që punon
+        brenda shfletuesit tënd. Ushtrimet vijnë nga baza e hapur e <a href="https://database.lichess.org/#puzzles">Lichess</a>.
+        Kodi burimor: <a href="https://github.com/lucacomino61-prog/shah">github.com/lucacomino61-prog/shah</a>.
+      </p>
+    </section>
+
+    <div class="group progress__reset">
+      <button type="button" class="row reset" data-reset><span data-label>Fshi progresin</span><Fragment set:html={icon('x')} /></button>
+    </div>
+  </div>
+  <script>
+    import '../../scripts/settings';
+  </script>
+</App>
+
+<style>
+  /* back to Progresi, as an iOS navigation bar leads back */
+  /* above the large title: once it has folded, its tall Didone line box reaches up over this link */
+  .back { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 0.25rem; min-height: 44px; margin-left: -0.25rem; color: var(--tint-ink); font-weight: 500; text-decoration: none; }
+  .back :global(.icon) { width: 1.125rem; height: 1.125rem; }
+  .settings-page .page-title { margin-top: 0; }
+  .progress { max-width: 46rem; margin-inline: auto; }
+  .glass-card { border-radius: var(--r-list); }
+  /* in the room every list is tinted glass, so the inset separators are drawn as a hairline image, not painted over
+     with the cell colour */
+  .progress :is(.sheet-rows > div + div, .mistakes > li + li, .games > li + li, .sync > * + *, .backup > * + *, .settings > * + *, .field-row + .field-row, .ladder > li + li) {
+    box-shadow: none; background-image: linear-gradient(var(--sep), var(--sep)); background-size: calc(100% - 1rem) 0.5px; background-position: 1rem 0; background-repeat: no-repeat;
+  }
+  .progress .ladder > li + li { background-size: calc(100% - 4.25rem) 0.5px; background-position: 4.25rem 0; }
+  /* the lists' own separator is a pseudo-element, which a grid row would take for a cell */
+  .progress .ladder > li + li::before { display: none; }
+
+  /* the three figures, set large in the Didone, as a scoreboard */
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: var(--space-m); padding: 1rem 0.25rem; }
+  .stat { display: grid; align-content: start; gap: 0.25rem; padding-inline: 0.75rem; min-width: 0; }
+  .stat + .stat { box-shadow: inset 0.5px 0 0 var(--sep); }
+  .stat dt { font-size: var(--t-cap); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--label-2); }
+  .stat dd { display: grid; gap: 0.125rem; }
+  .stat__n { font-family: var(--font-display); font-size: clamp(2.25rem, 1.5rem + 3.5vw, 3.25rem); font-weight: 600; line-height: 1; letter-spacing: -0.02em; }
+  .stat__sub { font-size: var(--t-cap); line-height: 1.3; color: var(--label-2); }
+  .facts { margin-top: var(--space-xs); }
+
+  /* the accuracy chart */
+  .chart { margin: 0; padding: 0.75rem 0.75rem 0.875rem; }
+  .chart__svg { display: block; width: 100%; height: auto; max-height: 12rem; overflow: visible; }
+  .chart__cap { margin-top: 0.5rem; padding-inline: 0.25rem; font-size: var(--t-foot); color: var(--label-2); }
+  .chart__key { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; margin-top: 0.375rem; padding-inline: 0.25rem; font-size: var(--t-cap); color: var(--label-2); }
+  .chart__key li { display: inline-flex; align-items: center; gap: 0.375rem; }
+  .chart__key li::before { content: ''; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--r); }
+  :global(:root) { --win: #d9b26f; --draw: #b9b2a6; --loss: #e0675c; }
+  :global(html[data-world-tone='light']) { --win: #a87a2e; --draw: #8e8a83; --loss: #c2372b; }
+  .chart__key [data-r='win'] { --r: var(--win); }
+  .chart__key [data-r='draw'] { --r: var(--draw); }
+  .chart__key [data-r='loss'] { --r: var(--loss); }
+  .chart__svg :global(.grid) { stroke: var(--sep); stroke-width: 1; }
+  .chart__svg :global(.tick) { fill: var(--label-2); font: 600 13px var(--font); }
+  .chart__svg :global(.avg) { stroke: var(--label-2); stroke-width: 1.25; stroke-dasharray: 4 5; }
+  .chart__svg :global(.trace) { fill: none; stroke: color-mix(in srgb, var(--label) 55%, transparent); stroke-width: 1.75; stroke-linejoin: round; }
+  .chart__svg :global(.dot) { stroke: var(--room-glass, #000); stroke-width: 2; }
+  .chart__svg :global(.dot[data-r='win']) { fill: var(--win); }
+  .chart__svg :global(.dot[data-r='draw']) { fill: var(--draw); }
+  .chart__svg :global(.dot[data-r='loss']), .chart__svg :global(.dot[data-r='resigned']) { fill: var(--loss); }
+
+  /* the club ladder: each opponent's face, the score, and a bar split into wins, draws and losses */
+  .ladder { padding-block: 0.25rem; }
+  .rung { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: 0.75rem; row-gap: 0.375rem; align-items: center; padding: 0.625rem 1rem; }
+  .rung__face { grid-row: 1 / 3; width: 2.5rem; height: 2.5rem; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1.5px rgb(255 255 255 / 0.18); }
+  .rung__who { display: flex; align-items: baseline; gap: 0.5rem; min-width: 0; }
+  .rung__name { font-family: var(--font-display); font-size: var(--t-title3); font-weight: 600; line-height: 1.1; }
+  .rung__lv { font-size: var(--t-cap); color: var(--label-2); white-space: nowrap; }
+  .rung__score { font-size: var(--t-sub); font-weight: 600; color: var(--label); }
+  .rung__bar { grid-column: 2 / 4; display: flex; height: 0.375rem; border-radius: 999px; overflow: hidden; background: var(--fill-2); }
+  .rung__bar span { flex: 0 0 auto; width: 0; }
+  .rung__bar [data-part='win'] { background: var(--win); }
+  .rung__bar [data-part='draw'] { background: var(--draw); }
+  .rung__bar [data-part='loss'] { background: var(--loss); }
+  .rung[data-none] .rung__face { filter: grayscale(0.7) brightness(0.75); }
+  .rung[data-none] .rung__score { font-weight: 500; color: var(--label-3); }
+
+  /* the medals: struck brass when earned, an engraved ring while still to win */
+  .medals { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(6.75rem, 100%), 1fr)); gap: 1.25rem 0.75rem; padding: 1.25rem 0.875rem; }
+  .badge { display: grid; justify-items: center; align-content: start; gap: 0.25rem; text-align: center; }
+  .medal {
+    display: grid; place-items: center; width: 4rem; height: 4rem; margin-bottom: 0.375rem; border-radius: 50%;
+    color: rgb(226 196 140 / 0.42); box-shadow: inset 0 0 0 1.5px rgb(226 196 140 / 0.32), inset 0 0 0 5px rgb(0 0 0 / 0.08);
+  }
+  .medal :global(.icon) { width: 1.625rem; height: 1.625rem; }
+  .badge[data-earned] .medal {
+    color: #5b3a12;
+    background: radial-gradient(circle at 34% 28%, #fff5d6 0%, #efd08a 16%, #c39443 50%, #8a5f24 78%, #5d3d14 100%);
+    box-shadow: inset 0 0 0 2.5px rgb(255 238 196 / 0.45), inset 0 -5px 9px rgb(70 40 10 / 0.45), 0 8px 16px -6px rgb(0 0 0 / 0.6);
+  }
+  .badge[data-earned] .medal :global(.icon) { filter: drop-shadow(0 1px 0 rgb(255 236 190 / 0.75)) drop-shadow(0 -1px 0 rgb(60 35 8 / 0.4)); }
+  /* a medal won since the last visit is struck in front of the learner, once (rare: it may bounce) */
+  .badge[data-new] .medal { animation: strike 900ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  @keyframes strike { 0% { transform: scale(0.6) rotateY(80deg); opacity: 0; } 60% { transform: scale(1.08) rotateY(-8deg); opacity: 1; } 100% { transform: none; } }
+  :global(html[data-motion='off']) .badge[data-new] .medal { animation: none; }
+  .badge__title { font-size: var(--t-foot); font-weight: 700; line-height: 1.2; }
+  .badge__how { font-size: var(--t-cap2); line-height: 1.3; color: var(--label-2); }
+  .badge__state { font-size: var(--t-cap2); font-weight: 600; color: var(--label-3); font-variant-numeric: tabular-nums; }
+  .badge[data-earned] .badge__state { color: var(--win); }
+  .about { padding: 0.875rem 1rem; color: var(--label-2); font-size: var(--t-sub); line-height: 1.45; }
+  .about a { color: var(--tint-ink); text-decoration: none; }
+  .about a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+  .progress__reset { margin-top: var(--space-l); }
+  .reset { width: 100%; text-align: start; color: var(--red-ink); font-size: var(--t-body); }
+  .reset .icon { width: 1rem; height: 1rem; }
+  .progress :global(.sheet-rows > div) { display: flex; justify-content: space-between; align-items: center; gap: 1rem; min-height: 2.875rem; padding: 0.625rem 1rem; }
+  .progress :global(.sheet-rows > div + div) { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
+  .progress :global(.sheet-rows > div)::before { display: none; }
+  .progress :global(.sheet-rows dd) { color: var(--label-2); font-variant-numeric: tabular-nums; text-align: end; }
+  .progress :global(.mistakes li:not(.empty)), .progress :global(.games li:not(.empty)) {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.125rem 1rem; align-items: center;
+    padding: 0.75rem 1rem;
+  }
+  .progress :global(.mistakes > li + li::before), .progress :global(.games > li + li::before) { display: none; }
+  .progress :global(.mistakes > li + li), .progress :global(.games > li + li) { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
+  .progress :global(.mistakes b) { font-weight: 600; }
+  .progress :global(.mistakes .n) { font-weight: 700; font-size: var(--t-title3); font-variant-numeric: tabular-nums; color: var(--label-2); }
+  .progress :global(.mistakes li:not(.empty) a) { grid-column: 1 / -1; justify-self: start; display: inline-flex; align-items: center; min-height: 44px; color: var(--tint-ink); font-weight: 500; font-size: var(--t-sub); text-decoration: none; }
+  .progress :global(.games .res) { font-weight: 700; font-size: var(--t-foot); padding: 0.125rem 0.625rem; border-radius: 999px; background: var(--fill-2); }
+  .progress :global(.games .res[data-r="win"]) { color: var(--green-ink); background: color-mix(in srgb, var(--green) 18%, transparent); }
+  .progress :global(.games .res[data-r="loss"]) { color: var(--red-ink); background: color-mix(in srgb, var(--red) 14%, transparent); }
+  .progress :global(.games .meta) { grid-column: 1 / -1; }
+  .progress :global(.game__who) { display: flex; align-items: center; gap: 0.625rem; min-width: 0; }
+  .progress :global(.game__face) { flex: none; width: 1.75rem; height: 1.75rem; border-radius: 50%; object-fit: cover; }
+  .progress :global(.games .meta) { padding-inline-start: 2.375rem; }
+  .progress :global(.empty a) { display: flex; align-items: center; min-height: 44px; margin-top: 0.25rem; color: var(--tint-ink); font-weight: 600; text-decoration: none; }
+  .sync > * + * { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
+  .sync .row { width: 100%; text-align: start; color: var(--tint-ink); }
+  .sync .icon { width: 1.125rem; height: 1.125rem; }
+  .sync .chev { width: 0.9rem; height: 0.9rem; color: var(--label-3); }
+  .sync .sync__code { color: var(--label); }
+  .sync .reset { color: var(--red-ink); }
+  .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 600; letter-spacing: 0.04em; user-select: all; overflow-wrap: anywhere; text-align: end; }
+  .row__value { color: var(--label-2); font-size: var(--t-foot); font-variant-numeric: tabular-nums; }
+  .sync-join { display: grid; padding: 0.25rem 0; margin-top: var(--space-2xs); }
+  .sync-join[hidden], .sync[hidden] { display: none; }
+  .field-row { display: block; padding: 0.5rem 1rem; }
+  .field-row + .field-row { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
+  .field { width: 100%; min-height: 44px; padding: 0.5rem 0; border: 0; background: transparent; color: var(--label); font-size: max(16px, var(--t-body)); outline: none; }
+  .code-field { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.06em; text-transform: uppercase; }
+  .field::placeholder { color: var(--label-3); letter-spacing: 0.04em; }
+  .field-row:focus-within { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tint) 60%, transparent); border-radius: var(--r-list); }
+  .sync__go { width: 100%; }
+  .pick { position: relative; display: inline-flex; align-items: center; gap: 0.25rem; color: var(--label-2); }
+  .pick select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; color: inherit; font: inherit; font-variant-numeric: tabular-nums; min-height: 44px; padding: 0 1.25rem 0 0.75rem; margin-inline-end: -1.25rem; cursor: pointer; text-align: end; }
+  .pick .icon { width: 0.875rem; height: 0.875rem; pointer-events: none; }
+  .pick select:focus-visible { outline: 2px solid var(--tint); outline-offset: 2px; border-radius: 999px; }
+  .backup > * + * { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
+  .backup .row { width: 100%; text-align: start; color: var(--tint-ink); }
+  .backup .icon { width: 1.125rem; height: 1.125rem; }
+  .settings > [hidden] { display: none; }
+  .settings > * + * { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
+  .look { display: grid; gap: 0.5rem; padding: 0.875rem 1rem 1rem; }
+  .look__label { font-size: var(--t-body); }
+  .look__range { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.75rem; font-size: var(--t-foot); color: var(--label-2); }
+  .look__note { margin-top: var(--space-2xs); }
+  /* the iOS slider: a thin track filled in the tint up to a white thumb */
+  .look input { -webkit-appearance: none; appearance: none; width: 100%; height: max(2.75rem, 44px); margin: 0; background: transparent; cursor: pointer; --pct: 50%; }
+  .look input::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: linear-gradient(90deg, var(--tint) var(--pct), var(--fill) 0); }
+  .look input::-moz-range-track { height: 4px; border-radius: 999px; background: var(--fill); }
+  .look input::-moz-range-progress { height: 4px; border-radius: 999px; background: var(--tint); }
+  .look input::-webkit-slider-thumb { -webkit-appearance: none; width: 1.75rem; height: 1.75rem; margin-top: -0.75rem; border-radius: 50%; background: #fff; box-shadow: 0 0.5px 4px rgb(0 0 0 / 0.12), 0 6px 13px rgb(0 0 0 / 0.12), 0 0 0 0.5px rgb(0 0 0 / 0.04); }
+  .look input::-moz-range-thumb { width: 1.75rem; height: 1.75rem; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 0.5px 4px rgb(0 0 0 / 0.12), 0 6px 13px rgb(0 0 0 / 0.12); }
+</style>

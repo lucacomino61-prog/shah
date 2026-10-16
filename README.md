@@ -54,6 +54,7 @@ node tools/test-resign.mjs                # a stronger bot resigns a lost game (
 node tools/test-club.mjs                  # first-visit question, deck of player cards, the seat and voice, course, progress (dev)
 node tools/test-analyse.mjs               # the analysis board and game review (dev server)
 node tools/test-animations.mjs            # the box opening, the fallen king, the promotion, captured pieces, the streak (dev)
+node tools/test-screens.mjs               # every page is one screen (only the settings scroll), every table sheet opens (dev)
 npm run server:check                      # the server's types (generates server/worker-configuration.d.ts first)
 node tools/test-server.mjs                # the server alone: rooms, clocks, sync vault, reminders (npm run server)
 node tools/test-online.mjs                # a game between two browsers online (dev server and server)
@@ -113,7 +114,14 @@ The second command asks for the value; it is in `server/.dev.vars`. The Worker's
   of the home screen and the opening.
 - `src/scripts/celebrate.ts`: the streak's roll and the captured pieces popping in.
 - `src/scripts/feel.ts`, `src/styles/feel.css`: how the app feels in the hand: the light and spring of a press, haptic
-  ticks, scroll-driven reveals and the folding title, the tab bar's lens and tuck, page transitions, swipe-down sheets.
+  ticks, the rows arriving on a page and the settings' scroll reveals, the tab bar's lens and tuck, page transitions,
+  swipe-down sheets.
+- One screen per page (`.screen` in `src/styles/app.css`): no page scrolls except the settings (the App prop `scroll`).
+  `src/scripts/pager.ts` pages Mësime and Progresi sideways under a row of tabs (a list down the side from 1024px,
+  `.screen--split`); `src/scripts/panel.ts` raises a
+  table's extras (the scoresheet, the puzzle themes, the games to review, the opening lines) as sheets.
+- `src/pages/progresi/cilesimet.astro`, `src/scripts/settings.ts`: the settings page (look, sound, reminder, sync,
+  backup, reset); `src/scripts/progress.ts` draws the Progresi pages.
 - `src/scripts/board/board2d.ts`: the flat board, used only where WebGL fails (every page shows the 3D table).
 - `src/scripts/trainer.ts`, `src/data/repertoires.ts`: the opening trainer and its lines.
 - `src/data/puzzles.json`: 1,120 puzzles from the Lichess database (CC0), each solution checked with the engine.

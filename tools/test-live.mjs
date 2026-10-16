@@ -90,13 +90,13 @@ await B.evaluate(() => {
 ok((await waitText(A, '[data-glyph]', /Fitove/)) === 'Fitove' && (await waitText(B, '[data-glyph]', /Humbe/)) === 'Humbe', 'a resignation ends it on both');
 
 // ------------------------------------------------------------------ sync
-await A.goto(base + '/progresi/', { waitUntil: 'networkidle0' });
-ok(await A.$('[data-remind-box]').then(Boolean), 'Progresi has the daily reminder');
+await A.goto(base + '/progresi/cilesimet/', { waitUntil: 'networkidle0' });
+ok(await A.$('[data-remind-box]').then(Boolean), 'the settings have the daily reminder');
 await A.evaluate(() => document.querySelector('[data-sync-start]').click());
 await A.waitForFunction(() => !document.querySelector('[data-sync-on]').hidden, { timeout: 20000 }).catch(() => {});
 const sync = await A.evaluate(() => JSON.parse(localStorage.getItem('shah.sync') || 'null'));
 ok(sync?.rev === 1, 'sync on: the first copy is on the server');
-await B.goto(`${base}/progresi/#sync=${sync?.code}`, { waitUntil: 'networkidle0' });
+await B.goto(`${base}/progresi/cilesimet/#sync=${sync?.code}`, { waitUntil: 'networkidle0' });
 await B.evaluate(() => document.querySelector('[data-sync-join] button[type="submit"]').click());
 await B.waitForFunction(() => !document.querySelector('[data-sync-on]').hidden, { timeout: 20000 }).catch(() => {});
 ok((await text(B, '[data-sync-note]')).includes('U lidh'), 'the other phone joins with the link', await text(B, '[data-sync-note]'));

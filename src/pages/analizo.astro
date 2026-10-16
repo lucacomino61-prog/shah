@@ -30,11 +30,12 @@ const names: Record<string, string> = { k: 'mbret', q: 'mbretëreshë', r: 'torr
       <div class="score__row"><span class="score__name">Radha</span><span class="tabular" data-turn-label>Të bardhat</span></div>
     </div>
 
-    <ol class="strip" data-strip data-board-ui aria-label="Lëvizjet"><li class="strip__empty">Luaj një lëvizje, ose hap një lojë më poshtë.</li></ol>
+    <ol class="strip" data-strip data-board-ui aria-label="Lëvizjet"><li class="strip__empty">Luaj një lëvizje, ose <button type="button" class="strip__open" data-panel-open="games">hap një lojë</button>.</li></ol>
 
     <div class="tools" data-board-ui>
       <button type="button" class="tool tool--menu" data-tools-toggle aria-expanded="false" aria-controls="tools-list" aria-label="Mjetet"><Fragment set:html={icon('dotsThreeVertical')} /></button>
       <div class="tools__list" id="tools-list">
+        <button type="button" class="tool" data-panel-open="games"><span class="tool__icon"><Fragment set:html={icon('downloadSimple')} /></span><span class="tool__label">Hap një lojë</span></button>
         <button type="button" class="tool" data-reset><span class="tool__icon"><Fragment set:html={icon('plus')} /></span><span class="tool__label">Pozicioni fillestar</span></button>
         <button type="button" class="tool" data-edit aria-pressed="false"><span class="tool__icon"><Fragment set:html={icon('pencilSimple')} /></span><span class="tool__label">Rregullo pozicionin</span></button>
         <button type="button" class="tool" data-flip><span class="tool__icon"><Fragment set:html={icon('arrowsDownUp')} /></span><span class="tool__label">Rrotullo tabelën</span></button>
@@ -85,8 +86,12 @@ const names: Record<string, string> = { k: 'mbret', q: 'mbretëreshë', r: 'torr
     </section>
   </div>
 
-  <section class="record" aria-labelledby="games-title">
-    <h2 class="record__title" id="games-title">Rishiko lojërat e tua</h2>
+  <dialog class="setup panel" data-panel="games" aria-labelledby="games-title">
+    <div class="panel__head">
+      <h2 class="panel__title" id="games-title" tabindex="-1">Rishiko lojërat e tua</h2>
+      <button type="button" class="panel__close" data-panel-close aria-label="Mbyll"><Fragment set:html={icon('x')} /></button>
+    </div>
+    <div class="panel__body">
     <p class="record__opening">Trajneri kalon nëpër çdo lëvizje dhe të thotë ku ndryshoi loja. Gabimet e tua bëhen ushtrime.</p>
 
     <form class="group fetcher" data-fetch>
@@ -135,7 +140,8 @@ const names: Record<string, string> = { k: 'mbret', q: 'mbretëreshë', r: 'torr
 
     <h3 class="group-h">Lëvizjet</h3>
     <ol class="sheet" data-sheet></ol>
-  </section>
+    </div>
+  </dialog>
   <script>
     import '../scripts/analyse';
   </script>

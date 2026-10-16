@@ -35,8 +35,8 @@ const game = (date, result) => ({ date, side: 'w', level: 2, result, moves: 30, 
 const A = await phone('A', { games: [game('2026-10-10T10:00:00.000Z', 'win')], lessons: ['piruni'], puzzleRating: 1040, puzzlesSolved: 30, puzzlesTried: 41, rushBest: 12, updated: '2026-10-14T08:00:00.000Z' });
 const B = await phone('B', { games: [game('2026-10-12T10:00:00.000Z', 'draw')], lessons: ['lidhja'], puzzleRating: 990, puzzlesSolved: 5, puzzlesTried: 9, rushBest: 3, updated: '2026-10-14T07:00:00.000Z' });
 
-// A turns sync on
-await A.goto(base + '/progresi/', { waitUntil: 'networkidle0' });
+// A turns sync on (Progresi > Cilësimet)
+await A.goto(base + '/progresi/cilesimet/', { waitUntil: 'networkidle0' });
 await A.evaluate(() => document.querySelector('[data-sync-start]').click());
 await A.waitForFunction(() => !document.querySelector('[data-sync-on]').hidden, { timeout: 15000 }).catch(() => {});
 const sa = await syncState(A);
@@ -53,8 +53,9 @@ const id = await A.evaluate(async (code) => {
 const raw = await (await fetch(`http://127.0.0.1:8787/sync/${id}`)).json();
 ok(raw.rev === 1 && !raw.blob.includes('piruni') && !Buffer.from(raw.blob, 'base64').toString('latin1').includes('piruni'), 'the server copy is ciphertext: no lesson names, no numbers in clear');
 
-// B joins from the shared link
+// B joins from the shared link (an old /progresi/ link: it goes on to the settings)
 await B.goto(`${base}/progresi/#sync=${sa.code}`, { waitUntil: 'networkidle0' });
+await B.waitForFunction(() => location.pathname === '/progresi/cilesimet/' && document.querySelector('[data-sync-join] input')?.value, { timeout: 15000 }).catch(() => {});
 const prefilled = await B.$eval('[data-sync-join] input', (e) => e.value);
 ok(prefilled === shown && (await B.evaluate(() => location.hash)) === '', 'the link fills in the code and leaves the address bar clean', prefilled);
 await B.evaluate(() => document.querySelector('[data-sync-join] button[type="submit"]').click());
@@ -62,8 +63,10 @@ await B.waitForFunction(() => !document.querySelector('[data-sync-on]').hidden, 
 let pb = await progress(B);
 ok(pb.games?.length === 2 && pb.lessons.join(',') === 'lidhja,piruni' && pb.puzzleRating === 1040 && pb.rushBest === 12, 'B now holds both phones’ progress', `${pb.games?.length} games, ${pb.lessons?.join(',')}, ${pb.puzzleRating}`);
 ok((await note(B)).includes('U lidh'), 'and says so', await note(B));
+await B.goto(base + '/progresi/', { waitUntil: 'networkidle0' });
 const games = await B.$eval('[data-fig="games"]', (e) => e.textContent);
-ok(games === '2', 'the summary on the page is drawn again with both games', games);
+ok(games === '2', 'Progresi counts both phones’ games', games);
+await B.goto(base + '/progresi/cilesimet/', { waitUntil: 'networkidle0' });
 
 // A picks up B's half on its next look
 await A.reload({ waitUntil: 'networkidle0' });

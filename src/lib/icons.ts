@@ -45,6 +45,9 @@ import arrowsClockwise from '@phosphor-icons/core/assets/regular/arrows-clockwis
 import handshake from '@phosphor-icons/core/assets/regular/handshake.svg?raw';
 import handTap from '@phosphor-icons/core/assets/regular/hand-tap.svg?raw';
 import palette from '@phosphor-icons/core/assets/regular/palette.svg?raw';
+import listNumbers from '@phosphor-icons/core/assets/regular/list-numbers.svg?raw';
+import gear from '@phosphor-icons/core/assets/regular/gear-six.svg?raw';
+import caretLeftBold from '@phosphor-icons/core/assets/bold/caret-left-bold.svg?raw';
 // the medals on Progresi: filled, so the symbol reads as struck into the metal
 import trophy from '@phosphor-icons/core/assets/fill/trophy-fill.svg?raw';
 import crownSimple from '@phosphor-icons/core/assets/fill/crown-simple-fill.svg?raw';
@@ -103,6 +106,9 @@ const raw = {
   handshake,
   handTap,
   palette,
+  listNumbers,
+  gear,
+  caretLeftBold,
   trophy,
   crownSimple,
   shieldCheck,

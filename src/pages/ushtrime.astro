@@ -24,7 +24,7 @@ import '../styles/play.css';
     </div>
 
     <div class="bug bug--score" data-board-ui>
-      <div class="score__row"><span class="score__name" data-theme-name>Tema</span><span class="tabular" data-puzzle-rating></span></div>
+      <div class="score__row"><button type="button" class="score__name score__pick" data-theme-name data-panel-open="themes" aria-label="Zgjidh temën">Tema</button><span class="tabular" data-puzzle-rating></span></div>
       <div class="score__row"><span class="score__name" data-my-label>Vlerësimi yt</span><span class="score__flame" data-flame hidden><Fragment set:html={icon('fire')} /></span><b class="tabular" data-my-rating></b></div>
     </div>
 
@@ -32,6 +32,7 @@ import '../styles/play.css';
       <button type="button" class="tool tool--menu" data-tools-toggle aria-expanded="false" aria-controls="tools-list" aria-label="Mjetet"><Fragment set:html={icon('dotsThreeVertical')} /></button>
       <div class="tools__list" id="tools-list">
         <button type="button" class="tool" data-next-puzzle><span class="tool__icon"><Fragment set:html={icon('arrowRight')} /></span><span class="tool__label" data-label>Ushtrimi tjetër</span></button>
+        <button type="button" class="tool" data-panel-open="themes"><span class="tool__icon"><Fragment set:html={icon('puzzlePiece')} /></span><span class="tool__label">Tema dhe mënyrat</span></button>
         <button type="button" class="tool" data-angle><span class="tool__icon"><Fragment set:html={icon('videoCamera')} /></span><span class="tool__label" data-label>Këndi i kamerës</span></button>
         <button type="button" class="tool" data-look-open><span class="tool__icon"><Fragment set:html={icon('palette')} /></span><span class="tool__label">Pamja</span></button>
         <button type="button" class="tool tool--motion" data-motion-switch aria-pressed="false"><span class="tool__icon" data-when="on"><Fragment set:html={icon('pause')} /></span><span class="tool__icon" data-when="off"><Fragment set:html={icon('play')} /></span><span class="tool__label">Ndal animacionet</span></button>
@@ -64,8 +65,13 @@ import '../styles/play.css';
     </div>
   </div>
 
-  <section class="record" aria-labelledby="themes-title">
-    <h2 class="visually-hidden">Mënyrat</h2>
+  <dialog class="setup panel" data-panel="themes" aria-labelledby="themes-panel-title">
+    <div class="panel__head">
+      <h2 class="panel__title" id="themes-panel-title" tabindex="-1">Ushtrimet</h2>
+      <button type="button" class="panel__close" data-panel-close aria-label="Mbyll"><Fragment set:html={icon('x')} /></button>
+    </div>
+    <div class="panel__body">
+    <h3 class="visually-hidden">Mënyrat</h3>
     <div class="group modes">
       <button type="button" class="row mode" data-daily>
         <span class="mode__tile mode__tile--day" aria-hidden="true"><Fragment set:html={icon('fire')} /></span>
@@ -78,7 +84,7 @@ import '../styles/play.css';
         <span aria-hidden="true"><Fragment set:html={icon('caretRight', 'icon chev')} /></span>
       </button>
     </div>
-    <h2 class="record__title wide themes-h" id="themes-title">Zgjidh temën</h2>
+    <h3 class="group-h themes-h" id="themes-title">Zgjidh temën</h3>
     <p class="record__opening">Ushtrimet vijnë nga baza e hapur e Lichess (CC0), me vlerësime nga lojtarë të vërtetë. Zgjidhja e çdonjërit është kontrolluar me motorin.</p>
     <div class="themes" data-themes role="radiogroup" aria-label="Tema">
       <label class="theme"><input type="radio" name="theme" value="mine" /><span><b>Gabimet e tua</b><span data-count="mine"></span></span></label>
@@ -87,7 +93,8 @@ import '../styles/play.css';
         <label class="theme"><input type="radio" name="theme" value={t.id} /><span><b>{t.name}</b><span data-count={t.id}></span></span></label>
       ))}
     </div>
-  </section>
+    </div>
+  </dialog>
   <script>
     import '../scripts/puzzles';
   </script>

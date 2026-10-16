@@ -49,7 +49,9 @@ export function initShell() {
     };
     btn.addEventListener('click', () => set(!box.hasAttribute('data-open')));
     box.querySelector('.tools__list')?.addEventListener('click', (e) => {
-      if ((e.target as Element).closest('.tool')) set(false);
+      // a choice closes the menu; one that asks to be pressed again (Dorëzohu) keeps it open for the second press
+      const t = (e.target as Element).closest('.tool');
+      if (t && !t.hasAttribute('data-keep-open')) set(false);
     });
     document.addEventListener('pointerdown', (e) => {
       if (!box.contains(e.target as Node)) set(false);

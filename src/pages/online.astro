@@ -43,6 +43,7 @@ import '../styles/play.css';
       <div class="tools__list" id="tools-list">
         <button type="button" class="tool" data-new><span class="tool__icon"><Fragment set:html={icon('plus')} /></span><span class="tool__label">Lojë e re online</span></button>
         <button type="button" class="tool" data-flip><span class="tool__icon"><Fragment set:html={icon('arrowsDownUp')} /></span><span class="tool__label">Rrotullo tabelën</span></button>
+        <button type="button" class="tool" data-panel-open="record"><span class="tool__icon"><Fragment set:html={icon('listNumbers')} /></span><span class="tool__label">Fleta e lojës</span></button>
         <button type="button" class="tool" data-analyse><span class="tool__icon"><Fragment set:html={icon('magnifyingGlass')} /></span><span class="tool__label">Analizo lojën</span></button>
         <button type="button" class="tool" data-angle><span class="tool__icon"><Fragment set:html={icon('videoCamera')} /></span><span class="tool__label">Këndi i kamerës</span></button>
         <button type="button" class="tool" data-look-open><span class="tool__icon"><Fragment set:html={icon('palette')} /></span><span class="tool__label">Pamja</span></button>
@@ -79,11 +80,16 @@ import '../styles/play.css';
     </section>
   </div>
 
-  <section class="record" aria-labelledby="sheet-title">
-    <h2 class="record__title" id="sheet-title">Fleta e lojës</h2>
+  <dialog class="setup panel" data-panel="record" aria-labelledby="sheet-title">
+    <div class="panel__head">
+      <h2 class="panel__title" id="sheet-title" tabindex="-1">Fleta e lojës</h2>
+      <button type="button" class="panel__close" data-panel-close aria-label="Mbyll"><Fragment set:html={icon('x')} /></button>
+    </div>
+    <div class="panel__body">
     <p class="record__opening" data-opening hidden></p>
     <ol class="sheet" data-sheet><li class="sheet-empty">Lëvizjet do të shkruhen këtu.</li></ol>
-  </section>
+    </div>
+  </dialog>
 
   <dialog class="setup" data-setup-dialog aria-labelledby="setup-title">
     <form class="setup__form" data-setup method="dialog">

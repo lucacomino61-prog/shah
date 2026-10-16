@@ -18,6 +18,7 @@ import { takenIcons, writeTaken } from './celebrate.ts';
 import { portrait } from '../lib/bots.ts';
 import { scoreVs, scoreWords } from '../lib/record.ts';
 import { fly, resetChatter, seat as seatOpponent, speak } from './seat.ts';
+import { closePanels, openPanel } from './panel.ts';
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const START = new Chess().fen();
@@ -947,7 +948,7 @@ function openPly(i: number) {
   } else {
     enterStudy(fens[i], [ucis[i]], `Lëvizja ${Math.floor(i / 2) + 1}`);
   }
-  document.querySelector('.stage')?.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto', block: 'start' });
+  closePanels();
 }
 
 // ------------------------------------------------------------------ the graph of the game
@@ -1197,6 +1198,10 @@ ui.resign.addEventListener('click', () => {
   clearTimeout(resignArmed);
   resignArmed = null;
   label.textContent = 'Dorëzohu';
+  // the menu held open for the second press closes with it
+  const tools = ui.resign.closest('.tools');
+  tools?.removeAttribute('data-open');
+  tools?.querySelector('[data-tools-toggle]')?.setAttribute('aria-expanded', 'false');
   endGame(true);
 });
 
@@ -1206,10 +1211,11 @@ ui.end.querySelector('[data-again]')!.addEventListener('click', () => {
   speak(level.id, 'hello', 0);
 });
 ui.end.querySelector('[data-review]')!.addEventListener('click', () => {
+  // the moment the game turned, on the board; without one, the scoresheet and its graph
   ui.review.open = true;
-  ui.review.scrollIntoView({ behavior: motionOn() ? 'smooth' : 'auto', block: 'start' });
   const t = turning();
   if (t !== null) openPly(t);
+  else openPanel('record');
 });
 
 // ------------------------------------------------------------------ start

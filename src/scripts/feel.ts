@@ -81,7 +81,7 @@ function sheets() {
     grab.className = 'sheet-grab';
     grab.setAttribute('aria-hidden', 'true');
     d.prepend(grab);
-    const handles = [grab, ...d.querySelectorAll<HTMLElement>('.setup__title, .welcome__k, .welcome__title')];
+    const handles = [grab, ...d.querySelectorAll<HTMLElement>('.setup__title, .welcome__k, .welcome__title, .panel__head')];
     let y0 = 0;
     let t0 = 0;
     let dy = 0;

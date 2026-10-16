@@ -96,18 +96,11 @@ html:active-view-transition-type(tab)::view-transition-new(root) { animation: 22
 .mast__title { display: none; }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    html:not([data-motion='off']) :is(.stop, .chapter__head, .rung, .badge, .chart, .stats, .facts, .page section > .group:not(.ladder), .page > .group, .record > *) {
-      animation: rise linear both; animation-timeline: view(); animation-range: entry 0% entry 75%;
-    }
-    html:not([data-motion='off']) .chapter__n { animation: drift linear both; animation-timeline: view(); animation-range: cover; }
-    html:not([data-motion='off']) .chart { view-timeline-name: --chart; }
-    html:not([data-motion='off']) .chart .trace { stroke-dasharray: 1; animation: draw linear both; animation-timeline: --chart; animation-range: entry 35% cover 50%; }
-    html:not([data-motion='off']) .chart .dot { animation: dot-in linear both; animation-timeline: --chart; animation-range: entry 60% cover 50%; transform-box: fill-box; transform-origin: center; }
-    html:not([data-motion='off']) .rung__bar { animation: fill-in linear both; animation-timeline: view(); animation-range: entry 30% entry 100%; }
-    html:not([data-motion='off']) .badge:not([data-new]) .medal { animation: strike-in linear both; animation-timeline: view(); animation-range: entry 10% entry 90%; }
+    /* the settings, the one page that scrolls: its groups rise into place as they come into view */
+    html[data-scroll]:not([data-motion='off']) .page section > .group { animation: rise linear both; animation-timeline: view(); animation-range: entry 0% entry 75%; }
     /* the large title folds into the bar as the page scrolls, as in iOS */
-    html:not([data-motion='off']) .page-title { transform-origin: 0 100%; animation: title-fold linear both; animation-timeline: scroll(root); animation-range: 0 8rem; }
-    html:not([data-motion='off']) .mast__title {
+    html[data-scroll]:not([data-motion='off']) .page-title { transform-origin: 0 100%; animation: title-fold linear both; animation-timeline: scroll(root); animation-range: 0 8rem; }
+    html[data-scroll]:not([data-motion='off']) .mast__title {
       display: block; position: absolute; left: 50%; top: 50%; translate: -50% -50%;
       font-family: var(--font-display); font-weight: 600; font-size: var(--t-title3); letter-spacing: -0.01em; white-space: nowrap; pointer-events: none;
       animation: title-in linear both; animation-timeline: scroll(root); animation-range: 5rem 8.5rem;
@@ -124,3 +117,15 @@ html:active-view-transition-type(tab)::view-transition-new(root) { animation: 22
 @keyframes strike-in { from { opacity: 0; transform: scale(0.7) rotate(-14deg); } 70% { opacity: 1; transform: scale(1.06) rotate(2deg); } to { transform: none; } }
 @keyframes title-fold { to { transform: translateY(-1.25rem) scale(0.82); opacity: 0; } }
 @keyframes title-in { from { opacity: 0; translate: -50% -30%; } to { opacity: 1; translate: -50% -50%; } }
+
+/* ------------------------------------------------------------------ a page of a pager, the first time it shows */
+/* The screens do not scroll (Luca, 2026-10-16), so nothing arrives by scrolling: a page's rows arrive in a short stagger
+   the first time it is swiped to, the chart draws its line, the ladder's bars fill and the medals are struck. Once. */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion='off']) .pager__page[data-shown] .stagger > * { animation: arrive 460ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 45ms + 60ms); }
+  html:not([data-motion='off']) .pager__page[data-shown] .chart .trace { stroke-dasharray: 1; animation: draw 900ms var(--ease-in-out) 200ms both; }
+  html:not([data-motion='off']) .pager__page[data-shown] .chart .dot { animation: dot-in 320ms var(--ease-out) both; animation-delay: calc(200ms + var(--i, 0) * 40ms); transform-box: fill-box; transform-origin: center; }
+  html:not([data-motion='off']) .pager__page[data-shown] .rung__bar { animation: fill-in 700ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 45ms + 200ms); }
+  html:not([data-motion='off']) .pager__page[data-shown] .badge:not([data-new]) .medal { animation: strike-in 620ms cubic-bezier(0.34, 1.4, 0.64, 1) both; animation-delay: calc(var(--i, 0) * 40ms + 80ms); }
+}
+@keyframes arrive { from { opacity: 0; transform: translateY(0.75rem) scale(0.98); } }

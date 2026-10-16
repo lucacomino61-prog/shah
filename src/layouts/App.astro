@@ -12,12 +12,14 @@ interface Props {
   stage?: boolean;
   /** a reading page that sits in the same room as the table (a still of it behind the page) */
   room?: boolean;
+  /** the one kind of page that scrolls (the settings); every other page is one screen */
+  scroll?: boolean;
   /** kept out of search results (the 404) */
   noindex?: boolean;
   /** the home page carries the app's structured data */
   home?: boolean;
 }
-const { title, description, tab, stage = false, room = false, noindex = false, home = false } = Astro.props;
+const { title, description, tab, stage = false, room = false, scroll = false, noindex = false, home = false } = Astro.props;
 const site = Astro.site!;
 const canonical = new URL(Astro.url.pathname, site).href;
 const ogImage = new URL('/og.png', site).href;
@@ -46,7 +48,7 @@ import LookPicker from '../components/LookPicker.astro';
 ---
 
 <!doctype html>
-<html lang="sq" data-motion="on" data-stage={stage ? '' : undefined} data-room={room ? '' : undefined}>
+<html lang="sq" data-motion="on" data-stage={stage ? '' : undefined} data-room={room ? '' : undefined} data-scroll={scroll ? '' : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -141,8 +143,12 @@ import LookPicker from '../components/LookPicker.astro';
     <script>
       import { initShell } from '../scripts/shell';
       import { initFeel } from '../scripts/feel';
+      import { initPanels } from '../scripts/panel';
+      import { initPagers } from '../scripts/pager';
       initShell();
       initFeel();
+      initPanels();
+      initPagers();
     </script>
     {import.meta.env.PROD && (
       <script is:inline>

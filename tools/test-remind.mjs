@@ -64,7 +64,7 @@ await page.evaluateOnNewDocument((sub) => {
   PushManager.prototype.getSubscription = async () => current;
 }, sub);
 
-await page.goto(base + '/progresi/', { waitUntil: 'networkidle0' });
+await page.goto(base + '/progresi/cilesimet/', { waitUntil: 'networkidle0' });
 await page.evaluate(() => navigator.serviceWorker.ready);
 ok(await page.$eval('[data-remind-box]', (e) => !!e), 'a build with a server shows the reminder');
 const hour = new Date().getHours();
@@ -114,7 +114,7 @@ await ios.setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) A
 await ios.evaluateOnNewDocument(() => {
   delete window.PushManager;
 });
-await ios.goto(base + '/progresi/', { waitUntil: 'networkidle0' });
+await ios.goto(base + '/progresi/cilesimet/', { waitUntil: 'networkidle0' });
 const iosNote = await ios.$eval('[data-remind-note]', (e) => e.textContent);
 ok((await ios.$eval('[data-remind]', (e) => e.disabled)) && iosNote.includes('ekrani kryesor'), 'on an iPhone in Safari: the switch waits and says to add Shah to the home screen', iosNote.slice(0, 70));
 
