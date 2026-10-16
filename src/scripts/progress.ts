@@ -3,30 +3,19 @@
 
 import { TAG_NAMES, type Tag } from '../lib/coach.ts';
 import { LESSONS } from '../data/lessons.ts';
+import { CURE } from '../lib/cure.ts';
+import { shareCard } from './share.ts';
 import { levelOf } from '../lib/levels.ts';
 import { portrait } from '../lib/bots.ts';
-import { accuracies, badges, scores, scoreWords } from '../lib/record.ts';
+import { accuracies, badges, playingLevel, scores, scoreWords } from '../lib/record.ts';
 import { countUp, settle } from './feel.ts';
-import { load, streakNow } from '../lib/store.ts';
+import { load, streakNow, update } from '../lib/store.ts';
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 let p = load();
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
 // which lesson answers which mistake
-const CURE: Record<Tag, { href: string; label: string }> = {
-  hanging: { href: '/mesime/vlera-e-figurave/', label: 'Mësimi: Vlera e figurave' },
-  'lost-material': { href: '/mesime/vlera-e-figurave/', label: 'Mësimi: Vlera e figurave' },
-  'missed-capture': { href: '/ushtrime/', label: 'Ushtrime: Figura pa mbrojtje' },
-  'allowed-fork': { href: '/mesime/piruni/', label: 'Mësimi: Piruni' },
-  'missed-fork': { href: '/mesime/piruni/', label: 'Mësimi: Piruni' },
-  'allowed-mate': { href: '/mesime/mat-ne-rreshtin-e-fundit/', label: 'Mësimi: Mat në rreshtin e fundit' },
-  'missed-mate': { href: '/mesime/mati-me-dy-torra/', label: 'Mësimi: Mati me dy torra' },
-  'early-queen': { href: '/mesime/parimet-e-hapjes/', label: 'Mësimi: Parimet e hapjes' },
-  'same-piece': { href: '/mesime/parimet-e-hapjes/', label: 'Mësimi: Parimet e hapjes' },
-  'rim-knight': { href: '/mesime/parimet-e-hapjes/', label: 'Mësimi: Parimet e hapjes' },
-  'f-pawn': { href: '/mesime/parimet-e-hapjes/', label: 'Mësimi: Parimet e hapjes' },
-};
 
 function render(first = false) {
   p = load();
@@ -55,10 +44,11 @@ function render(first = false) {
     if (avg !== null) countUp($('[data-fig="acc"]'), avg, '%');
     countUp($('[data-fig="rating"]'), p.puzzleRating);
   }
+  const mine = playingLevel(p);
   const rows: [string, string][] = [
     ['Mësime', `${LESSONS.filter((l) => p.lessons.includes(l.slug)).length} nga ${LESSONS.length}`],
     ['Seria', streakNow(p) ? `${streakNow(p)} ditë` : 'Pa filluar'],
-    ['Gara', p.rushBest ? `${p.rushBest} pikë` : 'Ende pa garë'],
+    ['Niveli', mine.level ? `${mine.level.n} · ${mine.level.bot}` : 'Ende jo'],
   ];
   $('[data-summary]').innerHTML = rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('');
   chart();
@@ -144,11 +134,17 @@ function chart() {
 
 /** The record against each opponent, easiest first. */
 function ladder() {
+  const mine = playingLevel(p);
   for (const { level: l, score: s } of scores(p)) {
     const row = document.querySelector<HTMLElement>(`[data-rung="${l.id}"]`);
     if (!row) continue;
     const n = s.won + s.drawn + s.lost;
     row.toggleAttribute('data-none', !n);
+    // your level, and the one to beat next
+    row.toggleAttribute('data-mine', mine.level?.id === l.id);
+    row.toggleAttribute('data-next', mine.next?.id === l.id);
+    row.querySelector('[data-lv]')!.textContent = mine.level?.id === l.id ? `Niveli ${l.n} · niveli yt` : mine.next?.id === l.id ? `Niveli ${l.n} · tjetri` : `Niveli ${l.n}`;
+    row.querySelector('[data-pick]')!.setAttribute('aria-label', `${l.bot}, niveli ${l.n}: ${scoreWords(s)}. Zgjidhe për lojën e radhës.`);
     const out = row.querySelector<HTMLElement>('[data-score]')!;
     out.textContent = n ? `${s.won} – ${s.drawn} – ${s.lost}` : 'Ende pa lojë';
     out.setAttribute('aria-label', scoreWords(s));
@@ -174,6 +170,7 @@ function medals() {
     li.toggleAttribute('data-new', b.earned && seen.length > 0 && !seen.includes(b.id));
     li.querySelector('[data-badge-state]')!.textContent = b.earned ? 'E fituar' : b.progress ? `${b.progress[0]} nga ${b.progress[1]}` : 'Ende jo';
   }
+  $('[data-share-medals]').hidden = !earned.length;
   $('[data-medals-note]').textContent = earned.length
     ? `${earned.length} nga ${all.length} medalje të fituara. Fitohen me lojëra, ushtrime dhe mësime.`
     : 'Fitohen me lojëra, ushtrime dhe mësime. Askush nuk i jep falas.';
@@ -193,3 +190,27 @@ new ResizeObserver(() => {
   fitGames();
 }).observe($('.pager'));
 
+// the ladder is the opponent picker too: a tap seats that opponent for the next game and opens the table (a game left
+// unfinished is played out first)
+document.querySelectorAll<HTMLButtonElement>('[data-pick]').forEach((b) =>
+  b.addEventListener('click', () => {
+    update((x) => (x.level = Number(b.dataset.pick)));
+    location.href = '/luaj/';
+  }),
+);
+
+// the medals as a picture for friends: how many of the twelve, struck in brass
+$<HTMLButtonElement>('[data-share-medals]').addEventListener('click', async (e) => {
+  const btn = e.currentTarget as HTMLButtonElement;
+  const all = badges(p);
+  const earned = all.filter((b) => b.earned);
+  btn.disabled = true;
+  try {
+    await shareCard(
+      { kicker: 'Medaljet', title: `${earned.length} nga ${all.length} medalje`, line: earned.slice(0, 4).map((b) => b.title).join(' · '), medals: { earned: earned.length, total: all.length } },
+      `Kam fituar ${earned.length} nga ${all.length} medaljet në Shah. Provoje edhe ti:`,
+    );
+  } finally {
+    btn.disabled = false;
+  }
+});

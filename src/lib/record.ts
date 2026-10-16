@@ -4,7 +4,7 @@
 import { LESSONS } from '../data/lessons.ts';
 import { REPERTOIRES } from '../data/repertoires.ts';
 import type { IconName } from './icons.ts';
-import { LEVELS, levelOf } from './levels.ts';
+import { LEVELS, levelOf, type Level } from './levels.ts';
 import type { GameRecord, Progress } from './store.ts';
 
 export interface Score {
@@ -25,6 +25,17 @@ export const scoreVs = (p: Progress, id: number): Score => tally(p.games.filter(
 
 /** Every opponent in the order they are met, with the learner's score against each. */
 export const scores = (p: Progress) => LEVELS.map((l) => ({ level: l, score: scoreVs(p, l.id) }));
+
+/** The learner's level, from the games alone: the strongest opponent scored at least half against over two or more
+ *  games (a win counts 1, a draw a half), and the next one up. Nothing is estimated beyond the games played. */
+export function playingLevel(p: Progress): { level: Level | null; next: Level | null } {
+  let level: Level | null = null;
+  for (const { level: l, score: s } of scores(p)) {
+    const n = s.won + s.drawn + s.lost;
+    if (n >= 2 && (s.won + s.drawn / 2) / n >= 0.5) level = l;
+  }
+  return { level, next: LEVELS[(level ? LEVELS.indexOf(level) : -1) + 1] ?? null };
+}
 
 /** "2 – 1 – 0" read as words, for screen readers and short lines. */
 export function scoreWords(s: Score): string {

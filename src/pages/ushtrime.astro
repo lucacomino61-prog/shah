@@ -54,6 +54,7 @@ import '../styles/play.css';
           <button type="button" class="cue" data-solution><Fragment set:html={icon('eye')} />Zgjidhja</button>
           <button type="button" class="cue cue--on" data-next hidden><Fragment set:html={icon('arrowRight')} />Tjetri</button>
           <button type="button" class="cue" data-again hidden><Fragment set:html={icon('arrowCounterClockwise')} />Provo përsëri</button>
+          <button type="button" class="cue" data-share hidden><Fragment set:html={icon('shareNetwork')} />Ndaje</button>
         </div>
       </div>
       <p class="visually-hidden" aria-live="polite" data-live></p>
@@ -83,6 +84,11 @@ import '../styles/play.css';
         <span class="mode__body"><b>Gara 3 minutëshe</b><span data-rush-best>Sa ushtrime zgjidh në 3 minuta?</span></span>
         <span aria-hidden="true"><Fragment set:html={icon('caretRight', 'icon chev')} /></span>
       </button>
+      <button type="button" class="row mode" data-contest-new hidden>
+        <span class="mode__tile mode__tile--friends" aria-hidden="true"><Fragment set:html={icon('users')} /></span>
+        <span class="mode__body"><b>Sfidë me shokët</b><span>Dhjetë ushtrime, të njëjtat për të gjithë. Kush zgjidh më shumë?</span></span>
+        <span aria-hidden="true"><Fragment set:html={icon('caretRight', 'icon chev')} /></span>
+      </button>
     </div>
     <h3 class="group-h themes-h" id="themes-title">Zgjidh temën</h3>
     <p class="record__opening">Ushtrimet vijnë nga baza e hapur e Lichess (CC0), me vlerësime nga lojtarë të vërtetë. Zgjidhja e çdonjërit është kontrolluar me motorin.</p>
@@ -93,6 +99,28 @@ import '../styles/play.css';
         <label class="theme"><input type="radio" name="theme" value={t.id} /><span><b>{t.name}</b><span data-count={t.id}></span></span></label>
       ))}
     </div>
+    </div>
+  </dialog>
+  <!-- a challenge between friends: ten puzzles, the same for all, and a board of results -->
+  <dialog class="setup panel" data-panel="contest" aria-labelledby="contest-title">
+    <div class="panel__head">
+      <h2 class="panel__title" id="contest-title" tabindex="-1">Sfida</h2>
+      <button type="button" class="panel__close" data-panel-close aria-label="Mbyll"><Fragment set:html={icon('x')} /></button>
+    </div>
+    <div class="panel__body contest">
+      <p class="contest__lede" data-contest-lede>Dhjetë ushtrime rreth nivelit tënd. Shokët që hapin lidhjen zgjidhin të njëjtat, dhe tabela tregon kush zgjidhi më shumë e më shpejt. Pa ndihmë: një gabim e kalon ushtrimin.</p>
+      <label class="contest__name">
+        <span>Emri yt</span>
+        <input type="text" maxlength="20" autocomplete="nickname" spellcheck="false" data-contest-name placeholder="Si të të shohin shokët" />
+      </label>
+      <p class="contest__err" data-contest-err role="alert" hidden></p>
+      <div class="contest__actions">
+        <button type="button" class="btn btn--solid" data-contest-go>Krijo sfidën</button>
+        <button type="button" class="btn" data-contest-invite hidden><Fragment set:html={icon('shareNetwork')} />Fto shokët</button>
+      </div>
+      <h3 class="group-h" data-contest-board-h hidden>Tabela</h3>
+      <ol class="group contest__board" data-contest-board hidden></ol>
+      <p class="group-note" data-contest-ends hidden></p>
     </div>
   </dialog>
   <script>
@@ -108,6 +136,26 @@ import '../styles/play.css';
   .mode__tile .icon { width: 1.25rem; height: 1.25rem; }
   .mode__tile--day { background: linear-gradient(180deg, #ff9f0a, #ff6a00); }
   .mode__tile--rush { background: linear-gradient(180deg, #0a84ff, #0062d6); }
+  .mode__tile--friends { background: linear-gradient(180deg, #30d158, #1f9e43); }
+  .mode[hidden] { display: none; }
+  /* the challenge sheet: a name, one action, the board of results */
+  .contest { display: grid; gap: var(--space-s); align-content: start; }
+  .contest__lede { font-size: var(--t-sub); line-height: 1.4; color: var(--label-2); padding-inline: 0.25rem; }
+  .contest__name { display: grid; gap: 0.375rem; padding-inline: 0.25rem; }
+  .contest__name > span { font-size: var(--t-foot); font-weight: 600; color: var(--label-2); }
+  .contest__name input { min-height: 48px; padding: 0 1rem; border-radius: 0.875rem; border: 0; background: var(--fill-2); color: var(--label); font: inherit; font-size: 1rem; }
+  .contest__name input:focus-visible { outline: 3px solid color-mix(in srgb, var(--tint) 75%, transparent); outline-offset: 1px; }
+  .contest__err { color: var(--red-ink); font-size: var(--t-foot); font-weight: 600; padding-inline: 0.25rem; }
+  .contest__err[hidden], .contest__board[hidden], [data-contest-board-h][hidden], [data-contest-ends][hidden], .contest__actions .btn[hidden] { display: none; }
+  .contest__actions { display: grid; gap: 0.5rem; }
+  .contest__board :global(li) { display: grid; grid-template-columns: 1.75rem minmax(0, 1fr) auto; align-items: center; gap: 0.625rem; min-height: 2.875rem; padding: 0.5rem 1rem; }
+  .contest__board :global(li + li) { box-shadow: inset 1rem 0 0 var(--cell), inset 0 0.5px 0 var(--sep); }
+  .contest__board :global(.rank) { font-family: var(--font-display); font-size: var(--t-title3); font-weight: 600; color: var(--label-2); text-align: center; }
+  .contest__board :global(li:first-child .rank) { color: #d9b26f; }
+  .contest__board :global(.who) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+  .contest__board :global(.res) { font-variant-numeric: tabular-nums; color: var(--label-2); font-size: var(--t-foot); }
+  .contest__board :global(.res b) { color: var(--label); font-size: var(--t-sub); }
+  .contest__board :global(li[data-me]) { background: color-mix(in srgb, var(--tint) 12%, transparent); }
   .mode__body { display: grid; gap: 0.0625rem; }
   .mode__body b { font-weight: 600; }
   .mode__body span { font-size: var(--t-foot); color: var(--label-2); }

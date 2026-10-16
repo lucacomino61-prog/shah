@@ -11,12 +11,22 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const rows = JSON.parse(readFileSync(join(root, 'tools', 'cache', 'puzzle-rows.json'), 'utf8'));
 
 // the order decides a puzzle's main theme when it has several
-const THEMES = ['mateIn1', 'backRankMate', 'mateIn2', 'fork', 'pin', 'skewer', 'discoveredAttack', 'hangingPiece', 'trappedPiece', 'promotion'];
-// node tools/build-puzzles.mjs [per-theme]: up to this many per theme (a rare theme gives what the sample holds)
-const PER_THEME = Number(process.argv[2] ?? 200);
+const FIRST = ['mateIn1', 'backRankMate', 'mateIn2', 'fork', 'pin', 'skewer', 'discoveredAttack', 'hangingPiece', 'trappedPiece', 'promotion'];
+// added 2026-10-16: deflection, attraction, removing the defender, mate in three, pawn and rook endings
+const ADDED = ['deflection', 'attraction', 'capturingDefender', 'mateIn3', 'pawnEndgame', 'rookEndgame'];
+const THEMES = [...FIRST, ...ADDED];
+// node tools/build-puzzles.mjs [per-theme] [--add]: up to this many per theme (a rare theme gives what the sample
+// holds). --add keeps every puzzle already in src/data/puzzles.json as it is (today's puzzle and saved progress point
+// at them) and deals only the themes not in it yet.
+const PER_THEME = Number(process.argv.find((a) => /^\d+$/.test(a)) ?? 200);
+const ADD = process.argv.includes('--add');
+const kept = ADD ? JSON.parse(readFileSync(join(root, 'src', 'data', 'puzzles.json'), 'utf8')) : [];
+const dealt = new Set(kept.map((p) => p.theme));
 
 const picked = new Map();
+for (const p of kept) picked.set(p.id, p);
 for (const theme of THEMES) {
+  if (dealt.has(theme)) continue;
   const pool = rows
     .filter((r) => r.themes.includes(theme) && r.rating >= 400 && r.rating <= 1700 && r.rd <= 95 && !picked.has(r.id))
     .sort((a, b) => b.pop * Math.log(b.plays) - a.pop * Math.log(a.plays));
@@ -29,9 +39,11 @@ for (const theme of THEMES) {
 console.log(`candidates: ${picked.size}`);
 
 const sf = startEngine();
-const out = [];
+const out = [...kept];
+const keptIds = new Set(kept.map((p) => p.id));
 let dropped = 0;
 for (const p of picked.values()) {
+  if (keptIds.has(p.id)) continue;
   const moves = p.moves.split(' ');
   const chess = new Chess(p.fen);
   try {

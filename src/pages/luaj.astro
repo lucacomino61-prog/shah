@@ -108,9 +108,15 @@ import '../styles/play.css';
           <p class="end__acc">Saktësia <b class="tabular" data-end-acc></b></p>
           <ul class="end__counts" data-end-counts></ul>
           <p class="end__tag" data-end-tag></p>
+          <div class="end__moments" data-end-moments-box hidden>
+            <p class="end__h" data-end-moments-h>Tri momentet kryesore</p>
+            <ol data-end-moments></ol>
+          </div>
+          <a class="end__lesson" data-end-lesson hidden></a>
           <div class="lower__actions">
             <button type="button" class="cue cue--on" data-again><Fragment set:html={icon('plus')} />Lojë e re</button>
             <button type="button" class="cue" data-review><Fragment set:html={icon('eye')} />Rishiko gabimet</button>
+            <button type="button" class="cue" data-share-game hidden><Fragment set:html={icon('shareNetwork')} />Ndaje</button>
           </div>
         </div>
       </div>

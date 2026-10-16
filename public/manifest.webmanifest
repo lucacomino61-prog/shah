@@ -1,14 +1,20 @@
 {
+  "id": "/",
   "name": "Shah: trajner shahu",
   "short_name": "Shah",
   "description": "Luaj kundër motorit dhe mëso pse: trajner shahu në shqip.",
   "lang": "sq",
+  "dir": "ltr",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#070908",
   "theme_color": "#070908",
+  "categories": [
+    "education",
+    "games"
+  ],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -25,6 +31,47 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Luaj",
+      "short_name": "Luaj",
+      "description": "Një lojë kundër motorit, me trajnerin.",
+      "url": "/luaj/",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Ushtrimi i ditës",
+      "short_name": "Ushtrimi",
+      "description": "Ushtrimi i sotëm dhe seria jote.",
+      "url": "/ushtrime/?tema=dita",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Mësime",
+      "short_name": "Mësime",
+      "description": "Kursi, kapitull pas kapitulli.",
+      "url": "/mesime/",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }

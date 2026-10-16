@@ -152,12 +152,28 @@ export const FIRST_LEVEL = 8;
 /** Does this level choose its moves from the engine's lines (and so need them)? */
 export const usesEngine = (l: Level) => !l.eye || l.slip < 1;
 
-/** Is the bot's game lost beyond hope here (from its side): a mate against it it can see, or about a queen down? */
+/** Is the bot's game lost beyond hope here (from its side): a mate against it it can see, or about a queen down?
+ *  A longer forced mate still counts the material, as a person would: a queen and a rook down is lost whether the
+ *  engine calls it mate in 7 or +12 (before, a long mate read as "not hopeless" and the bot played on). */
 export function hopeless(a: Analysis): boolean {
   const top = a.lines[0];
   if (!top) return false;
-  if (top.mate !== undefined) return top.mate < 0 && top.mate >= -3;
+  if (top.mate !== undefined) return top.mate < 0 && (top.mate >= -3 || material(a.fen) <= -9);
   return lineScore(top) <= -900;
+}
+
+const WORTH: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+/** The material of the side to move minus the other side's, in pawns. */
+function material(fen: string): number {
+  const [placement, turn] = fen.split(' ');
+  let sum = 0;
+  for (const ch of placement) {
+    const v = WORTH[ch.toLowerCase()];
+    if (v === undefined) continue;
+    const white = ch !== ch.toLowerCase();
+    sum += (white === (turn === 'w') ? 1 : -1) * v;
+  }
+  return sum;
 }
 
 /** The bot's move at this level in the position `fen`, from the engine's search with `lines` lines. */

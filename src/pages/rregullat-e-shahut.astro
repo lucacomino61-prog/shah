@@ -1,0 +1,122 @@
+---
+// The rules of chess for search ("rregullat e shahut"), as nine short cards in the app's one-screen way.
+import App from '../layouts/App.astro';
+import Guide, { type Section } from '../components/Guide.astro';
+
+const START = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+const sections: Section[] = [
+  {
+    tab: 'Tabela',
+    title: 'Tabela dhe figurat',
+    text: [
+      'Shahu luhet nga dy lojtarë në një tabelë me 64 fusha. Fusha e cepit në të djathtë të secilit është e çelët.',
+      'Secili ka 16 figura: mbretin, mbretëreshën, dy torra, dy oficerë, dy kuaj dhe tetë ushtarë. Të bardhat luajnë të parat, pastaj me radhë.',
+    ],
+    fen: START,
+    label: 'Pozicioni i fillimit',
+  },
+  {
+    tab: 'Mbreti',
+    title: 'Mbreti dhe mbretëresha',
+    text: [
+      'Mbreti lëviz një fushë në çdo drejtim, por kurrë ku sulmohet.',
+      'Mbretëresha, figura më e fortë, lëviz sa fusha të dojë, drejt ose tërthor.',
+      'Një figurë merr duke zënë fushën e një figure kundërshtare; ajo del nga tabela.',
+    ],
+    fen: '8/8/8/8/3Q4/8/8/4K3 w - - 0 1',
+    marks: ['a4', 'b4', 'c4', 'e4', 'f4', 'g4', 'h4', 'd1', 'd2', 'd3', 'd5', 'd6', 'd7', 'd8', 'a1', 'b2', 'c3', 'e5', 'f6', 'g7', 'h8', 'a7', 'b6', 'c5', 'e3', 'f2', 'g1'],
+    label: 'Fushat ku arrin mbretëresha nga d4',
+  },
+  {
+    tab: 'Torra',
+    title: 'Torra dhe oficeri',
+    text: [
+      'Torra lëviz drejt: përpara, prapa ose anash, sa fusha të dojë.',
+      'Oficeri lëviz tërthor, sa fusha të dojë, dhe mbetet gjithmonë në fushat e së njëjtës ngjyrë.',
+      'Asnjëra nuk kalon mbi figura të tjera.',
+    ],
+    fen: '8/8/8/8/3R4/8/8/8 w - - 0 1',
+    marks: ['a4', 'b4', 'c4', 'e4', 'f4', 'g4', 'h4', 'd1', 'd2', 'd3', 'd5', 'd6', 'd7', 'd8'],
+    label: 'Fushat ku arrin torra nga d4',
+  },
+  {
+    tab: 'Kali',
+    title: 'Kali',
+    text: [
+      'Kali lëviz në formë L-je: dy fusha në një drejtim dhe një fushë anash. Është e vetmja figurë që kërcen mbi të tjerat.',
+      'Nga mesi i tabelës kali arrin tetë fusha; nga cepi vetëm dy.',
+    ],
+    fen: '8/8/8/8/3N4/8/8/8 w - - 0 1',
+    marks: ['c6', 'e6', 'f5', 'f3', 'e2', 'c2', 'b3', 'b5'],
+    label: 'Tetë fushat ku arrin kali nga d4',
+  },
+  {
+    tab: 'Ushtari',
+    title: 'Ushtari',
+    text: [
+      'Ushtari ecën përpara një fushë. Nga fusha e tij e nisjes mund të ecë edhe dy.',
+      'Ushtari merr ndryshe nga si ecën: një fushë tërthor përpara. Nuk kthehet kurrë prapa.',
+    ],
+    fen: '8/8/8/8/8/3n4/4P3/8 w - - 0 1',
+    marks: ['e3', 'e4', 'd3'],
+    label: 'Ushtari në e2 ecën në e3 ose e4, dhe merr kalin në d3',
+  },
+  {
+    tab: 'Të veçantat',
+    title: 'Tri lëvizjet e veçanta',
+    text: [
+      '[Rokada](/mesime/rokada/): mbreti lëviz dy fusha drejt torrës, torra kalon mbi të. Jo kur je në shah.',
+      '[Marrja në kalim](/mesime/marrja-ne-kalim/): ushtari që kapërcen dy fusha pranë tëndit merret sikur të kishte ecur një, vetëm menjëherë.',
+      '[Promovimi](/mesime/promovimi/): ushtari në rreshtin e fundit bëhet mbretëreshë, torrë, oficer ose kalë.',
+    ],
+  },
+  {
+    tab: 'Shah e mat',
+    title: 'Shahu, mati dhe pati',
+    text: [
+      'Shah: mbreti sulmohet dhe duhet të shpëtojë menjëherë: lëviz mbretin, mbulo sulmin ose merr sulmuesin.',
+      'Mat: shah pa shpëtim. Fiton ai që dha matin.',
+      '[Pati](/mesime/pati/): je në radhë, nuk je në shah, por nuk ke asnjë lëvizje. Barazim.',
+    ],
+    fen: '3R2k1/5ppp/8/8/8/8/5PPP/6K1 b - - 1 1',
+    marks: ['d8', 'g8'],
+    label: 'Mat në rreshtin e fundit: torra në d8 i jep mat mbretit në g8',
+  },
+  {
+    tab: 'Barazimi',
+    title: 'Kur loja mbaron barazim',
+    text: [
+      'Përveç patit, loja mbaron barazim kur të dy lojtarët e pranojnë, kur i njëjti pozicion përsëritet tri herë, dhe kur nuk mbetet material për mat, për shembull vetëm dy mbretërit.',
+      'Edhe kur secili lojtar bën 50 lëvizje pa asnjë kapje dhe pa asnjë lëvizje ushtari.',
+    ],
+  },
+  {
+    tab: 'Fillo',
+    title: 'Provoji në tabelë',
+    text: [
+      'Rregullat mësohen më shpejt duke luajtur. Lea, kundërshtarja e parë, sapo i ka mësuar edhe ajo.',
+      'Pas çdo lëvizjeje trajneri të thotë nëse ishte e mirë, dhe pse.',
+    ],
+    links: [
+      { href: '/luaj/', label: 'Luaj tani', solid: true },
+      { href: '/si-luhet-shahu/', label: 'Si luhet shahu' },
+    ],
+  },
+];
+const title = 'Rregullat e shahut';
+const description = 'Rregullat e shahut në shqip, shkurt e qartë: tabela, si lëviz secila figurë, rokada, marrja në kalim, promovimi, shahu, mati, pati dhe barazimi.';
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  inLanguage: 'sq',
+  about: { '@type': 'Thing', name: 'Shahu' },
+  publisher: { '@type': 'Organization', name: 'Shah' },
+  articleSection: sections.map((s) => s.title),
+};
+---
+
+<App title={`${title}: si lëvizin figurat, shahu, mati dhe pati · Shah`} description={description} tab="mesime" room ld={ld}>
+  <Guide name="rregullat" title={title} sub="Gjithçka për lojën e parë, në nëntë faqe." sections={sections} />
+</App>

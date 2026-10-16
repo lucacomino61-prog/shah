@@ -25,6 +25,8 @@ const hours = Array.from({ length: 24 }, (_, h) => (h + 6) % 24);
         <label class="row"><span>Tingujt dhe dridhja</span><input type="checkbox" class="switch" data-sound /></label>
         <label class="row"><span>Trego rreziqet në lojë</span><input type="checkbox" class="switch" data-threats-pref /></label>
         <label class="row"><span>Tekst më i madh</span><input type="checkbox" class="switch" data-text-large /></label>
+        <label class="row"><span>Tabela e lehtë</span><input type="checkbox" class="switch" data-light-board /></label>
+        <label class="row"><span>Trajneri me zë</span><input type="checkbox" class="switch" data-voice /></label>
         <div class="look">
         <label class="look__label" for="glass-level">Xhami</label>
         <div class="look__range">
@@ -34,7 +36,8 @@ const hours = Array.from({ length: 24 }, (_, h) => (h + 6) % 24);
         </div>
         </div>
       </div>
-      <p class="group-note look__note">Rreziqet: një rreth i kuq rreth figurave të tua që kundërshtari mund t’i marrë në lëvizjen tjetër. Xhami: sa shihet tabela përmes menyve dhe kartave; majtas më e qartë, djathtas më e lexueshme. Tekst më i madh: shkronjat e leximit një shkallë më të mëdha, në çdo faqe.</p>
+      <p class="group-note look__note">Rreziqet: një rreth i kuq rreth figurave të tua që kundërshtari mund t’i marrë në lëvizjen tjetër. Xhami: sa shihet tabela përmes menyve dhe kartave; majtas më e qartë, djathtas më e lexueshme. Tekst më i madh: shkronjat e leximit një shkallë më të mëdha, në çdo faqe. Tabela e lehtë: më pak efekte (pa turbullim, pa pasqyrime, hije më të thjeshta), që një telefon i thjeshtë të mos ngrohet; ndizet vetë kur tabela ecën ngadalë. Trajneri me zë: telefoni lexon me zë atë që thotë trajneri, me zërin shqip të vetë telefonit.</p>
+      <p class="group-note" data-voice-note hidden>Ky shfletues nuk ka zë shqip, prandaj trajneri nuk mund të flasë këtu.</p>
     </section>
 
     {hasServer && (
@@ -96,7 +99,7 @@ const hours = Array.from({ length: 24 }, (_, h) => (h + 6) % 24);
       <p class="group about">
         Shah është softuer i lirë me licencën GPL-3.0. Motori është <a href="https://stockfishchess.org/">Stockfish</a>, që punon
         brenda shfletuesit tënd. Ushtrimet vijnë nga baza e hapur e <a href="https://database.lichess.org/#puzzles">Lichess</a>.
-        Kodi burimor: <a href="https://github.com/lucacomino61-prog/shah">github.com/lucacomino61-prog/shah</a>.
+        Kodi burimor: <a href="https://github.com/lucacomino61-prog/shah">github.com/lucacomino61-prog/shah</a>. <a href="/privatesia/">Privatësia</a>: çfarë ruhet dhe ku.
       </p>
     </section>
 

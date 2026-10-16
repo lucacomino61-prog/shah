@@ -18,6 +18,13 @@ export const THEMES: Theme[] = [
   { id: 'hangingPiece', name: 'Figura pa mbrojtje', task: 'Fito materialin falas.', idea: 'Një figurë që askush nuk e mbron mund të merret pa humbur asgjë.' },
   { id: 'trappedPiece', name: 'Figurë e bllokuar', task: 'Kape figurën që s’ka ku të ikë.', idea: 'Një figurë pa asnjë fushë të sigurt humbet, edhe pa qenë e pambrojtur.' },
   { id: 'promotion', name: 'Promovimi', task: 'Çoje ushtarin deri në fund.', idea: 'Ushtari që arrin rreshtin e fundit bëhet mbretëreshë; shpesh vlen më shumë se çdo gjë tjetër në tabelë.' },
+  // added 2026-10-16
+  { id: 'deflection', name: 'Devijimi', task: 'Largoje mbrojtësin nga detyra e tij.', idea: 'Një figurë që mbron diçka mund të detyrohet të largohet, me shah, me kapje ose me një sakrificë. Pastaj ajo që mbronte bie.' },
+  { id: 'attraction', name: 'Tërheqja', task: 'Tërhiqe figurën në fushën ku bie.', idea: 'Një sakrificë e detyron një figurë, shpesh mbretin, të vijë në një fushë ku pastaj sulmohet.' },
+  { id: 'capturingDefender', name: 'Heqja e mbrojtësit', task: 'Hiqe figurën që mbron.', idea: 'Kap figurën që mbron një tjetër: pa mbrojtësin, figura e dytë bie.' },
+  { id: 'mateIn3', name: 'Mat me tri lëvizje', task: 'Gjej matin me tri lëvizje.', idea: 'Një plan me tre hapa, ku çdo lëvizje e detyron kundërshtarin. Fillo nga shahet dhe kapjet.' },
+  { id: 'pawnEndgame', name: 'Fundloja me ushtarë', task: 'Gjej rrugën e fitores.', idea: 'Me pak figura mbreti lufton: zëre opozitën dhe numëro fushat deri në rreshtin e fundit.' },
+  { id: 'rookEndgame', name: 'Fundloja me torra', task: 'Gjej lëvizjen më të mirë.', idea: 'Torra punon më mirë nga larg: pas ushtarit të lirë, ose duke prerë mbretin kundërshtar.' },
 ];
 
 export const themeOf = (id: string) => THEMES.find((t) => t.id === id) ?? THEMES[0];

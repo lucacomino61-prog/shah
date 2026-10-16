@@ -508,6 +508,36 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   const vsm = renderer.extensions.has('EXT_color_buffer_float') || renderer.extensions.has('EXT_color_buffer_half_float');
   renderer.shadowMap.type = vsm ? VSMShadowMap : PCFShadowMap;
   let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  // the light board (Cilësimet > Tabela e lehtë): chosen ('on' / 'off' in shah.light), or by itself on a phone that
+  // reports little memory, or one that was too slow before (shah.light.auto)
+  const lightPref = (() => {
+    try {
+      return localStorage.getItem('shah.light');
+    } catch {
+      return null;
+    }
+  })();
+  const lightAuto = (() => {
+    try {
+      return localStorage.getItem('shah.light.auto') === 'on';
+    } catch {
+      return false;
+    }
+  })();
+  const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+  // a GPU known to struggle with this table: drawn in software, or a budget phone's (older Mali, Adreno and PowerVR)
+  const gpu = (() => {
+    try {
+      const gl = renderer.getContext();
+      const info = gl.getExtension('WEBGL_debug_renderer_info');
+      return String(info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    } catch {
+      return '';
+    }
+  })();
+  const weakGpu = /swiftshader|llvmpipe|softpipe|software|basic render|mali-(4\d\d|t[678]\d\d|g(31|51|52|57))|adreno\D*(3\d\d|4\d\d|50\d|51\d|60[5-9]|61[02])|powervr (sgx|rogue ge8)/i.test(gpu);
+  let light = lightPref === 'on' || (lightPref !== 'off' && (lightAuto || weakGpu || (memory !== undefined && memory <= 2)));
+  if (light) dpr = 1;
   renderer.setPixelRatio(dpr);
 
   const scene = new Scene();
@@ -561,7 +591,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   // one lamp over the board: a pool of warm light on the marble, the table falling into the dark around it
   const key = new SpotLight(0xfff0dc, STUDIO.lamp, 0, 0.5, 0.62, 0);
   key.castShadow = true;
-  key.shadow.mapSize.set(1024, 1024);
+  key.shadow.mapSize.set(light ? 512 : 1024, light ? 512 : 1024);
   key.shadow.camera.near = 8;
   key.shadow.camera.far = 40;
   key.shadow.radius = vsm ? 5 : 2;
@@ -1152,7 +1182,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       const refl = reflections.get(b);
       if (refl) {
         // in the lacquer only while the box lies open and the piece is over the board
-        refl.visible = disc.visible && floor === BOARD.top;
+        refl.visible = !light && disc.visible && floor === BOARD.top;
         if (refl.visible) {
           g.updateMatrixWorld(true);
           refl.matrix.multiplyMatrices(mirror, b.mesh.matrixWorld);
@@ -2521,7 +2551,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       renderer.shadowMap.needsUpdate = true;
       shadowsStale = false;
     }
-    if (cinema && lensFx && !exp.noDof) {
+    if (cinema && lensFx && !exp.noDof && !light) {
       // the focus lies a little in front of the middle of the board, on the player's side
       focusAt.set(0, BOARD.top + 0.5, orientation === 'w' ? 2.2 : -2.2);
       lensFx.render(scene, camera, camera.position.distanceTo(focusAt));
@@ -2637,6 +2667,29 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   let slow = 0;
   let quiet = 0;
   let dprWanted = 0;
+  let spent = 0;
+  let lightWanted = false;
+  /** The light board, from now on: no lens, no reflections, a smaller shadow map, no swing, a resolution of 1. */
+  function goLight() {
+    if (light) return;
+    light = true;
+    key.shadow.mapSize.set(512, 512);
+    key.shadow.map?.dispose();
+    key.shadow.map = null;
+    if (orbitSpeed) {
+      az = azimuthFor();
+      placeCamera(false);
+    }
+    if (dpr > 1) {
+      dpr = 1;
+      renderer.setPixelRatio(dpr);
+      fit();
+    }
+    ground();
+    shadowsStale = true;
+    stillOk = false;
+    dirty = true;
+  }
   function tick(seconds: number) {
     if (!visible) return;
     const dt = Math.min(seconds, 1 / 20);
@@ -2658,6 +2711,9 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     const n = Math.max(1, Math.ceil(dt / (1 / 120)));
     for (let i = 0; i < n; i++) moving = step(dt / n) || moving;
     if (moving) shadowsStale = true;
+    // pieces (or the case) in motion: a canvas resize would stall them, so the quality changes wait for rest; the home
+    // screen's slow swing of the camera does not count, or that page would never adapt
+    const piecesMoving = moving;
 
     // anything but the pieces moving (the arrows, the camera, the case) draws the whole frame
     let busyView = !!unboxing;
@@ -2684,7 +2740,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     }
     // a slow swing round the table on the home page; anywhere a game, lesson or puzzle is played the camera stays
     // put (Luca, 2026-10-14: "make the board to not move")
-    if (motionOn && orbitSpeed) {
+    if (motionOn && orbitSpeed && !light) {
       orbitT += orbitSpeed * dt;
       az = azimuthFor() + Math.sin(orbitT) * 0.32;
       placeCamera(false);
@@ -2698,15 +2754,29 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     if (moving || dirty || settle) {
       render();
       frames++;
+      spent += seconds;
       if (seconds > 1 / 40) slow++;
-      if (frames === 45) {
-        // too slow: a lower resolution, but only once nothing moves (resizing the canvas stalls a frame)
-        if (slow > 15 && dpr > 1 && !exp.noAdapt) dprWanted = Math.max(1, dpr - 0.5);
+      // judged every 45 frames, or every 3 s on a GPU too slow to draw 45 of them
+      if (frames >= 45 || spent > 3) {
+        const tooSlow = slow > frames / 3 && frames >= 4;
+        // too slow: a lower resolution first, then the light board
+        if (tooSlow && dpr > 1 && !exp.noAdapt) dprWanted = Math.max(1, dpr - 0.5);
+        else if (tooSlow && !light && lightPref !== 'off' && !exp.noAdapt) lightWanted = true;
         frames = 0;
         slow = 0;
+        spent = 0;
       }
     }
-    if (!moving && dprWanted && dprWanted !== dpr) {
+    if (!piecesMoving && lightWanted) {
+      lightWanted = false;
+      goLight();
+      try {
+        localStorage.setItem('shah.light.auto', 'on');
+      } catch {
+        /* it is found slow again next time */
+      }
+    }
+    if (!piecesMoving && dprWanted && dprWanted !== dpr) {
       dpr = dprWanted;
       renderer.setPixelRatio(dpr);
       fit();
@@ -2791,6 +2861,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
         visible: bodies.filter((b) => b.group.visible).length,
         fallen: [...bySq.entries()].filter(([, b]) => b.fall).map(([s, b]) => ({ sq: s, tilt: Number((2 * Math.acos(Math.min(1, Math.abs(b.group.quaternion.w)))).toFixed(2)) })),
         morphing: bodies.filter((b) => b.morph).length,
+        light,
       }),
       shadows: () => (vsm ? 'vsm' : 'pcf'),
       // the shader programs compiled so far, and how many times the canvas was resized (development only)
@@ -2862,7 +2933,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     topple,
     setCinema(on: boolean) {
       cinema = on;
-      if (on && realism && !lensFx) {
+      if (on && realism && !lensFx && !light) {
         lensFx = createFocus(renderer, { aperture: 1.0, maxBlur: 9 });
         sized = '';
         // every piece's program for the lens's target, with the set briefly out where it last stood

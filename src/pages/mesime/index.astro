@@ -20,7 +20,7 @@ let n = 0;
     <header class="screen__head">
       <div>
         <h1 class="screen__title poster">Mësime</h1>
-        <p class="screen__sub"><b class="tabular" data-done-n>0</b> nga {LESSONS.length} të kryera, në {COURSE.length} kapituj</p>
+        <p class="screen__sub"><b class="tabular" data-done-n>0</b> nga {LESSONS.length} të kryera, në {COURSE.length} kapituj · <a class="screen__link" href="/rregullat-e-shahut/">Rregullat</a></p>
       </div>
       <a class="btn btn--solid course__go" href={`/mesime/${COURSE[0].lessons[0].slug}/`} data-next-link>
         <Fragment set:html={icon('play')} /><span data-next-verb>Fillo</span>
@@ -151,6 +151,7 @@ let n = 0;
 </App>
 
 <style>
+  .screen__link { color: var(--tint-ink); font-weight: 600; text-decoration: none; white-space: nowrap; }
   .course__go { flex: none; min-height: 44px; padding-inline: 1.125rem; }
   .course__go :global(.icon) { width: 1rem; height: 1rem; }
   .course__bar { display: block; height: 0.25rem; border-radius: 999px; background: var(--fill); overflow: hidden; }

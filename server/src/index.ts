@@ -1,11 +1,12 @@
 // The front door: CORS for the app's own origins, then each request handed to the Durable Object that owns it
-// (one Room per game code, one Vault per sync code, one Bell for every reminder).
+// (one Room per game code, one Vault per sync code, one Bell for every reminder, one Contest per challenge).
 
 import { Bell } from './bell';
+import { Contest } from './contest';
 import { Room, CODE_RE, newCode } from './room';
 import { Vault } from './vault';
 
-export { Bell, Room, Vault };
+export { Bell, Contest, Room, Vault };
 
 const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' } });
@@ -66,6 +67,35 @@ async function route(req: Request, url: URL, env: Env): Promise<Response> {
     if (parts[2] === 'ws') {
       if (req.headers.get('Upgrade') !== 'websocket') return json({ error: 'websocket' }, 426);
       return room.fetch(req);
+    }
+    return json({ error: 'missing' }, 404);
+  }
+
+  // a challenge between friends: ten puzzles and a board of results
+  if (parts[0] === 'contest') {
+    if (parts.length === 1 && req.method === 'POST') {
+      const b = await body<{ puzzles?: unknown; name?: unknown }>(req);
+      if (!b) return json({ error: 'bad' }, 400);
+      for (let i = 0; i < 6; i++) {
+        const code = newCode();
+        const out = await env.CONTESTS.get(env.CONTESTS.idFromName(code)).create(code, b.puzzles, b.name);
+        if ('error' in out && out.error === 'taken') continue;
+        return json(out, 'error' in out ? 400 : 200);
+      }
+      return json({ error: 'busy' }, 503);
+    }
+    const code = (parts[1] ?? '').toUpperCase();
+    if (!CODE_RE.test(code)) return json({ error: 'missing' }, 404);
+    const contest = env.CONTESTS.get(env.CONTESTS.idFromName(code));
+    if (parts.length === 2 && req.method === 'GET') {
+      const info = await contest.info();
+      return json(info ?? { error: 'missing' }, info ? 200 : 404);
+    }
+    if (parts[2] === 'score' && req.method === 'POST') {
+      const b = await body<{ token?: unknown; name?: unknown; score?: unknown; ms?: unknown }>(req);
+      if (!b) return json({ error: 'bad' }, 400);
+      const out = await contest.submit(b.token, b.name, b.score, b.ms);
+      return json(out, 'error' in out ? (out.error === 'missing' ? 404 : out.error === 'full' ? 409 : 400) : 200);
     }
     return json({ error: 'missing' }, 404);
   }

@@ -12,8 +12,11 @@ import { gsap, motionOn, onMotion, onTick } from './shell.ts';
 import { missSound, moveSound, winSound } from '../lib/sound.ts';
 import { remindDone } from '../lib/remind.ts';
 import { rollStreak } from './celebrate.ts';
-import { closePanels } from './panel.ts';
+import { closePanels, openPanel } from './panel.ts';
 import { pickDaily } from '../lib/daily.ts';
+import { shareCard } from './share.ts';
+import { api, hasServer, ServerError } from '../lib/server.ts';
+import { speakSq } from '../lib/voice.ts';
 
 interface Puzzle {
   id: string;
@@ -44,6 +47,7 @@ const ui = {
   solution: $<HTMLButtonElement>('[data-solution]'),
   next: $<HTMLButtonElement>('[data-next]'),
   again: $<HTMLButtonElement>('[data-again]'),
+  share: $<HTMLButtonElement>('[data-share]'),
   nextTool: $<HTMLButtonElement>('[data-next-puzzle]'),
   angle: $<HTMLButtonElement>('[data-angle]'),
   promo: $('[data-promo]'),
@@ -65,8 +69,8 @@ let busy = false;
 let hintStep = 0;
 let done = false;
 let gen = 0;
-/** a theme from the list, today's puzzle, or the three-minute race */
-let mode: 'theme' | 'daily' | 'rush' = 'theme';
+/** a theme from the list, today's puzzle, the three-minute race, or a challenge between friends */
+let mode: 'theme' | 'daily' | 'rush' | 'contest' = 'theme';
 const RUSH_SECONDS = 180;
 const rush = { active: false, left: RUSH_SECONDS, score: 0, strikes: 0, target: 600, used: new Set<string>() };
 
@@ -125,6 +129,15 @@ function rushPuzzle(): Puzzle {
 }
 
 function pick(): Puzzle | null {
+  if (mode === 'contest') {
+    // the challenge's puzzles in their order (one this app does not have is passed over)
+    while (contest.i < contest.ids.length) {
+      const p = ALL.find((x) => x.id === contest.ids[contest.i]);
+      if (p) return p;
+      contest.i++;
+    }
+    return null;
+  }
   if (mode === 'daily') return dailyPuzzle();
   if (mode === 'rush') return rushPuzzle();
   if (theme === 'mine') {
@@ -266,6 +279,7 @@ async function onMove(from: Sq, to: Sq) {
     const m = play(uci);
     missSound();
     if (mode === 'rush') return rushMiss(m.san, g);
+    if (mode === 'contest') return contestMiss(m.san, g);
     setCoach('wrong', 'Jo kjo', 'Provo përsëri', [`[[${m.san}]] nuk e zgjidh ushtrimin. Shiko çfarë kërcënon kundërshtari dhe kërko diçka më të fortë.`]);
     say('Jo kjo. Provo përsëri.');
     await wait(900);
@@ -295,6 +309,7 @@ function solved(lastSan: string) {
   if (!puzzle) return;
   if (chess.isCheckmate()) mateFall(() => board, chess.fen(), () => chess.fen());
   if (mode === 'rush') return rushSolved(lastSan);
+  if (mode === 'contest') return contestSolved(lastSan);
   done = true;
   busy = false;
   const clean = !failed && !helped;
@@ -331,6 +346,7 @@ function solved(lastSan: string) {
   // a day more on the streak: the count rolls up and the flame jumps
   if (mode === 'daily') rollStreak(ui.myRating, hadDays, streak, document.querySelector('[data-flame] .icon'));
   showButtons();
+  ui.share.hidden = mode !== 'daily';
   countThemes();
   ticker();
 }
@@ -361,6 +377,11 @@ function capsule() {
     ui.puzzleRating.textContent = clockText(rush.left);
     label.textContent = 'Pikët';
     ui.myRating.textContent = rush.strikes ? `${rush.score} · ${rush.strikes} ${rush.strikes === 1 ? 'gabim' : 'gabime'}` : String(rush.score);
+  } else if (mode === 'contest') {
+    ui.themeName.textContent = 'Sfida';
+    ui.puzzleRating.textContent = `${Math.min(contest.i + 1, contest.ids.length)}/${contest.ids.length}`;
+    label.textContent = 'Pikët';
+    ui.myRating.textContent = String(contest.score);
   } else if (mode === 'daily') {
     ui.themeName.textContent = 'Ushtrimi i ditës';
     label.textContent = 'Ditë rresht';
@@ -382,7 +403,27 @@ function dailyDone() {
   ui.solution.hidden = true;
   ui.again.hidden = true;
   ui.next.hidden = false;
+  ui.share.hidden = false;
 }
+
+// today's puzzle, solved, as a picture for friends: its position and the streak
+ui.share.addEventListener('click', async () => {
+  const p = ALL.find((x) => x.id === prefs.daily?.id);
+  if (!p) return;
+  const c = new Chess(p.fen);
+  const m = c.move({ from: p.moves[0].slice(0, 2), to: p.moves[0].slice(2, 4), promotion: p.moves[0][4] || undefined });
+  const n = streakNow(prefs);
+  ui.share.disabled = true;
+  try {
+    const how = await shareCard(
+      { kicker: 'Ushtrimi i ditës', title: 'E zgjidha sot', line: n > 1 ? `${n} ditë rresht · ${themeOf(p.theme).name}` : themeOf(p.theme).name, fen: c.fen(), side: c.turn(), marks: [m.from, m.to] },
+      'Zgjidha ushtrimin e ditës në Shah. Provoje edhe ti:',
+    );
+    if (how === 'saved') say('Fotografia u ruajt.');
+  } finally {
+    ui.share.disabled = false;
+  }
+});
 
 function startRush() {
   mode = 'rush';
@@ -472,6 +513,247 @@ document.querySelector('[data-rush]')?.addEventListener('click', () => {
   closePanels();
 });
 
+// ------------------------------------------------------------------ a challenge between friends ("Sfida")
+// Ten puzzles fixed by whoever makes it, the same for everyone with the link; no help, a wrong move passes the
+// puzzle; the result (solved, then time) goes to the server's board. Hidden where there is no server.
+
+interface ContestInfo {
+  code: string;
+  puzzles: string[];
+  by: string;
+  at: number;
+  ends: number;
+  board: { name: string; score: number; ms: number; at: number }[];
+}
+const contest = { code: '', ids: [] as string[], i: 0, score: 0, start: 0, by: '', info: null as ContestInfo | null, mine: -1 };
+const cs = {
+  lede: $('[data-contest-lede]'),
+  name: $<HTMLInputElement>('[data-contest-name]'),
+  err: $('[data-contest-err]'),
+  go: $<HTMLButtonElement>('[data-contest-go]'),
+  invite: $<HTMLButtonElement>('[data-contest-invite]'),
+  boardH: $('[data-contest-board-h]'),
+  board: $('[data-contest-board]'),
+  ends: $('[data-contest-ends]'),
+};
+const store = (k: string, v?: string) => {
+  try {
+    if (v === undefined) return localStorage.getItem(k);
+    localStorage.setItem(k, v);
+  } catch {
+    /* forgotten on reload */
+  }
+  return null;
+};
+/** the phone's own token: one entry per player on each board */
+function token(): string {
+  let t = store('shah.contest.token');
+  if (!t || !/^[0-9a-f]{32}$/.test(t)) {
+    t = [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, '0')).join('');
+    store('shah.contest.token', t);
+  }
+  return t;
+}
+const clock = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
+const contestLink = () => `${location.origin}/ushtrime/?sfida=${contest.code}`;
+const escHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+function contestError(e: unknown) {
+  const st = e instanceof ServerError ? e.status : 0;
+  const what = e instanceof ServerError ? String(e.data?.error ?? '') : '';
+  cs.err.textContent =
+    st === 404 ? 'Kjo sfidë nuk ekziston më (zgjat dy javë).' : what === 'full' ? 'Sfida është plot: 50 lojtarë.' : what === 'name' ? 'Shkruaj një emër, deri në 20 shkronja.' : 'Sfida nuk u hap. Kontrollo internetin dhe provo përsëri.';
+  cs.err.hidden = false;
+}
+
+function drawBoard() {
+  const info = contest.info;
+  const rows = info?.board ?? [];
+  cs.boardH.hidden = cs.board.hidden = !info;
+  cs.board.innerHTML = rows.length
+    ? rows
+        .map((e, k) => `<li${k === contest.mine ? ' data-me' : ''}><span class="rank">${k + 1}</span><span class="who">${escHtml(e.name)}</span><span class="res"><b>${e.score}/${info!.puzzles.length}</b> · ${clock(e.ms)}</span></li>`)
+        .join('')
+    : '<li><span class="rank">·</span><span class="who">Ende askush në tabelë.</span><span></span></li>';
+  if (info) {
+    const days = Math.max(0, Math.ceil((info.ends - Date.now()) / 86400000));
+    cs.ends.textContent = `Sfida mbetet e hapur edhe ${days === 1 ? '1 ditë' : `${days} ditë`}. Kodi: ${info.code}.`;
+  }
+  cs.ends.hidden = !info;
+}
+
+/** the sheet in one of its states: making one, one opened from a link, or a result */
+function contestSheet(state: 'create' | 'join' | 'result') {
+  cs.err.hidden = true;
+  cs.name.value = cs.name.value || store('shah.name') || '';
+  if (state === 'create') {
+    contest.info = null;
+    contest.mine = -1;
+    cs.lede.textContent = 'Dhjetë ushtrime rreth nivelit tënd. Shokët që hapin lidhjen zgjidhin të njëjtat, dhe tabela tregon kush zgjidhi më shumë e më shpejt. Pa ndihmë: një gabim e kalon ushtrimin.';
+    cs.go.textContent = 'Krijo sfidën';
+    cs.invite.hidden = true;
+  } else if (state === 'join') {
+    const n = contest.ids.length;
+    cs.lede.textContent = `Sfida nga ${contest.by}: ${n} ushtrime, të njëjtat për të gjithë. Pa ndihmë: një gabim e kalon ushtrimin.`;
+    cs.go.textContent = 'Fillo';
+    cs.invite.hidden = false;
+  } else {
+    const me = contest.info?.board[contest.mine];
+    cs.lede.textContent = me
+      ? `Zgjidhe ${me.score} nga ${contest.ids.length}, në ${clock(me.ms)}. Vendi yt: ${contest.mine + 1} nga ${contest.info!.board.length}.`
+      : 'Rezultati nuk u ruajt.';
+    cs.go.textContent = 'Provo përsëri';
+    cs.invite.hidden = false;
+  }
+  cs.go.dataset.state = state;
+  drawBoard();
+  openPanel('contest');
+}
+
+function nameOk(): string | null {
+  const v = cs.name.value.replace(/\s+/g, ' ').trim();
+  if (!v || [...v].length > 20) {
+    cs.err.textContent = 'Shkruaj një emër, deri në 20 shkronja.';
+    cs.err.hidden = false;
+    cs.name.focus();
+    return null;
+  }
+  store('shah.name', v);
+  return v;
+}
+
+/** ten puzzles near the learner's rating, not seen before where it can, from as many themes as it can, easy first */
+function contestPuzzles(): string[] {
+  const seen = new Set(prefs.seen);
+  const near = (d: number) => ALL.filter((p) => Math.abs(p.rating - prefs.puzzleRating) <= d && !seen.has(p.id));
+  const pool = near(150).length >= 30 ? near(150) : near(400).length >= 30 ? near(400) : ALL;
+  const out: Puzzle[] = [];
+  const themesUsed = new Map<string, number>();
+  for (const p of [...pool].sort(() => Math.random() - 0.5)) {
+    if ((themesUsed.get(p.theme) ?? 0) >= 2) continue;
+    out.push(p);
+    themesUsed.set(p.theme, (themesUsed.get(p.theme) ?? 0) + 1);
+    if (out.length === 10) break;
+  }
+  return out.sort((a, b) => a.rating - b.rating).map((p) => p.id);
+}
+
+async function contestGo() {
+  const state = cs.go.dataset.state;
+  const name = nameOk();
+  if (!name) return;
+  cs.err.hidden = true;
+  if (state === 'create') {
+    cs.go.disabled = true;
+    try {
+      const info = await api<ContestInfo>('/contest', { body: { puzzles: contestPuzzles(), name } });
+      Object.assign(contest, { code: info.code, ids: info.puzzles, by: info.by, info });
+      history.replaceState(null, '', `/ushtrime/?sfida=${info.code}`);
+      contestSheet('join');
+      cs.lede.textContent = 'Sfida u krijua. Fto shokët me lidhjen, pastaj fillo vetë.';
+    } catch (e) {
+      contestError(e);
+    } finally {
+      cs.go.disabled = false;
+    }
+    return;
+  }
+  // play it (again): from the first puzzle, the clock from now
+  stopRush();
+  Object.assign(contest, { i: 0, score: 0, start: Date.now() });
+  mode = 'contest';
+  closePanels();
+  say(`Sfida filloi: ${contest.ids.length} ushtrime.`);
+  void deal();
+}
+
+async function contestSolved(san: string) {
+  const g = gen;
+  contest.score++;
+  winSound();
+  setCoach('good', `${sanHtml(san)} Saktë`, `${contest.score} pikë`, ['Tjetri vjen menjëherë.'], true);
+  capsule();
+  await wait(500);
+  if (g !== gen || mode !== 'contest') return;
+  contestNext();
+}
+
+async function contestMiss(san: string, g: number) {
+  capsule();
+  setCoach('wrong', 'Jo kjo', 'Ky ushtrim kaloi', [`[[${san}]] nuk e zgjidh ushtrimin. Në sfidë nuk ka provë të dytë.`]);
+  await wait(900);
+  if (g !== gen || mode !== 'contest') return;
+  contestNext();
+}
+
+function contestNext() {
+  contest.i++;
+  if (contest.i >= contest.ids.length) return void contestEnd();
+  void deal();
+}
+
+async function contestEnd() {
+  gen++;
+  done = true;
+  busy = false;
+  board.setInteractive(false);
+  const ms = Math.max(1000, Date.now() - contest.start);
+  const n = contest.ids.length;
+  setCoach('end', `${contest.score} nga ${n}`, `Koha: ${clock(ms)}`, ['Po dërgohet rezultati…']);
+  mode = 'theme';
+  try {
+    const info = await api<ContestInfo>(`/contest/${contest.code}/score`, { body: { token: token(), name: store('shah.name') ?? '', score: contest.score, ms } });
+    contest.info = info;
+    // which row is this phone's: the newest entry with this name, score and time
+    contest.mine = info.board.findIndex((e) => e.name === store('shah.name') && e.score === contest.score && e.ms === ms);
+    if (contest.mine < 0) contest.mine = info.board.findIndex((e) => e.name === store('shah.name'));
+    setCoach('end', `${contest.score} nga ${n}`, `Koha: ${clock(ms)}`, [`Vendi yt: ${contest.mine + 1} nga ${info.board.length}.`]);
+    contestSheet('result');
+  } catch (e) {
+    setCoach('end', `${contest.score} nga ${n}`, `Koha: ${clock(ms)}`, ['Rezultati nuk u dërgua. Kontrollo internetin.']);
+    contestError(e);
+  }
+  ui.next.hidden = false;
+}
+
+async function contestOpen(code: string) {
+  try {
+    const info = await api<ContestInfo>(`/contest/${code}`);
+    Object.assign(contest, { code: info.code, ids: info.puzzles, by: info.by, info, mine: -1 });
+    contestSheet('join');
+  } catch (e) {
+    contest.info = null;
+    contestSheet('create');
+    contestError(e);
+  }
+}
+
+cs.go.addEventListener('click', () => void contestGo());
+cs.name.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') void contestGo();
+});
+cs.invite.addEventListener('click', async () => {
+  const text = `Sfidë shahu: ${contest.ids.length} ushtrime, të njëjtat për të gjithë. Sa zgjidh ti?`;
+  try {
+    if (navigator.share) await navigator.share({ title: 'Shah: sfidë', text, url: contestLink() });
+    else {
+      await navigator.clipboard.writeText(`${text} ${contestLink()}`);
+      cs.err.textContent = 'Lidhja u kopjua.';
+      cs.err.hidden = false;
+    }
+  } catch {
+    /* the share sheet was closed */
+  }
+});
+const contestNew = document.querySelector<HTMLButtonElement>('[data-contest-new]');
+if (contestNew && hasServer) {
+  contestNew.hidden = false;
+  contestNew.addEventListener('click', () => {
+    closePanels();
+    contestSheet('create');
+  });
+}
+
 // ------------------------------------------------------------------ help
 
 ui.hint.addEventListener('click', () => {
@@ -539,7 +821,8 @@ function setCoach(state: string, glyph: string, title: string, lines: string[], 
 }
 
 function showButtons() {
-  if (mode === 'rush') {
+  ui.share.hidden = true;
+  if (mode === 'rush' || mode === 'contest') {
     // no help in a race: solve it or lose a strike
     ui.hint.hidden = true;
     ui.solution.hidden = true;
@@ -555,6 +838,7 @@ function showButtons() {
 
 function say(t: string) {
   ui.live.textContent = sentenceText(t);
+  speakSq(t);
 }
 
 /** The learner's rating in the capsule: "Ti" on a phone, where the theme needs the room, the words on a wide screen
@@ -635,6 +919,9 @@ keyboard(ui.host, () => board, () => side);
   renderModes();
   ui.myRating.textContent = String(prefs.puzzleRating);
   if (tema === 'gara') return startRush();
+  // a challenge link: its sheet over the first puzzle of the day's list
+  const sfida = new URLSearchParams(location.search).get('sfida');
+  if (sfida && hasServer && /^[A-Za-z0-9]{4}$/.test(sfida)) void contestOpen(sfida.toUpperCase());
   await deal();
 })();
 

@@ -284,3 +284,74 @@ njohur" clear for a beginner?
 
 **Cilësimet:** the switch "Tekst më i madh" and its note "Tekst më i madh: shkronjat e leximit një shkallë më të mëdha,
 në çdo faqe."
+
+## New on 2026-10-16 (second round), please check
+
+**New chess terms**
+
+| In the app | English | Confidence | Alternatives |
+| --- | --- | --- | --- |
+| marrja në kalim | en passant | check | "en passant" |
+| devijimi | deflection | check, least sure | "largimi i mbrojtësit" |
+| tërheqja | attraction (decoy) | check | "joshja" |
+| heqja e mbrojtësit | removing the defender | check | "eliminimi i mbrojtësit" |
+| kombinimet | combinations | check | "goditjet taktike" |
+| fundloja me ushtarë / me torra | pawn / rook endings | check | |
+| tabela e lehtë | light board (fewer effects) | check | |
+
+**Nine new lessons** (`src/data/lessons.ts`, from "added 2026-10-16"): Rokada, Marrja në kalim, Promovimi, Sulmi i
+dyfishtë i mbretëreshës, Heqja e mbrojtësit, Devijimi, Figura e bllokuar, Mat me dy lëvizje, Pati. The course is now
+six chapters, and the new chapter is "Kombinimet": "Goditje që përgatiten: sulmo dy, hiq mbrojtësin, largoje,
+bllokoje."
+
+**Six new puzzle themes** (`src/lib/themes.ts`), each with its one sentence: Devijimi, Tërheqja, Heqja e mbrojtësit,
+Mat me tri lëvizje, Fundloja me ushtarë, Fundloja me torra.
+
+**Progresi:**
+- "Niveli" with "4 · Agimi" or "Ende jo".
+- On the ladder: "Niveli 4 · niveli yt" and "Niveli 5 · tjetri".
+- The ladder buttons are read as "Zgjidhe për lojën e radhës".
+
+**The end of a game:**
+- "Tri momentet kryesore", "Dy momentet kryesore" or "Momenti kryesor".
+- "Shiko lëvizjen 12: Gabim".
+- "Mësimi: Mat me dy lëvizje ›".
+
+**Sharing:**
+- The button reads "Ndaje".
+- The cards say "E zgjidha sot" · "Ushtrimi i ditës" · "Fitore" · "Medaljet" · "5 nga 12 medalje" · "Trajner shahu në
+  shqip".
+- The texts sent with them: "Zgjidha ushtrimin e ditës në Shah. Provoje edhe ti:" · "Fitova një lojë në Shah (Agimi,
+  niveli 4). Provoje edhe ti:" · "Kam fituar 5 nga 12 medaljet në Shah. Provoje edhe ti:"
+- Where nothing can share pictures: "Fotografia u ruajt."
+
+**Sfida (challenges with friends):**
+- The mode: "Sfidë me shokët" · "Dhjetë ushtrime, të njëjtat për të gjithë. Kush zgjidh më shumë?"
+- The sheet:
+  - "Emri yt" · "Si të të shohin shokët" · "Krijo sfidën" · "Fillo" · "Fto shokët" · "Provo përsëri" · "Tabela".
+  - "Sfida nga Ana: 10 ushtrime, të njëjtat për të gjithë. Pa ndihmë: një gabim e kalon ushtrimin."
+  - "Sfida u krijua. Fto shokët me lidhjen, pastaj fillo vetë."
+- The result: "Zgjidhe 8 nga 10, në 2:41. Vendi yt: 2 nga 5."
+- During play: "Ky ushtrim kaloi" · "Në sfidë nuk ka provë të dytë."
+- The board: "Ende askush në tabelë." · "Sfida mbetet e hapur edhe 14 ditë. Kodi: GBYX."
+- Errors: "Kjo sfidë nuk ekziston më (zgjat dy javë)." · "Sfida është plot: 50 lojtarë." · "Shkruaj një emër, deri në 20
+  shkronja." · "Sfida nuk u hap. Kontrollo internetin dhe provo përsëri."
+- Sending the result: "Po dërgohet rezultati…" · "Rezultati nuk u dërgua. Kontrollo internetin."
+- The invitation: "Sfidë shahu: 10 ushtrime, të njëjtat për të gjithë. Sa zgjidh ti?" · "Lidhja u kopjua."
+
+**Cilësimet:**
+- The switches "Tabela e lehtë" and "Trajneri me zë".
+- Their notes: "Tabela e lehtë: më pak efekte (pa turbullim, pa pasqyrime, hije më të thjeshta), që një telefon i thjeshtë
+  të mos ngrohet; ndizet vetë kur tabela ecën ngadalë." · "Trajneri me zë: telefoni lexon me zë atë që thotë trajneri,
+  me zërin shqip të vetë telefonit."
+- Without an Albanian voice: "Ky shfletues nuk ka zë shqip, prandaj trajneri nuk mund të flasë këtu."
+- When the voice is turned on: "Mirë. Tani trajneri flet."
+
+**Three new pages**, read them whole:
+- `src/pages/rregullat-e-shahut.astro` (the rules);
+- `src/pages/si-luhet-shahu.astro` (how to play);
+- `src/pages/privatesia.astro` (privacy).
+
+Also "Nuk i di ende rregullat? Lexoji këtu." on the first visit, and "Rregullat" on Mësime.
+
+**Google Play texts:** `docs/PLAY-STORE.md` (the short and the full description).

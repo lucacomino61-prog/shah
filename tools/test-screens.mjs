@@ -7,7 +7,7 @@ import puppeteer from 'puppeteer-core';
 const base = process.argv[2] ?? 'http://127.0.0.1:3770';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const today = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })();
-const pages = ['/', '/luaj/', '/ushtrime/', '/mesime/', '/mesime/piruni/', '/mesime/hapje/italiania/', '/analizo/', '/online/', '/progresi/', '/404.html'];
+const pages = ['/', '/luaj/', '/ushtrime/', '/mesime/', '/mesime/piruni/', '/mesime/rokada/', '/mesime/hapje/italiania/', '/analizo/', '/online/', '/progresi/', '/rregullat-e-shahut/', '/si-luhet-shahu/', '/privatesia/', '/404.html'];
 const sheets = [['/luaj/', 'record'], ['/ushtrime/', 'themes'], ['/analizo/', 'games'], ['/online/', 'record'], ['/mesime/hapje/italiania/', 'lines']];
 const browser = await puppeteer.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true, args: ['--ignore-gpu-blocklist', '--use-angle=d3d11'] });
 let failed = 0;

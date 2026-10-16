@@ -1,0 +1,65 @@
+---
+// The privacy note (a store listing asks for one): what stays on the phone, what the small server keeps and for how
+// long, and who else is involved. Every line is what the code does (server/src: room.ts, vault.ts, bell.ts,
+// contest.ts).
+import App from '../layouts/App.astro';
+import Guide, { type Section } from '../components/Guide.astro';
+
+const sections: Section[] = [
+  {
+    tab: 'Shkurt',
+    title: 'Shkurt',
+    text: [
+      'Shah nuk ka llogari, reklama apo cookies për ndjekje. Progresi yt ruhet në këtë shfletues, në këtë telefon.',
+      'Serveri i vogël i Shah merr diçka vetëm kur e kërkon ti: një lojë online, sinkronizimi, kujtesa ose një sfidë me shokët. Faqet në vijim tregojnë çfarë mban dhe sa gjatë.',
+    ],
+  },
+  {
+    tab: 'Në telefon',
+    title: 'Çfarë mbetet në telefon',
+    text: [
+      'Lojërat, ushtrimet, mësimet, medaljet dhe cilësimet ruhen vetëm në këtë shfletues. Motori i shahut punon brenda shfletuesit, pa dërguar lëvizjet askund.',
+      'Mund t’i fshish kur të duash te [Cilësimet](/progresi/cilesimet/) > Fshi progresin, ose duke pastruar të dhënat e shfletuesit.',
+    ],
+  },
+  {
+    tab: 'Sinkronizimi',
+    title: 'Sinkronizimi mes telefonave',
+    text: [
+      'Kur lidh dy telefona, progresi shifrohet në telefon me kodin tënd përpara se të dërgohet. Serveri mban vetëm kopjen e shifruar dhe jo kodin, prandaj nuk e lexon dot.',
+      'Një kopje që askush nuk e prek për një vit fshihet.',
+    ],
+  },
+  {
+    tab: 'Online',
+    title: 'Loja online dhe sfidat',
+    text: [
+      'Në një lojë online serveri mban lëvizjet dhe orën e lojës; dhoma fshihet një ditë pas lëvizjes së fundit.',
+      'Në një sfidë me shokët mban emrin që shkruan, sa ushtrime zgjidhe dhe kohën, për ta treguar në tabelë. Sfida fshihet pas dy javësh.',
+    ],
+  },
+  {
+    tab: 'Kujtesa',
+    title: 'Kujtesa e përditshme',
+    text: [
+      'Nëse e ndez kujtesën, serveri mban adresën e njoftimeve të shfletuesit tënd, orën që zgjodhe dhe zonën kohore. Njoftimi dërgohet nga shërbimi i njoftimeve i shfletuesit.',
+      'Kur e fik kujtesën, këto fshihen.',
+    ],
+  },
+  {
+    tab: 'Të tjerët',
+    title: 'Kush tjetër merr pjesë',
+    text: [
+      'Faqja dhe serveri qëndrojnë te Cloudflare, që si çdo shërbim interneti merr adresën IP për të dërguar faqen.',
+      'Lojërat e tua në Analizo shfletuesi i kërkon drejtpërdrejt te chess.com ose Lichess.',
+      'Kodi i Shah është i hapur: çdokush mund ta lexojë [në GitHub](https://github.com/lucacomino61-prog/shah).',
+    ],
+  },
+];
+const title = 'Privatësia';
+const description = 'Çfarë ruan Shah dhe ku: progresi në telefonin tënd, dhe sa pak mban serveri, për sa kohë, kur e kërkon ti.';
+---
+
+<App title={`${title} · Shah`} description={description} tab="progresi" room>
+  <Guide name="privatesia" title={title} sub="Pa llogari, pa reklama, pa ndjekje." sections={sections} />
+</App>

@@ -114,7 +114,7 @@ const START = [
     <form class="setup__form welcome__form" method="dialog" data-welcome-form novalidate>
       <p class="welcome__k">Mirë se erdhe në Shah</p>
       <h2 class="welcome__title poster" id="welcome-title" tabindex="-1">Sa e njeh shahun?</h2>
-      <p class="welcome__lede">Zgjidh njërën: të gjej kundërshtarin e parë dhe mësimin nga ku të nisësh. Mund t’i ndryshosh kur të duash.</p>
+      <p class="welcome__lede">Zgjidh njërën: të gjej kundërshtarin e parë dhe mësimin nga ku të nisësh. Mund t’i ndryshosh kur të duash. Nuk i di ende rregullat? <a class="welcome__rules" href="/rregullat-e-shahut/">Lexoji këtu</a>.</p>
       <fieldset class="welcome__choices">
         <legend class="visually-hidden">Sa e njeh shahun</legend>
         {START.map((c) => {
@@ -288,6 +288,7 @@ const START = [
   .pick:has(input:focus-visible) { outline: 3px solid color-mix(in srgb, var(--tint) 75%, transparent); outline-offset: 2px; }
   .welcome__err { text-align: center; font-size: var(--t-foot); font-weight: 600; color: var(--red-ink); }
   .welcome__err[hidden] { display: none; }
+  .welcome__rules { color: var(--tint-ink); font-weight: 600; text-decoration: none; }
   .welcome__about { max-width: 36ch; margin-inline: auto; text-align: center; font-size: var(--t-foot); line-height: 1.35; color: var(--label-2); }
   .welcome__about a { color: var(--tint-ink); font-weight: 600; text-decoration: none; white-space: nowrap; }
 

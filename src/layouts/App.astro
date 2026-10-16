@@ -18,8 +18,10 @@ interface Props {
   noindex?: boolean;
   /** the home page carries the app's structured data */
   home?: boolean;
+  /** a page's own structured data (the guides: an article, a how-to) */
+  ld?: Record<string, unknown>;
 }
-const { title, description, tab, stage = false, room = false, scroll = false, noindex = false, home = false } = Astro.props;
+const { title, description, tab, stage = false, room = false, scroll = false, noindex = false, home = false, ld } = Astro.props;
 const site = Astro.site!;
 const canonical = new URL(Astro.url.pathname, site).href;
 const ogImage = new URL('/og.png', site).href;
@@ -73,6 +75,7 @@ import LookPicker from '../components/LookPicker.astro';
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     {home && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    {ld && <script type="application/ld+json" set:html={JSON.stringify(ld)} />}
     <style is:inline>@view-transition{navigation:auto}</style>
     <script is:inline>
       // the kind of move between pages, for the view transition (styles/feel.css): deeper slides in from the right

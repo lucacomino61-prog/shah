@@ -309,6 +309,186 @@ LESSONS.push({
   ],
 });
 
+
+// ---------------------------------------------------------------- added 2026-10-16: the special moves, more tactics,
+// mate in two and stalemate (every task checked by tools/check-lessons.ts like the rest)
+LESSONS.push(
+  {
+    slug: 'rokada',
+    title: 'Rokada',
+    lede: 'E vetmja lëvizje me dy figura njëherësh: mbreti fshihet, torra del në lojë.',
+    steps: [
+      {
+        title: 'Rokada e shkurtër',
+        text: 'Mbreti lëviz dy fusha drejt torrës, dhe torra kalon mbi të e qëndron pranë tij: mbreti në g1, torra në f1. Për ta bërë, prek mbretin dhe çoje dy fusha anash.',
+        fen: 'r3k2r/pppq1ppp/2npbn2/2b1p3/2B1P3/2NPBN2/PPPQ1PPP/R3K2R w KQkq - 0 1',
+        arrows: [
+          { from: 'e1', to: 'g1' },
+          { from: 'h1', to: 'f1' },
+        ],
+      },
+      {
+        title: 'Rokada e gjatë',
+        text: 'Nga ana tjetër mbreti shkon në c1 dhe torra në d1. Kjo rokadë e çon torrën menjëherë në qendër.',
+        fen: 'r3k2r/pppq1ppp/2npbn2/2b1p3/2B1P3/2NPBN2/PPPQ1PPP/R3K2R w KQkq - 0 1',
+        arrows: [
+          { from: 'e1', to: 'c1' },
+          { from: 'a1', to: 'd1' },
+        ],
+      },
+      {
+        title: 'Kur nuk lejohet',
+        text: 'Torra e zezë në e8 i jep shah mbretit tënd. Kur je në shah nuk bën rokadë. As kur mbreti ose ajo torrë kanë lëvizur më parë, as kur mbreti kalon ose përfundon në një fushë të sulmuar, as kur ka figura mes tyre.',
+        fen: 'r3r1k1/ppp2ppp/2n5/8/8/2N5/PPP2PPP/R3K2R w KQ - 0 1',
+        arrows: [{ from: 'e8', to: 'e1' }],
+        focus: ['e1'],
+      },
+      {
+        title: 'Bëje tani',
+        text: 'Torra e zezë në e8 shikon drejt mbretit tënd, dhe vetëm kali në e2 i qëndron përpara. Bëj rokadën e gjatë: mbreti del nga kolona e hapur, kali lirohet dhe torra vjen në d1.',
+        fen: 'r3r1k1/ppp2ppp/2n5/8/8/2N5/PPP1NPPP/R3K2R w KQ - 0 1',
+        task: { moves: ['e1c1'], done: 'Mbreti doli nga kolona e hapur, dhe torra erdhi në kolonën d.' },
+      },
+    ],
+  },
+  {
+    slug: 'marrja-ne-kalim',
+    title: 'Marrja në kalim',
+    lede: 'Kur një ushtar kapërcen dy fusha pranë ushtarit tënd, mund ta marrësh sikur të kishte lëvizur vetëm një.',
+    steps: [
+      {
+        title: 'Ushtari kapërcen',
+        text: 'Ushtari i zi sapo lëvizi dy fusha, nga d7 në d5, dhe qëndron pranë ushtarit tënd në e5. Mund ta marrësh sikur të kishte lëvizur vetëm një: luaj ushtarin tënd në d6.',
+        fen: '4k3/3p4/8/4P3/8/8/8/4K3 b - - 0 1',
+        setup: 'd7d5',
+        side: 'w',
+        arrows: [{ from: 'e5', to: 'd6' }],
+        task: { moves: ['e5d6'], done: 'Kjo është marrja në kalim: ushtari i zi doli nga d5, dhe yti qëndron në d6.' },
+      },
+      {
+        title: 'Vetëm menjëherë',
+        text: 'Marrja në kalim lejohet vetëm në lëvizjen që vjen menjëherë pas kapërcimit me dy fusha. Nëse luan diçka tjetër, mundësia humbet për gjithmonë.',
+        fen: '4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 2',
+        focus: ['d5', 'd6'],
+      },
+      {
+        title: 'Edhe me të zezat',
+        text: 'Tani ushtari i bardhë kapërceu nga c2 në c4, pranë ushtarit tënd në b4. Merre në kalim.',
+        fen: '4k3/8/8/8/1p6/8/2P5/4K3 w - - 0 1',
+        setup: 'c2c4',
+        side: 'b',
+        task: { moves: ['b4c3'], done: 'Ushtari yt përfundon në c3, dhe ai i bardhë del nga tabela.' },
+      },
+    ],
+  },
+  {
+    slug: 'promovimi',
+    title: 'Promovimi',
+    lede: 'Ushtari që arrin rreshtin e fundit shndërrohet në figurë: zakonisht mbretëreshë, ndonjëherë kalë.',
+    steps: [
+      {
+        title: 'Ushtari bëhet mbretëreshë',
+        text: 'Ushtari që arrin rreshtin e fundit shndërrohet në një figurë tjetër, zakonisht në mbretëreshë. Mbreti i zi sulmon ushtarin tënd: çoje tani në e8 dhe zgjidh mbretëreshën.',
+        fen: '8/4P3/3k4/8/8/8/8/4K3 w - - 0 1',
+        task: { moves: ['e7e8q'], done: 'Një mbretëreshë e re: tani mund të japësh mat.' },
+      },
+      {
+        title: 'Ndonjëherë kali',
+        text: 'Mund të zgjedhësh edhe kalë, torrë ose oficer. Këtu kali është zgjedhja më e mirë: nga e8 jep shah mbretit në d6 dhe sulmon mbretëreshën në f6. Shndërroje ushtarin në kalë.',
+        fen: '8/4P3/3k1q2/8/8/8/7P/7K w - - 0 1',
+        focus: ['d6', 'f6'],
+        task: { moves: ['e7e8n', 'd6e6', 'e8f6'], done: 'Kali dha shah dhe mori mbretëreshën.' },
+      },
+      practice('promotion', 0, 'Provo vetë', 'Gjej rrugën që ushtari të arrijë deri në fund.'),
+    ],
+  },
+  {
+    slug: 'sulmi-i-dyfishte',
+    title: 'Sulmi i dyfishtë i mbretëreshës',
+    lede: 'Mbretëresha sulmon në tetë drejtime: një shah prej saj shpesh sulmon edhe një figurë tjetër.',
+    steps: [
+      {
+        title: 'Shah dhe një figurë',
+        text: 'Mbreti i zi iku në f7. Gjej fushën ku mbretëresha jep shah dhe sulmon njëherësh torrën në b5.',
+        fen: '3Q2k1/6pp/8/1r6/8/8/6PP/6K1 b - - 1 1',
+        setup: 'g8f7',
+        side: 'w',
+        focus: ['f7', 'b5'],
+        task: { moves: ['d8d7', 'f7f6', 'd7b5'], done: 'Shah, dhe torra ra: dy sulme me një lëvizje.' },
+      },
+      practice('fork', 5, 'Provo vetë', 'Kërko lëvizjen që sulmon dy gjëra njëherësh, shpesh me shah.'),
+    ],
+  },
+  {
+    slug: 'heqja-e-mbrojtesit',
+    title: 'Heqja e mbrojtësit',
+    lede: 'Kap figurën që mbron një tjetër: pa mbrojtësin, figura e dytë bie.',
+    steps: [
+      {
+        title: 'Kush e mbron?',
+        text: 'Oficerin e zi në e5 e mbron vetëm kali në d7. Merre kalin me oficerin tënd: nëse mbretëresha e rimerr, oficeri në e5 mbetet pa mbrojtje kundër torrës.',
+        fen: '3q2k1/3n1ppp/8/1B2b3/8/5Q2/5PPP/4R1K1 w - - 0 1',
+        focus: ['e5', 'd7'],
+        task: { moves: ['b5d7', 'd8d7', 'e1e5'], done: 'Hoqe mbrojtësin, dhe figura që mbronte ra pas tij.' },
+      },
+      practice('capturingDefender', 0, 'Provo vetë', 'Gjej figurën që mbron, dhe hiqe.'),
+    ],
+  },
+  {
+    slug: 'devijimi',
+    title: 'Devijimi',
+    lede: 'Një figurë që mbron diçka mund të detyrohet të largohet. Pastaj ajo që mbronte bie.',
+    steps: [
+      practice('deflection', 0, 'Largoje mbrojtësin', 'Një figurë mbron një fushë ose një figurë tjetër. Me shah, me kapje ose me një sakrificë, detyroje të largohet nga ajo detyrë.'),
+      practice('deflection', 3, 'Edhe një', 'Pyet veten: cila figurë e kundërshtarit ka dy detyra njëherësh? Ajo është shënjestra.'),
+    ],
+  },
+  {
+    slug: 'figura-e-bllokuar',
+    title: 'Figura e bllokuar',
+    lede: 'Një figurë pa asnjë fushë të sigurt humbet, edhe kur ende nuk sulmohet.',
+    steps: [
+      practice('trappedPiece', 0, 'Kape figurën', 'Shiko ku mund të ikë figura e kundërshtarit. Nëse çdo fushë e saj sulmohet, një sulm i vetëm mjafton.'),
+      practice('trappedPiece', 2, 'Edhe një', 'Figurat në buzë të tabelës bllokohen më lehtë: kanë më pak fusha.'),
+    ],
+  },
+  {
+    slug: 'mat-ne-dy',
+    title: 'Mat me dy lëvizje',
+    lede: 'Lëvizja e parë i merr mbretit fushat ose e detyron; e dyta jep mat.',
+    steps: [
+      {
+        title: 'Shkallët me dy torra',
+        text: 'Mbreti i zi në h8 është në buzë. Mbylle rreshtin e shtatë me njërën torrë; tjetra do të japë mat në rreshtin e tetë.',
+        fen: '7k/8/8/8/8/8/1R6/R5K1 w - - 0 1',
+        task: { moves: ['b2b7', 'h8g8', 'a1a8'], also: ['a1a7'], done: 'Mat me dy lëvizje: e para e mbylli mbretin, e dyta goditi.' },
+      },
+      practice('mateIn2', 1, 'Provo vetë', 'Fillo nga shahet dhe kapjet: cila lëvizje e lë kundërshtarin pa zgjidhje?'),
+      practice('mateIn2', 4, 'Edhe një', 'Lëvizja e parë mund të jetë edhe një sakrificë.'),
+    ],
+  },
+  {
+    slug: 'pati',
+    title: 'Pati',
+    lede: 'Mbreti pa lëvizje, por pa shah: loja mbaron barazim. Kujdes kur je duke fituar.',
+    steps: [
+      {
+        title: 'Pa lëvizje, pa shah',
+        text: 'Radha është e të zezave. Mbreti në a8 nuk është në shah, por çdo fushë ku mund të shkojë sulmohet, dhe e zeza nuk ka figura të tjera. Kjo është pati: loja mbaron barazim, edhe pse e bardha ka një mbretëreshë më shumë.',
+        fen: 'k7/2Q5/1K6/8/8/8/8/8 b - - 0 1',
+        side: 'w',
+        focus: ['a8', 'b8', 'a7', 'b7'],
+      },
+      {
+        title: 'Jep mat, jo pat',
+        text: 'Kujdes: Qc7 do të ishte pati. Gjej lëvizjen që jep mat.',
+        fen: 'k7/8/1K6/8/8/8/8/2Q5 w - - 0 1',
+        task: { moves: ['c1c8'], done: 'Mat. Kur je duke fituar, kontrollo gjithmonë: a ka mbreti kundërshtar të paktën një lëvizje?' },
+      },
+    ],
+  },
+);
+
 export const lessonOf = (slug: string) => LESSONS.find((l) => l.slug === slug);
 
 /** The lessons as a course: chapters in the order a learner meets them (the path on Mësime, the next lesson on the
@@ -321,11 +501,12 @@ export interface Chapter {
 }
 const chapter = (n: string, title: string, note: string, slugs: string[]): Chapter => ({ n, title, note, lessons: slugs.map((s) => lessonOf(s)!).filter(Boolean) });
 export const COURSE: Chapter[] = [
-  chapter('I', 'Bazat', 'Sa vlen secila figurë, dhe si nis një lojë e mirë.', ['vlera-e-figurave', 'parimet-e-hapjes']),
+  chapter('I', 'Bazat', 'Sa vlen secila figurë, lëvizjet e veçanta, dhe si nis një lojë e mirë.', ['vlera-e-figurave', 'rokada', 'marrja-ne-kalim', 'promovimi', 'parimet-e-hapjes']),
   chapter('II', 'Taktikat', 'Goditjet e shkurtra që fitojnë material.', ['piruni', 'lidhja', 'helli', 'sulmi-i-zbuluar']),
-  chapter('III', 'Mati', 'Dy mënyrat e para për ta mbaruar lojën.', ['mat-ne-rreshtin-e-fundit', 'mati-me-dy-torra']),
-  chapter('IV', 'Fundloja', 'Kur kanë mbetur pak figura: mbreti lufton.', ['opozita', 'fundloja']),
-  chapter('V', 'Hapjet', 'Një hapje e vërtetë nga fillimi.', ['mbrojtja-siciliane']),
+  chapter('III', 'Kombinimet', 'Goditje që përgatiten: sulmo dy, hiq mbrojtësin, largoje, bllokoje.', ['sulmi-i-dyfishte', 'heqja-e-mbrojtesit', 'devijimi', 'figura-e-bllokuar']),
+  chapter('IV', 'Mati', 'Mënyrat e para për ta mbaruar lojën.', ['mat-ne-rreshtin-e-fundit', 'mati-me-dy-torra', 'mat-ne-dy']),
+  chapter('V', 'Fundloja', 'Kur kanë mbetur pak figura: mbreti lufton, dhe pati është rrezik.', ['opozita', 'pati', 'fundloja']),
+  chapter('VI', 'Hapjet', 'Një hapje e vërtetë nga fillimi.', ['mbrojtja-siciliane']),
 ];
 {
   const placed = new Set(COURSE.flatMap((c) => c.lessons.map((l) => l.slug)));

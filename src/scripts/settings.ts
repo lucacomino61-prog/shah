@@ -1,6 +1,7 @@
 // The settings (Progresi > Cilësimet), the one page that scrolls: the game's switches and the glass, the backup file,
 // the daily reminder and sync between phones; and clearing the progress, which takes two presses.
 
+import { albanianVoice, setVoice, speakSq, voiceOn } from '../lib/voice.ts';
 import { load, loadGame, save, saveGame, today } from '../lib/store.ts';
 import { remindAt, remindHour, remindOff, remindSupport } from '../lib/remind.ts';
 import { joinSync, normalize, pretty, startSync, stopSync, syncNow, syncState, type SyncResult } from '../lib/sync.ts';
@@ -61,6 +62,32 @@ big.addEventListener('change', () => {
   try {
     if (big.checked) localStorage.setItem('shah.text', 'large');
     else localStorage.removeItem('shah.text');
+  } catch {}
+});
+
+// the coach's voice: only where the phone has an Albanian voice; otherwise the switch says why it is off
+const voiceBox = $<HTMLInputElement>('[data-voice]');
+voiceBox.checked = voiceOn();
+void albanianVoice().then((ok) => {
+  voiceBox.disabled = !ok;
+  if (!ok) voiceBox.checked = false;
+  $('[data-voice-note]').hidden = ok;
+});
+voiceBox.addEventListener('change', () => {
+  setVoice(voiceBox.checked);
+  if (voiceBox.checked) speakSq('Mirë. Tani trajneri flet.');
+});
+
+// the light board: fewer effects for a weak phone ('on' / 'off'; unset, the board decides and remembers)
+const lightBox = $<HTMLInputElement>('[data-light-board]');
+try {
+  const pref = localStorage.getItem('shah.light');
+  lightBox.checked = pref === 'on' || (pref !== 'off' && localStorage.getItem('shah.light.auto') === 'on');
+} catch {}
+lightBox.addEventListener('change', () => {
+  try {
+    localStorage.setItem('shah.light', lightBox.checked ? 'on' : 'off');
+    if (!lightBox.checked) localStorage.removeItem('shah.light.auto');
   } catch {}
 });
 

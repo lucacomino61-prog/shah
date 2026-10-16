@@ -266,6 +266,22 @@ a.tool, a.cue { text-decoration: none; }
 .end__counts { display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; font-size: var(--t-sub); }
 .end__counts .ann { color: var(--orange); font-weight: 700; }
 .end__tag { font-size: var(--t-foot); color: var(--label-2); }
+/* the three moments that cost the most, each opening its move on the board; the lesson for the mistake made most */
+.end__moments[hidden], .end__lesson[hidden] { display: none; }
+.end__moments { display: grid; gap: 0.125rem; margin-top: 0.25rem; }
+.end__h { font-size: var(--t-cap); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--label-2); }
+.end__moments ol { display: grid; gap: 0.125rem; }
+.end__moment {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.5rem; width: 100%; min-height: 44px;
+  padding: 0 0.625rem; border-radius: 0.875rem; background: var(--fill-2); color: var(--label); font: inherit; font-size: var(--t-sub); text-align: start;
+  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-ui) ease;
+}
+.end__moment:active { transform: scale(0.985); background: var(--fill); }
+.end__moment .n { color: var(--label-2); font-variant-numeric: tabular-nums; }
+.end__moment .ann { color: var(--orange); font-weight: 700; }
+.end__moment[data-grade='blunder'] .ann { color: var(--red-ink); }
+.end__moment .drop { font-size: var(--t-foot); color: var(--label-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.end__lesson { display: inline-flex; align-items: center; min-height: 44px; color: var(--tint-ink); font-weight: 600; text-decoration: none; }
 .lower[data-state="end"] .lower__glyph { color: var(--label); }
 
 /* ------------------------------------------------------------------ the accessory: headlines and the game's extent */

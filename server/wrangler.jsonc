@@ -11,10 +11,14 @@
     "bindings": [
       { "name": "ROOMS", "class_name": "Room" },
       { "name": "VAULTS", "class_name": "Vault" },
-      { "name": "BELL", "class_name": "Bell" }
+      { "name": "BELL", "class_name": "Bell" },
+      { "name": "CONTESTS", "class_name": "Contest" }
     ]
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room", "Vault", "Bell"] }],
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["Room", "Vault", "Bell"] },
+    { "tag": "v2", "new_sqlite_classes": ["Contest"] }
+  ],
   // the reminders go out on the hour, each at the hour its learner chose in their own time zone
   "triggers": { "crons": ["0 * * * *"] },
   "vars": {

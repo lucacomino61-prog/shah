@@ -62,7 +62,8 @@ ok(seat.flights === 0, 'the flying card is gone once it lands');
 // the course: done lessons on the path, the next one marked
 await page.evaluate(() => {
   const p = JSON.parse(localStorage.getItem('shah.progress.v1'));
-  p.lessons = ['vlera-e-figurave', 'parimet-e-hapjes'];
+  // the whole first chapter (Bazat) done: the next lesson is the first of Taktikat
+  p.lessons = ['vlera-e-figurave', 'rokada', 'marrja-ne-kalim', 'promovimi', 'parimet-e-hapjes'];
   localStorage.setItem('shah.progress.v1', JSON.stringify(p));
 });
 await page.goto(base + '/mesime/', { waitUntil: 'networkidle0' });
@@ -72,7 +73,7 @@ const path = await page.evaluate(() => ({
   go: document.querySelector('[data-next-link]').getAttribute('href'),
   diagrams: document.querySelectorAll('.stop .mini use').length,
 }));
-ok(path.done.join(',') === 'vlera-e-figurave,parimet-e-hapjes', 'the course shows the lessons done', path.done.join(','));
+ok(path.done.join(',') === 'vlera-e-figurave,rokada,marrja-ne-kalim,promovimi,parimet-e-hapjes', 'the course shows the lessons done', path.done.join(','));
 ok(path.next === 'piruni' && path.go === '/mesime/piruni/', 'and the next one, where the button leads', `${path.next} ${path.go}`);
 ok(path.diagrams > 50, 'every stop carries a diagram with its pieces', String(path.diagrams));
 

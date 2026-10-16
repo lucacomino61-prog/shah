@@ -1,5 +1,6 @@
 // A lesson as a broadcast segment: one step at a time, the board shows the idea, a task waits for the move.
 
+import { speakSq } from '../lib/voice.ts';
 import { Chess, type Square } from 'chess.js';
 import { lessonOf, type Step } from '../data/lessons.ts';
 import { Engine } from '../lib/engine.ts';
@@ -99,6 +100,7 @@ async function show(i: number) {
   ui.hint.hidden = !s.task && !s.playout;
   ui.again.hidden = true;
   ui.live.textContent = `${s.title}. ${s.text}`;
+  speakSq(`${s.title}. ${s.text}`);
   rail();
   wipe();
   if (s.setup) {
@@ -156,6 +158,7 @@ async function onMove(from: Sq, to: Sq) {
   if (!right) {
     ui.task.innerHTML = `${sentenceHtml(`[[${m.san}]] nuk është përgjigjja. Provo përsëri.`)}`;
     ui.live.textContent = 'Jo kjo. Provo përsëri.';
+    speakSq('Jo kjo. Provo përsëri.');
     missSound();
     await wait(900);
     if (g !== gen) return;
@@ -189,6 +192,7 @@ function done(text: string) {
   ui.task.hidden = false;
   ui.task.innerHTML = `${icon('check')} ${sentenceHtml(text)}`;
   ui.live.textContent = `Saktë. ${text}`;
+  speakSq(`Saktë. ${text}`);
   ui.hint.hidden = true;
   ui.again.hidden = false;
   rail();

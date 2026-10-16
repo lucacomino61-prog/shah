@@ -1,0 +1,86 @@
+---
+// How to play chess, for search ("si luhet shahu"): a beginner's path in six short cards, each leading into a lesson.
+import App from '../layouts/App.astro';
+import Guide, { type Section } from '../components/Guide.astro';
+
+const sections: Section[] = [
+  {
+    tab: 'Qëllimi',
+    title: 'Qëllimi: mati',
+    text: [
+      'Në shah fiton ai që i jep mat mbretit kundërshtar: e sulmon, dhe mbreti nuk ka asnjë shpëtim.',
+      'Mbreti nuk merret kurrë nga tabela: loja mbaron sapo ai nuk shpëton dot. Për të gjitha rregullat, lexo [rregullat e shahut](/rregullat-e-shahut/).',
+    ],
+    fen: '3R2k1/5ppp/8/8/8/8/5PPP/6K1 b - - 1 1',
+    marks: ['d8', 'g8'],
+    label: 'Mat: mbreti në g8 nuk ka ku të ikë',
+  },
+  {
+    tab: 'Fillimi',
+    title: 'Si fillon një lojë',
+    text: [
+      'Tri rregulla për dhjetë lëvizjet e para:',
+      'Zër qendrën me një ushtar, e4 ose d4. Nxirr kuajt dhe oficerët para mbretëreshës. Bëj rokadë herët, që mbreti të jetë i sigurt.',
+    ],
+    fen: 'r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
+    label: 'Pas 1.e4 e5 2.Nf3 Nc6 3.Bc4: qendra e zënë, dy figura në lojë',
+    links: [{ href: '/mesime/parimet-e-hapjes/', label: 'Mësimi: Parimet e hapjes' }],
+  },
+  {
+    tab: 'Vlera',
+    title: 'Sa vlen secila figurë',
+    text: [
+      'Ushtari vlen 1, kali dhe oficeri 3, torra 5, mbretëresha 9.',
+      'Para çdo shkëmbimi numëro: çfarë merr dhe çfarë jep. Mos e lër asnjë figurë pa mbrojtje.',
+    ],
+    links: [{ href: '/mesime/vlera-e-figurave/', label: 'Mësimi: Vlera e figurave' }],
+  },
+  {
+    tab: 'Taktikat',
+    title: 'Taktikat e para',
+    text: [
+      'Te fillestarët, shumë lojëra vendosen nga goditje të shkurtra:',
+      '[Piruni](/mesime/piruni/): një figurë sulmon dy. [Lidhja](/mesime/lidhja/): figura nuk lëviz dot pa humbur atë pas saj. [Sulmi i zbuluar](/mesime/sulmi-i-zbuluar/): një figurë largohet dhe hap sulmin e një tjetre.',
+    ],
+    fen: 'r3k3/2N5/8/8/8/8/8/4K3 b - - 0 1',
+    marks: ['c7', 'e8', 'a8'],
+    label: 'Piruni: kali në c7 sulmon mbretin dhe torrën',
+  },
+  {
+    tab: 'Mbarimi',
+    title: 'Si ta mbarosh lojën',
+    text: [
+      'Kur ke më shumë material, shkëmbe figurat dhe shko drejt fundlojës.',
+      'Mësoje [matin me dy torra](/mesime/mati-me-dy-torra/), pastaj matin me mbretëreshë dhe me torrë te [fundloja](/mesime/fundloja/). Kujdes nga [pati](/mesime/pati/).',
+    ],
+  },
+  {
+    tab: 'Përmirësohu',
+    title: 'Si përmirësohesh',
+    text: [
+      'Luaj shpesh, me kundërshtarë pak më të fortë se ti.',
+      'Rishiko gabimet pas çdo loje: Shah t’i kthen si ushtrime derisa t’i mësosh. Dhe zgjidh ushtrimin e ditës.',
+    ],
+    links: [
+      { href: '/luaj/', label: 'Luaj tani', solid: true },
+      { href: '/ushtrime/', label: 'Ushtrime' },
+    ],
+  },
+];
+const title = 'Si luhet shahu';
+const description = 'Si luhet shahu, hap pas hapi në shqip: qëllimi i lojës, si fillon, vlera e figurave, taktikat e para, si e mbaron lojën dhe si përmirësohesh.';
+// a how-to in six steps, the cards' own words without their links
+const plain = (t: string) => t.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: title,
+  description,
+  inLanguage: 'sq',
+  step: sections.map((s, i) => ({ '@type': 'HowToStep', position: i + 1, name: s.title, text: s.text.map(plain).join(' ') })),
+};
+---
+
+<App title={`${title}: udhëzues për fillestarët · Shah`} description={description} tab="mesime" room ld={ld}>
+  <Guide name="si-luhet" title={title} sub="Udhëzues për fillestarët, në gjashtë hapa." sections={sections} />
+</App>

@@ -17,6 +17,9 @@ import { gsap, motionOn, onMotion, onTick } from './shell.ts';
 import { takenIcons, writeTaken } from './celebrate.ts';
 import { portrait } from '../lib/bots.ts';
 import { scoreVs, scoreWords } from '../lib/record.ts';
+import { CURE } from '../lib/cure.ts';
+import { shareCard } from './share.ts';
+import { speakSq } from '../lib/voice.ts';
 import { fly, resetChatter, seat as seatOpponent, speak } from './seat.ts';
 import { closePanels, openPanel } from './panel.ts';
 
@@ -595,8 +598,13 @@ function endGame(resigned = false, flagged: Side | null = null, botResigned = fa
     .map((g) => `<li><span class="ann">${GRADES[g].symbol}</span> ${GRADES[g].title}: <b class="tabular">${count(g)}</b></li>`)
     .join('');
   ui.end.querySelector('[data-end-tag]')!.textContent = topTag ? `Më shpesh: ${TAG_NAMES[topTag[0] as keyof typeof TAG_NAMES].toLowerCase()} (${topTag[1]}).` : 'Asnjë gabim i përsëritur.';
+  renderMoments(topTag ? (topTag[0] as keyof typeof CURE) : null);
+  // a win against the engine can be shown to friends
+  shareGame.hidden = !(res === 'win' && !friend);
+  shareGame.dataset.acc = acc === null ? '' : String(Math.round(acc));
   status();
   say(`${headline}. ${line}`);
+  speakSq(`${headline}. ${line}`);
   wipeIn();
   ticker();
   renderClock();
@@ -673,6 +681,7 @@ function renderVerdict(v: Verdict, fresh: boolean) {
   const answer = i >= 0 ? ucis[i + 1] : undefined;
   ui.reasons.innerHTML = (answer ? afterReply(v, answer) : v.reasons).map((r) => `<li>${sentenceHtml(r)}</li>`).join('');
   say(`${v.title}. ${v.reasons.map(sentenceText).join(' ')}`);
+  if (fresh) speakSq(`${v.title}. ${v.reasons.join(' ')}`);
   if (fresh) wipeIn();
   showWarning();
   status();
@@ -952,6 +961,59 @@ function openPly(i: number) {
 }
 
 // ------------------------------------------------------------------ the graph of the game
+
+/** The learner's moves that cost the most winning chances (a tenth or more), at most three, in the order played. */
+function moments(): number[] {
+  return verdicts
+    .map((v, i) => ({ i, drop: v ? v.winBefore - v.winAfter : 0 }))
+    .filter((m) => m.drop >= 10)
+    .sort((a, b) => b.drop - a.drop)
+    .slice(0, 3)
+    .map((m) => m.i)
+    .sort((a, b) => a - b);
+}
+
+/** The end of a game sums it up: the moments that cost the most, each opening its move, and one lesson to take. */
+function renderMoments(tag: keyof typeof CURE | null) {
+  const box = ui.end.querySelector<HTMLElement>('[data-end-moments-box]')!;
+  const list = ui.end.querySelector<HTMLElement>('[data-end-moments]')!;
+  const lesson = ui.end.querySelector<HTMLAnchorElement>('[data-end-lesson]')!;
+  const ms = friend ? [] : moments();
+  box.hidden = !ms.length;
+  ui.end.querySelector('[data-end-moments-h]')!.textContent = ms.length === 3 ? 'Tri momentet kryesore' : ms.length === 2 ? 'Dy momentet kryesore' : 'Momenti kryesor';
+  list.innerHTML = ms
+    .map((i) => {
+      const v = verdicts[i]!;
+      const n = Math.floor(i / 2) + 1;
+      return `<li><button type="button" class="end__moment" data-grade="${v.grade}" data-moment="${i}" aria-label="Shiko lëvizjen ${n}: ${v.title}"><span class="n">${n}.</span><span>${sanHtml(v.san)}<span class="ann">${v.symbol}</span> ${v.title}</span><span class="drop">${Math.round(v.winBefore)}% → ${Math.round(v.winAfter)}%</span></button></li>`;
+    })
+    .join('');
+  const cure = tag && !friend ? CURE[tag] : null;
+  lesson.hidden = !cure;
+  if (cure) {
+    lesson.href = cure.href;
+    lesson.textContent = `${cure.label} ›`;
+  }
+}
+const shareGame = $<HTMLButtonElement>('[data-share-game]');
+shareGame.addEventListener('click', async () => {
+  const moves = Math.ceil(ucis.length / 2);
+  const acc = shareGame.dataset.acc;
+  shareGame.disabled = true;
+  try {
+    const how = await shareCard(
+      { kicker: 'Fitore', title: `${level.bot}, niveli ${level.n}`, line: [acc ? `Saktësia ${acc}%` : '', `${moves} lëvizje`].filter(Boolean).join(' · '), fen: chess.fen(), side },
+      `Fitova një lojë në Shah (${level.bot}, niveli ${level.n}). Provoje edhe ti:`,
+    );
+    if (how === 'saved') say('Fotografia u ruajt.');
+  } finally {
+    shareGame.disabled = false;
+  }
+});
+ui.end.addEventListener('click', (e) => {
+  const b = (e.target as Element).closest<HTMLElement>('[data-moment]');
+  if (b) openPly(Number(b.dataset.moment));
+});
 
 /** The learner's move that cost the most winning chances, if any cost at least a tenth. */
 function turning(): number | null {

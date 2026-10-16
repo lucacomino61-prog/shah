@@ -2,8 +2,9 @@
 
 An Albanian chess coach. You play Stockfish at a strength you can beat, against nine named bots, the first three made for someone who has just learned the moves. After every move the
 coach grades it, says why in plain Albanian, and can replay the better line on the board ("Shiko pse"). Your own
-mistakes come back as spaced puzzles. There are also 1,120 Lichess puzzles with a puzzle of the day, a streak and a
-three-minute race, eleven short lessons, and an opening trainer for five repertoires. The analysis board reviews any
+mistakes come back as spaced puzzles. There are also 1,632 Lichess puzzles in sixteen themes with a puzzle of the day, a
+streak, a three-minute race and challenges with friends, twenty short lessons in six chapters, and an opening trainer
+for five repertoires. The analysis board reviews any
 game, including your recent chess.com or Lichess games. You can play a friend on the same phone, or online, each on
 their own phone. The engine and the coach run in the browser: no account and no cost. It installs as an app and works
 offline.
@@ -55,6 +56,7 @@ node tools/test-club.mjs                  # first-visit question, deck of player
 node tools/test-analyse.mjs               # the analysis board and game review (dev server)
 node tools/test-animations.mjs            # the box opening, the fallen king, the promotion, captured pieces, the streak (dev)
 node tools/test-screens.mjs               # every page is one screen (only the settings scroll), every table sheet opens (dev)
+node tools/test-contest.mjs               # a challenge between friends: made, played, joined by link, ranked (dev and server)
 npm run server:check                      # the server's types (generates server/worker-configuration.d.ts first)
 node tools/test-server.mjs                # the server alone: rooms, clocks, sync vault, reminders (npm run server)
 node tools/test-online.mjs                # a game between two browsers online (dev server and server)
@@ -124,9 +126,15 @@ The second command asks for the value; it is in `server/.dev.vars`. The Worker's
   backup, reset); `src/scripts/progress.ts` draws the Progresi pages.
 - `src/scripts/board/board2d.ts`: the flat board, used only where WebGL fails (every page shows the 3D table).
 - `src/scripts/trainer.ts`, `src/data/repertoires.ts`: the opening trainer and its lines.
-- `src/data/puzzles.json`: 1,120 puzzles from the Lichess database (CC0), each solution checked with the engine.
+- `src/data/puzzles.json`: 1,632 puzzles from the Lichess database (CC0), each solution checked with the engine.
+  `node tools/build-puzzles.mjs 120 --add` deals new themes on top and keeps every puzzle already dealt.
   Rebuilt with `tools/fetch-puzzles.mjs` and `tools/build-puzzles.mjs`.
-- `src/data/lessons.ts`: the lessons, and `COURSE`, their five chapters in the order a learner meets them.
+- `src/data/lessons.ts`: the lessons, and `COURSE`, their six chapters in the order a learner meets them.
+- `src/lib/record.ts` `playingLevel`: the learner's level from the games alone; `src/lib/cure.ts`: the lesson for each
+  kind of mistake.
+- `src/scripts/share.ts`: the share cards. `src/lib/voice.ts`: the coach read aloud in Albanian where the phone can.
+- `src/components/Guide.astro`: the guides (`/rregullat-e-shahut/`, `/si-luhet-shahu/`) and `/privatesia/`.
+- `server/src/contest.ts`: a challenge between friends (Sfida). `docs/PLAY-STORE.md`: putting Shah on Google Play.
 - `server/src/`: the Worker.
   - `room.ts`: one online game; it checks moves with chess.js and keeps the clocks.
   - `vault.ts`: one encrypted progress copy.
