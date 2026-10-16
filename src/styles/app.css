@@ -584,6 +584,27 @@ html[data-room] .page-title, html[data-room] .lede { text-shadow: 0 1px 18px var
 .mini__d { fill: #8d5338; }
 .mini__mark { fill: var(--last); opacity: 0.5; }
 
+/* ------------------------------------------------------------------ larger text (Cilësimet > Tekst më i madh) */
+/* everything read one step up, as iOS's first larger-text step: titles and spacing keep their size */
+html[data-text='large'] {
+  --t-body: 1.1875rem;
+  --t-callout: 1.125rem;
+  --t-sub: 1.0625rem;
+  --t-foot: 0.9375rem;
+  --t-cap: 0.875rem;
+  --t-cap2: 0.8125rem;
+}
+/* the fixed bars keep their size, as an iPhone's status and tab bars do: the score capsules, the move strip, the tab
+   bar and the page tabs are one line of a set height */
+html[data-text='large'] :is(.bug--score, .bug--live, .strip, .tabs, .mast, .pager-tabs) {
+  --t-body: 1.0625rem;
+  --t-callout: 1rem;
+  --t-sub: 0.9375rem;
+  --t-foot: 0.8125rem;
+  --t-cap: 0.75rem;
+  --t-cap2: 0.6875rem;
+}
+
 /* ------------------------------------------------------------------ one screen per page (Luca, 2026-10-16) */
 /* "everything inside a page not to scroll … except the settings … like a real app": the page never scrolls; what is
    longer than a screen pages sideways (scripts/pager.ts) or rises as a sheet (scripts/panel.ts). Only a page that

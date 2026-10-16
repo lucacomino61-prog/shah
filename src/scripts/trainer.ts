@@ -109,7 +109,7 @@ async function start(i: number) {
   board.setInteractive(false);
   board.setPosition(chess.fen(), true);
   board.setMarks({});
-  ui.lineN.textContent = `${i + 1} nga ${LINES.length}`;
+  ui.lineN.textContent = `${i + 1}/${LINES.length}`;
   ui.again.hidden = true;
   ui.next.hidden = true;
   ui.hint.hidden = false;
@@ -220,7 +220,7 @@ ui.lines.addEventListener('click', (e) => {
 function render() {
   const s = stats();
   const learnt = LINES.filter((_, i) => (s[keyOf(i)]?.streak ?? 0) >= LEARNT).length;
-  ui.learnt.textContent = `${learnt} nga ${LINES.length}`;
+  ui.learnt.textContent = `${learnt}/${LINES.length}`;
   ui.rail.innerHTML = LINES.map((_, i) => {
     const st = s[keyOf(i)];
     const g = !st ? 'them' : st.streak >= LEARNT ? 'best' : st.streak > 0 ? 'pending' : 'mistake';

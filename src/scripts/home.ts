@@ -168,6 +168,9 @@ function streakRoll() {
       reveal();
     };
     $('[data-unbox-open]').addEventListener('click', open);
+    // from here the page answers the tap itself; a tap that came while the table was loading opens it now
+    html.dataset.unboxReady = '';
+    if ('unboxWanted' in html.dataset) requestAnimationFrame(() => requestAnimationFrame(open));
     $('[data-unbox-skip]').addEventListener('click', (e) => {
       e.stopPropagation();
       skipAll();

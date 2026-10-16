@@ -98,6 +98,7 @@ import LookPicker from '../components/LookPicker.astro';
         if (localStorage.getItem('shah.motion') === 'off') document.documentElement.dataset.motion = 'off';
         var g = parseFloat(localStorage.getItem('shah.glass'));
         if (g >= 0 && g <= 1) document.documentElement.style.setProperty('--glass-level', String(g));
+        if (localStorage.getItem('shah.text') === 'large') document.documentElement.dataset.text = 'large';
         // the room (the reading pages show a still of it) and the bright room's light glass, before the page paints
         // (looks.ts keeps both in step afterwards)
         var world = localStorage.getItem('shah.world');

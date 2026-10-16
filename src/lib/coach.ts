@@ -15,7 +15,7 @@ export const GRADES: Record<Grade, { symbol: string; title: string }> = {
   brilliant: { symbol: '!!', title: 'Shkëlqyeshëm' },
   best: { symbol: '!', title: 'Më e mira' },
   good: { symbol: '', title: 'E mirë' },
-  book: { symbol: '', title: 'Teori' },
+  book: { symbol: '', title: 'E njohur' },
   forced: { symbol: '', title: 'E detyruar' },
   inaccuracy: { symbol: '?!', title: 'Pasaktësi' },
   mistake: { symbol: '?', title: 'Gabim' },

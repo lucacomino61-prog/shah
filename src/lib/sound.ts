@@ -13,7 +13,8 @@ function wake() {
   if (ctx) return;
   try {
     const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    ctx = new AC();
+    // the home page wakes one inside a tap that comes before this script has loaded (a slow connection)
+    ctx = (window as unknown as { __shahAudio?: AudioContext }).__shahAudio ?? new AC();
   } catch {
     ctx = null;
   }

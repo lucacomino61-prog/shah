@@ -261,7 +261,8 @@ function showEval(l: Line | undefined | null, c: Chess) {
   ui.turnLabel.textContent = c.turn() === 'w' ? 'Të bardhat' : 'Të zezat';
 }
 
-/** The coach card in plain analysis: who stands better, in words. */
+/** The coach card in plain analysis: who stands better, in words, and the engine's number read as pawns (a
+ *  beginner learns what +0.4 means instead of meeting it bare). */
 function headlineFromEval(l: Line | undefined) {
   if (editing) return;
   const f = fenAt();
@@ -270,16 +271,24 @@ function headlineFromEval(l: Line | undefined) {
   ui.reasons.innerHTML = '';
   if (!l) return;
   const sign = sideToMove(f) === 'w' ? 1 : -1;
-  ui.glyph.textContent = valueText(l, f);
+  const v = valueText(l, f);
   if (l.mate !== undefined) {
     const winner = l.mate * sign > 0 ? 'Të bardhat' : 'Të zezat';
-    ui.title.textContent = `${winner} japin mat në ${Math.abs(l.mate)}.`;
+    ui.glyph.textContent = `${winner} japin mat`;
+    ui.title.textContent = `Mat në ${Math.abs(l.mate)} lëvizje, me lojën më të mirë (${v}).`;
     return;
   }
   const cp = (l.cp ?? 0) * sign;
   const who = cp > 0 ? 'Të bardhat' : 'Të zezat';
   const a = Math.abs(cp);
-  ui.title.textContent = a < 35 ? 'Pozicion i barabartë.' : a < 110 ? `${who} janë pak më mirë.` : a < 300 ? `${who} janë më mirë.` : `${who} po fitojnë.`;
+  const pawns = Math.max(1, Math.round(a / 100));
+  ui.glyph.textContent = a < 35 ? 'Pozicion i barabartë' : a < 110 ? `${who} pak më mirë` : a < 300 ? `${who} më mirë` : `${who} po fitojnë`;
+  ui.title.textContent =
+    a < 35
+      ? `Asnjëra palë nuk ka përparësi (${v}).`
+      : a < 110
+        ? `Përparësi e vogël, më pak se një ushtar (${v}).`
+        : `Përparësi sa ${pawns} ${pawns === 1 ? 'ushtar' : 'ushtarë'} (${v}).`;
 }
 
 // ------------------------------------------------------------------ the coach card, the strip and the sheet

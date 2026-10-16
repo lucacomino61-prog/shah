@@ -254,3 +254,33 @@ Is "Pasqyra" right for an overview page?
 
 **Cilësimet** (its own page now): the back link "‹ Progresi" and the title "Cilësimet". The settings inside are
 unchanged.
+
+### Also new on 2026-10-16, after a stranger's first visit
+
+**Home, before the box opens:** "Falas, pa llogari, pa reklama." under the line that says what the app is · "Kalo" ·
+after an early tap, the cue reads "Po hapet…".
+
+**The first-visit sheet**, at its foot: "Falas dhe pa reklama: softuer i lirë, me motorin Stockfish dhe ushtrime nga
+Lichess. Rreth aplikacionit".
+
+**The coach:** a known opening move is now graded "E njohur" (it was "Teori"), like "E mirë" and "E detyruar". Is "E
+njohur" clear for a beginner?
+
+**Ushtrime:**
+- The capsule shows "Ti 900".
+- The coach card names the difficulty: "Mat me një lëvizje · vështirësia 958".
+- The first puzzle ever adds: "Vlerësimi yt fillon nga 900: rritet kur e zgjidh pa ndihmë, ulet kur jo."
+- An own mistake now says: "Në lojën tënde të 13.10 këtu luajte një lëvizje të gabuar. Gjej një më të mirë."
+
+**Analizo** says who stands better in words:
+- "Pozicion i barabartë" · "Të bardhat pak më mirë" · "Të zezat më mirë" · "Të bardhat po fitojnë" · "Të zezat japin mat".
+- The line under it reads the number as pawns: "Asnjëra palë nuk ka përparësi (+0.1)." · "Përparësi e vogël, më pak se
+  një ushtar (+0.4)." · "Përparësi sa 2 ushtarë (+2.1)." · "Mat në 3 lëvizje, me lojën më të mirë (M3)."
+- Is "Përparësi sa 2 ushtarë" natural?
+
+**Progresi:**
+- "Ruaj një kopje" (beside "Ruhet vetëm në këtë shfletues.").
+- A newcomer's chart: "Pas çdo loje, saktësia jote shtohet këtu." and the button "Luaj lojën e parë".
+
+**Cilësimet:** the switch "Tekst më i madh" and its note "Tekst më i madh: shkronjat e leximit një shkallë më të mëdha,
+në çdo faqe."

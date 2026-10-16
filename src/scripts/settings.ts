@@ -52,6 +52,18 @@ glass.addEventListener('input', () => {
   } catch {}
 });
 
+// larger text: every read size one step up, on every page (the head applies it before paint)
+const big = $<HTMLInputElement>('[data-text-large]');
+big.checked = document.documentElement.dataset.text === 'large';
+big.addEventListener('change', () => {
+  if (big.checked) document.documentElement.dataset.text = 'large';
+  else delete document.documentElement.dataset.text;
+  try {
+    if (big.checked) localStorage.setItem('shah.text', 'large');
+    else localStorage.removeItem('shah.text');
+  } catch {}
+});
+
 // the game's switches: sounds and vibration, and the red rings on pieces in danger
 const switchFor = (sel: string, key: 'sound' | 'threats') => {
   const box = $<HTMLInputElement>(sel);

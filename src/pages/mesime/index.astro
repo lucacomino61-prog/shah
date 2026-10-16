@@ -214,6 +214,8 @@ let n = 0;
     .stop__board { width: 2.375rem; }
     .stop__link { padding-block: 0.1875rem; }
     .stops:has(> .stop:nth-child(4)) .stop__title { font-size: 1.125rem; }
+    /* with larger text the five rows of the trainer need the last few pixels */
+    :global(html[data-text='large']) .stops:has(> .stop:nth-child(5)) { gap: 0; }
   }
 
   .pager-tabs :global(.tab__icon--keep) { display: block; }

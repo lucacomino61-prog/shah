@@ -24,6 +24,7 @@ const hours = Array.from({ length: 24 }, (_, h) => (h + 6) % 24);
       <div class="group settings">
         <label class="row"><span>Tingujt dhe dridhja</span><input type="checkbox" class="switch" data-sound /></label>
         <label class="row"><span>Trego rreziqet në lojë</span><input type="checkbox" class="switch" data-threats-pref /></label>
+        <label class="row"><span>Tekst më i madh</span><input type="checkbox" class="switch" data-text-large /></label>
         <div class="look">
         <label class="look__label" for="glass-level">Xhami</label>
         <div class="look__range">
@@ -33,7 +34,7 @@ const hours = Array.from({ length: 24 }, (_, h) => (h + 6) % 24);
         </div>
         </div>
       </div>
-      <p class="group-note look__note">Rreziqet: një rreth i kuq rreth figurave të tua që kundërshtari mund t’i marrë në lëvizjen tjetër. Xhami: sa shihet tabela përmes menyve dhe kartave; majtas më e qartë, djathtas më e lexueshme.</p>
+      <p class="group-note look__note">Rreziqet: një rreth i kuq rreth figurave të tua që kundërshtari mund t’i marrë në lëvizjen tjetër. Xhami: sa shihet tabela përmes menyve dhe kartave; majtas më e qartë, djathtas më e lexueshme. Tekst më i madh: shkronjat e leximit një shkallë më të mëdha, në çdo faqe.</p>
     </section>
 
     {hasServer && (
@@ -110,6 +111,7 @@ const hours = Array.from({ length: 24 }, (_, h) => (h + 6) % 24);
 
 <style>
   /* back to Progresi, as an iOS navigation bar leads back */
+  .settings-page :global(.group-h) { scroll-margin-top: calc(var(--mast-h) + 1rem); }
   /* above the large title: once it has folded, its tall Didone line box reaches up over this link */
   .back { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 0.25rem; min-height: 44px; margin-left: -0.25rem; color: var(--tint-ink); font-weight: 500; text-decoration: none; }
   .back :global(.icon) { width: 1.125rem; height: 1.125rem; }

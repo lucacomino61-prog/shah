@@ -166,13 +166,18 @@ async function deal(next?: Puzzle | null) {
   if (own) {
     const c = p.card!;
     ui.themeName.textContent = 'Gabimi yt';
-    ui.puzzleRating.textContent = c.made.split('-').reverse().slice(0, 2).join('.');
-    setCoach('intro', 'Gjej më të mirën', side === 'w' ? 'Të bardhat lëvizin' : 'Të zezat lëvizin', ['Në një lojë tënde këtu luajte një lëvizje të gabuar. Gjej një më të mirë.']);
+    ui.puzzleRating.textContent = '';
+    const when = c.made.split('-').reverse().slice(0, 2).join('.');
+    setCoach('intro', 'Gjej më të mirën', side === 'w' ? 'Të bardhat lëvizin' : 'Të zezat lëvizin', [`Në lojën tënde të ${when} këtu luajte një lëvizje të gabuar. Gjej një më të mirë.`]);
   } else {
     const t = themeOf(p.theme);
     ui.themeName.textContent = t.name;
-    ui.puzzleRating.textContent = String(p.rating);
-    setCoach('intro', side === 'w' ? 'Të bardhat lëvizin' : 'Të zezat lëvizin', t.name, [t.task]);
+    ui.puzzleRating.textContent = '';
+    // the puzzle's difficulty, named, where there is room for the word; the first puzzle ever also says what the
+    // learner's own number is and how it moves
+    const lines = [t.task];
+    if (!prefs.puzzlesTried) lines.push(`Vlerësimi yt fillon nga ${prefs.puzzleRating}: rritet kur e zgjidh pa ndihmë, ulet kur jo.`);
+    setCoach('intro', side === 'w' ? 'Të bardhat lëvizin' : 'Të zezat lëvizin', `${t.name} · vështirësia ${p.rating}`, lines);
   }
   ui.myRating.textContent = String(prefs.puzzleRating);
   ratingLabel();
@@ -552,8 +557,11 @@ function say(t: string) {
   ui.live.textContent = sentenceText(t);
 }
 
+/** The learner's rating in the capsule: "Ti" on a phone, where the theme needs the room, the words on a wide screen
+ *  (and for a screen reader everywhere). */
 function ratingLabel() {
-  document.querySelector('[data-my-label]')!.textContent = prefs.puzzlesTried ? 'Vlerësimi yt' : 'Vlerësimi fillestar';
+  const long = prefs.puzzlesTried ? 'Vlerësimi yt' : 'Vlerësimi fillestar';
+  document.querySelector('[data-my-label]')!.innerHTML = `<span class="me-short" aria-hidden="true">Ti</span><span class="me-long">${long}</span>`;
 }
 
 function ticker() {

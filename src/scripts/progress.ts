@@ -109,6 +109,8 @@ function chart() {
   const svg = $<SVGSVGElement>('[data-acc-chart]');
   const cap = $('[data-acc-cap]');
   const pts = accuracies(p, 20);
+  const empty = $('[data-acc-empty]');
+  empty.hidden = pts.length > 0;
   if (!pts.length) {
     svg.innerHTML = '';
     svg.style.display = 'none';

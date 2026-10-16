@@ -19,9 +19,9 @@ html[data-motion="off"] .tool--motion .tool__label::after { content: " (ndalur)"
   min-height: 36rem;
   overflow: hidden;
   isolation: isolate;
-  /* the room under the canvas, and the whole picture for the flat board */
-  background:
-    radial-gradient(ellipse 52% 46% at 50% 42%, #3d5444 0%, #24342a 46%, #111a14 78%, #090d0a 100%);
+  /* the room under the canvas while the table loads (and the whole picture for the flat board): the chosen room's
+     still at 36px wide, inlined so it paints with the page; scaled up it is as soft as the lens's blur */
+  background: #1a120c center 40% / cover no-repeat url('data:image/webp;base64,UklGRr4AAABXRUJQVlA4ILIAAABQBwCdASokAE4APpVAlkglpCIhMzjqqLASiWcAx04fYICGklaxN8aJxzVowANB/wFwEMl2FO98lgpsP24ExzWpGaVAAP7vDEQTY/R9/aGprlmchbHqFAQL3gP8Lob32TTDch5kdq5XUwJleTihVihJWGKWmTxX6T8AhH5eVpwdy2U+KP1VHMt20pHux0Fpx3f3gzHyHVDfxmV9vUM6UQDHsVpVLAXqYtcMUzAqJtNg0AAA');
   --acc-h: 2.875rem;
   /* the board frames itself inside these; the 3D board reads them as plain lengths, so never calc() */
   --inset-top: 7.25rem;
@@ -29,6 +29,9 @@ html[data-motion="off"] .tool--motion .tool__label::after { content: " (ndalur)"
   --inset-left: 0.5rem;
   --inset-right: 0.5rem;
 }
+html[data-world='day'] .stage { background-color: #d9d2c6; background-image: url('data:image/webp;base64,UklGRsYAAABXRUJQVlA4ILoAAACwBgCdASokAE4APo04lkglKSKhNVs8ySARiWUAxzAW6leHOaH2AofhkVpQv+/CuItq0JUplMvQ7GK4eatcAADL7x87+YuEuER8LUFnbBFqPJY2zh1/4AhQVfFwhU2s6+7hNbe81vLzJRn2qYYjdad47o62Xgi0JIqKeqmqUM/NcJMjtrnRD/gDwdGzA9eavJld/egv1BjRR2S2QepCJuay1MtW3FM8wynqNtw7/Upg08CSeyEiDFwmAAA='); }
+html[data-world='fire'] .stage { background-image: url('data:image/webp;base64,UklGRrwAAABXRUJQVlA4ILAAAACQBwCdASokAE4APp0+nUmlsKyhLNgKqhATiWUAuZBfjcAVg1ROTmIUn0MjFQpASa3ZbsGc4fO04PnxWPvRWUfpdM9JIKAA/vPs9/NHqiEh+Danj26/cJ324Yfa0cHAAsiznA39sAWK4BmTS8/8vNz3JUgIbdnhQtlTa4xg1VifiOoUd9a38UvuC1Xq7KhduSOjrsSDiHqZj1YyX5piCTJYhCQxRs8W7gGJ+7uRt6AAAA=='); }
+html[data-world='night'] .stage { background-image: url('data:image/webp;base64,UklGRtwAAABXRUJQVlA4INAAAAAwCACdASokAE4APp1GnEslo6KhqrM5mLATiWUAvUxeAD896oH30AiVD4kuMEurkue6ez7sVbfFKhPjLBhxpI+Inl4VTTbu7UZcwAD+w4m1Bg1OKtn/uPu/7AlB/mbfhwRn5x+9BMTyKNVhwZ6Wmcol79uNtsfBPZmCMOyR/ypAXi8ZaP8/7ZUXtrQtlOYMPJTM96czmnqZehGL6xT9TLpvBqUV+N7CXrO1uLhCwwZYmzxbXy2nYdMBZdxlwGbbz2NGlSI9mlqumG/vW04bwAAA'); }
 .stage::after {
   content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
   background: radial-gradient(ellipse 85% 70% at 50% 40%, transparent 55%, rgb(0 0 0 / 0.45) 100%);
@@ -47,7 +50,7 @@ html[data-motion="off"] .tool--motion .tool__label::after { content: " (ndalur)"
 .stage .board:focus-visible { outline: 3px solid color-mix(in srgb, var(--tint) 75%, transparent); outline-offset: -5px; border-radius: 1.5rem; }
 
 /* every surface that floats over the table */
-.bug--live, .bug--score, .tool--menu, .lower, .ticker, .bug--sheet:not(:empty), .promo button,
+.bug--live, .bug--score, .tool--menu, .tool--quick, .lower, .ticker, .bug--sheet:not(:empty), .promo button,
 .tools[data-open] .tools__list, .setup {
   background-color: var(--glass);
   background-image: linear-gradient(180deg, var(--glass-sheen), transparent 46%);
@@ -93,6 +96,20 @@ html[data-mode="study"] .bug__live[data-live-tag] { background: var(--tint-fill)
   border-radius: 50%; background: var(--label-3);
 }
 .score__row[data-turn] .score__name { font-weight: 700; }
+/* the learner's own number on the puzzle capsule: "Ti" on a phone, the words on a wide screen */
+@media (max-width: 1023px) { .me-long { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } }
+@media (min-width: 1024px) { .me-short { display: none; } }
+/* a 320px phone: every word in the capsule stays whole and labelled. The puzzle capsule lets its two dots go and
+   sets the theme a size down; Analizo lets the small bar go (the number and its label stay) and keeps the turn's dot
+   without the word "Radha" (still read aloud) */
+@media (max-width: 359px) {
+  .score__pick { font-size: var(--t-foot); }
+  .bug--score:is(:has(.score__pick), :has([data-learnt])) .score__row { padding-inline: 0.5rem; }
+  .bug--score:is(:has(.score__pick), :has([data-learnt])) .score__name { padding-inline-start: 0; }
+  .bug--score:is(:has(.score__pick), :has([data-learnt])) .score__name::before { display: none; }
+  .bug--score:has([data-turn-label]) .evalmini { display: none; }
+  .bug--score:has([data-turn-label]) .score__row + .score__row .score__name { font-size: 0; }
+}
 .score__row[data-turn] .score__name::before { background: var(--green); box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 28%, transparent); }
 .score__taken { display: flex; align-items: center; min-height: 1rem; }
 .cap { width: 1rem; height: 1rem; margin-inline-start: -0.3rem; --piece-edge-b: #8a8580; }
@@ -118,6 +135,7 @@ html[data-motion="off"] .cap--in { animation: none; }
 a.tool, a.cue { text-decoration: none; }
 .tool--menu { justify-content: center; padding: 0; width: 44px; border-radius: 50%; }
 .tools__list { display: none; }
+.tool--quick { display: none; }
 /* a menu in the iOS manner: the label leads, the symbol sits at the trailing edge */
 .tools[data-open] .tools__list {
   display: grid; min-width: 15.5rem; padding: 0.375rem; border-radius: 1.5rem;
@@ -503,6 +521,19 @@ html[data-motion="off"] .ticker__track { animation: none; }
   /* the hit area stays 44px round the smaller button */
   .tool--menu::after { content: ""; position: absolute; inset: -0.25rem; border-radius: 50%; }
   .tools[data-open] .tools__list { min-width: 13.5rem; padding: 0.3125rem; border-radius: 1.25rem; }
+  /* the camera button: round, under the menu; the menu opens over it, and no longer lists it */
+  .tools { gap: 0.375rem; }
+  .tool--quick { display: grid; place-items: center; width: 2.25rem; min-width: 2.25rem; height: 2.25rem; padding: 0; border-radius: 50%; position: relative; }
+  .tool--quick[hidden] { display: none; }
+  .tool--quick::after { content: ""; position: absolute; inset: -0.25rem; border-radius: 50%; }
+  .tool--quick .icon { width: 1.125rem; height: 1.125rem; }
+  .tools[data-open] .tools__list { position: absolute; top: 2.625rem; right: 0; z-index: 1; }
+  .tools:has(.tool--quick:not([hidden])) .tools__list [data-angle] { display: none; }
+  /* beside a move strip it takes the strip's height, and the strip and the opponent's line end before it */
+  .stage:has(.strip) .tool--quick { width: 2rem; min-width: 2rem; height: 2rem; }
+  .stage:has(.strip) .tool--quick::after { inset: -0.375rem; }
+  .stage:has(.tool--quick:not([hidden])) .strip { right: 3.25rem; }
+  .stage:has(.tool--quick:not([hidden])) .say { max-width: calc(100% - 4rem); }
   .tools__list .tool { height: 2.75rem; font-size: var(--t-callout); border-radius: 0.9375rem; padding-inline: 0.75rem; }
   .tools__list .tool .icon { width: 1.125rem; height: 1.125rem; }
 }
@@ -760,10 +791,12 @@ html[data-motion='off'] .card { animation: none; }
 /* the menu's one destructive choice */
 .tool--danger, .tool--danger .icon { color: var(--red-ink); }
 /* the puzzle theme in the score capsule opens the themes: it reads as a choice */
-.score__pick { min-width: 0; padding: 0 0 0 0.875rem; font: inherit; color: inherit; text-align: start; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+/* the theme picker takes the capsule's full height, so it is a real target (36px on a phone, 34 on a wide screen) */
+.score__pick { min-width: 0; min-height: 2.125rem; padding: 0 0 0 0.875rem; font: inherit; color: inherit; text-align: start; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+@media (max-width: 1023px) { .score__pick { min-height: 2.25rem; } }
 .score__pick::after { content: ' ▾'; color: var(--label-3); font-size: 0.85em; }
 /* the analysis strip's way to a game */
-.strip__open { padding: 0.25rem 0; color: var(--tint-ink); font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 0.18em; }
+.strip__open { margin-inline-start: 0.25em; padding: 0.25rem 0; color: var(--tint-ink); font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 0.18em; }
 
 /* a short phone (the card's band under 13rem): the intro lets its second line go (the score capsule already says who
    plays whom), so its sentence and its buttons are never cut */

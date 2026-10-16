@@ -48,6 +48,20 @@ export function initShell() {
       btn.setAttribute('aria-expanded', String(open));
     };
     btn.addEventListener('click', () => set(!box.hasAttribute('data-open')));
+    // the camera angle, the one tool a beginner wants mid-game (from the seat the far side looks small): on a phone
+    // it stands as its own round button under the menu and passes the tap to the page's own control
+    const angle = box.querySelector<HTMLButtonElement>('[data-angle]');
+    if (angle) {
+      const quick = document.createElement('button');
+      quick.type = 'button';
+      quick.className = 'tool tool--quick';
+      quick.setAttribute('aria-label', 'Këndi i kamerës');
+      quick.innerHTML = angle.querySelector('.tool__icon')?.innerHTML ?? '';
+      quick.hidden = angle.hidden;
+      new MutationObserver(() => (quick.hidden = angle.hidden)).observe(angle, { attributes: true, attributeFilter: ['hidden'] });
+      quick.addEventListener('click', () => angle.click());
+      btn.after(quick);
+    }
     box.querySelector('.tools__list')?.addEventListener('click', (e) => {
       // a choice closes the menu; one that asks to be pressed again (Dorëzohu) keeps it open for the second press
       const t = (e.target as Element).closest('.tool');
