@@ -508,24 +508,22 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   const vsm = renderer.extensions.has('EXT_color_buffer_float') || renderer.extensions.has('EXT_color_buffer_half_float');
   renderer.shadowMap.type = vsm ? VSMShadowMap : PCFShadowMap;
   let dpr = Math.min(window.devicePixelRatio || 1, 2);
-  // the light board (Cilësimet > Tabela e lehtë): chosen ('on' / 'off' in shah.light), or by itself on a phone that
-  // reports little memory, or one that was too slow before (shah.light.auto)
+  // the light board (Cilësimet > Tabela e lehtë): chosen ('on' / 'off' in shah.light), or by itself where the first
+  // look says the phone cannot draw the table (software drawing, a very old GPU, under 2 GB), or when this visit finds
+  // it too slow. Nothing is remembered on its own: a slow moment once must not blur every later game (Luca,
+  // 2026-10-16: "i cannot distinguish the pieces"; a remembered flag from the first seconds' compiles did that).
   const lightPref = (() => {
     try {
+      // the remembered flag of the first light board, set by those false alarms: gone
+      localStorage.removeItem('shah.light.auto');
       return localStorage.getItem('shah.light');
     } catch {
       return null;
     }
   })();
-  const lightAuto = (() => {
-    try {
-      return localStorage.getItem('shah.light.auto') === 'on';
-    } catch {
-      return false;
-    }
-  })();
   const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
-  // a GPU known to struggle with this table: drawn in software, or a budget phone's (older Mali, Adreno and PowerVR)
+  // a GPU that cannot draw this table: drawn in software, or a phone's from before about 2016 (a newer budget GPU is
+  // measured instead)
   const gpu = (() => {
     try {
       const gl = renderer.getContext();
@@ -535,9 +533,12 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       return '';
     }
   })();
-  const weakGpu = /swiftshader|llvmpipe|softpipe|software|basic render|mali-(4\d\d|t[678]\d\d|g(31|51|52|57))|adreno\D*(3\d\d|4\d\d|50\d|51\d|60[5-9]|61[02])|powervr (sgx|rogue ge8)/i.test(gpu);
-  let light = lightPref === 'on' || (lightPref !== 'off' && (lightAuto || weakGpu || (memory !== undefined && memory <= 2)));
-  if (light) dpr = 1;
+  const weakGpu = /swiftshader|llvmpipe|softpipe|software|basic render|mali-(4\d\d|t[67]\d\d)|adreno\D*[34]\d\d\b|powervr sgx/i.test(gpu);
+  let light = lightPref === 'on' || (lightPref !== 'off' && (weakGpu || (memory !== undefined && memory < 2)));
+  // where the game is played the pieces must stay readable: never below 1.5 pixels a point (a phone's screen has 2 to
+  // 3); only the home screen's photograph, blurred by its lens anyway, may go lower
+  const READ_DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+  if (light) dpr = Math.min(dpr, READ_DPR);
   renderer.setPixelRatio(dpr);
 
   const scene = new Scene();
@@ -2668,6 +2669,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   let quiet = 0;
   let dprWanted = 0;
   let spent = 0;
+  const bornAt = performance.now();
   let lightWanted = false;
   /** The light board, from now on: no lens, no reflections, a smaller shadow map, no swing, a resolution of 1. */
   function goLight() {
@@ -2680,8 +2682,9 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       az = azimuthFor();
       placeCamera(false);
     }
-    if (dpr > 1) {
-      dpr = 1;
+    const lightDpr = cinema ? 1 : READ_DPR;
+    if (dpr > lightDpr) {
+      dpr = lightDpr;
       renderer.setPixelRatio(dpr);
       fit();
     }
@@ -2753,28 +2756,28 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     const settle = !moving && cheapLast;
     if (moving || dirty || settle) {
       render();
-      frames++;
-      spent += seconds;
-      if (seconds > 1 / 40) slow++;
-      // judged every 45 frames, or every 3 s on a GPU too slow to draw 45 of them
-      if (frames >= 45 || spent > 3) {
-        const tooSlow = slow > frames / 3 && frames >= 4;
-        // too slow: a lower resolution first, then the light board
-        if (tooSlow && dpr > 1 && !exp.noAdapt) dprWanted = Math.max(1, dpr - 0.5);
-        else if (tooSlow && !light && lightPref !== 'off' && !exp.noAdapt) lightWanted = true;
-        frames = 0;
-        slow = 0;
-        spent = 0;
+      // the first seconds compile programs and upload textures: their long frames say nothing about the phone
+      if (performance.now() - bornAt > 4000) {
+        frames++;
+        spent += seconds;
+        // a frame over a quarter of a second is a one-off stall (a compile, a texture), not a slow phone
+        if (seconds > 1 / 40 && seconds < 0.25) slow++;
+        // judged every 45 frames, or every 3 s on a GPU too slow to draw 45 of them
+        if (frames >= 45 || spent > 3) {
+          const tooSlow = slow > frames / 3 && frames >= 8;
+          // too slow: a lower resolution first (never below the floor where the game is played), then the light board
+          const floor = cinema ? 1 : READ_DPR;
+          if (tooSlow && dpr > floor && !exp.noAdapt) dprWanted = Math.max(floor, dpr - 0.5);
+          else if (tooSlow && !light && lightPref !== 'off' && !exp.noAdapt) lightWanted = true;
+          frames = 0;
+          slow = 0;
+          spent = 0;
+        }
       }
     }
     if (!piecesMoving && lightWanted) {
       lightWanted = false;
       goLight();
-      try {
-        localStorage.setItem('shah.light.auto', 'on');
-      } catch {
-        /* it is found slow again next time */
-      }
     }
     if (!piecesMoving && dprWanted && dprWanted !== dpr) {
       dpr = dprWanted;

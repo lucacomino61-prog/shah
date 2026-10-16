@@ -82,12 +82,11 @@ voiceBox.addEventListener('change', () => {
 const lightBox = $<HTMLInputElement>('[data-light-board]');
 try {
   const pref = localStorage.getItem('shah.light');
-  lightBox.checked = pref === 'on' || (pref !== 'off' && localStorage.getItem('shah.light.auto') === 'on');
+  lightBox.checked = pref === 'on';
 } catch {}
 lightBox.addEventListener('change', () => {
   try {
     localStorage.setItem('shah.light', lightBox.checked ? 'on' : 'off');
-    if (!lightBox.checked) localStorage.removeItem('shah.light.auto');
   } catch {}
 });
 
