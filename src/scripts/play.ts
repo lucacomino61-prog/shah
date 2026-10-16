@@ -228,6 +228,18 @@ function rebuild() {
   for (const u of ucis) chess.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] || undefined });
 }
 
+/** Every square a move empties or fills: from and to, the rook in a castle, the pawn taken in passing. */
+function moveSquares(uci: string): Sq[] {
+  const m = chess.moves({ verbose: true }).find((x) => x.from + x.to + (x.promotion ?? '') === uci);
+  if (!m) return [uci.slice(0, 2) as Sq, uci.slice(2, 4) as Sq];
+  const sq: Sq[] = [m.from as Sq, m.to as Sq];
+  const rank = m.from[1];
+  if (m.flags.includes('k')) sq.push(`h${rank}` as Sq, `f${rank}` as Sq);
+  if (m.flags.includes('q')) sq.push(`a${rank}` as Sq, `d${rank}` as Sq);
+  if (m.flags.includes('e')) sq.push(`${m.to[0]}${rank}` as Sq);
+  return sq;
+}
+
 function persist() {
   saveGame(result ? null : { fens, sans, ucis, side, level: level.id, verdicts, evals, clock, friend });
 }
@@ -424,6 +436,8 @@ async function engineMove(given?: Analysis) {
   const last = chess.history({ verbose: true }).at(-1);
   const recapture = !!last?.captured && uci.slice(2, 4) === last.to;
   const think = study ? 250 : thinkTime(level, a, legal.length, chess.history().length, recapture);
+  // the board readies the move's picture while the bot thinks, so the piece's flight starts smooth
+  if (!study) board.prepare?.(moveSquares(uci));
   const wait = Math.max(0, Math.max(motionOn() ? 650 : 250, think) - (performance.now() - started));
   // a long think, now and then, comes with a thought
   if (!study && !friend && wait > 2400) speak(level.id, 'think', ucis.length, 0.3);

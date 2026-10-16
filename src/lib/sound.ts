@@ -24,7 +24,20 @@ if (typeof window !== 'undefined') {
     if (ctx?.state === 'suspended') void ctx.resume();
   };
   addEventListener('pointerdown', once, { passive: true });
+  // Safari unlocks audio on the end of a touch or a click, not its start
+  addEventListener('touchend', once, { passive: true });
+  addEventListener('click', once);
   addEventListener('keydown', once);
+  // made while the page is idle, so the first touch does not wait the 60 ms it takes; it starts suspended and the
+  // first gesture lets it play
+  const idle = (window as unknown as { requestIdleCallback?: (f: () => void) => void }).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 1500));
+  idle(() => {
+    try {
+      if (load().sound) wake();
+    } catch {
+      /* it wakes at the first touch instead */
+    }
+  });
 }
 
 const on = () => load().sound;

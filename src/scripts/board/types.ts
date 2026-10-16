@@ -69,6 +69,8 @@ export interface BoardView {
   setAngle?(i: number): void;
   /** the 3D board: the low photographic view of the home screen, its far side out of focus */
   setCinema?(on: boolean): void;
+  /** a move is coming from these squares (the bot's, decided): get ready to draw it cheaply */
+  prepare?(squares: Sq[]): void;
   /** the 3D board: a slow swing of the camera round the table, radians of phase per second (0 stops it) */
   orbit?(speed: number): void;
   /** the 3D board: lie shut (the pieces put away in the case) or open, at once */

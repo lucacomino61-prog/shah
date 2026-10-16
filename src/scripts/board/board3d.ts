@@ -3,6 +3,8 @@
 // every rule of chess applies (chess.js decides), and the commentator draws on the squares.
 
 import {
+  type Light,
+  type Object3D,
   BoxGeometry,
   BufferAttribute,
   BufferGeometry,
@@ -33,6 +35,7 @@ import {
   RingGeometry,
   Scene,
   ShaderMaterial,
+  ShadowMaterial,
   Shape,
   ShapeGeometry,
   SphereGeometry,
@@ -54,6 +57,7 @@ import { boardBounds, frameBounds, rigFor } from './camera.ts';
 import { FILES, planMoves, readFen, type Arrow, type BoardOptions, type BoardView, type Kind, type Marks, type Placed, type Side, type Sq, type UnboxHooks } from './types.ts';
 import { caseSound, fallSound, pieceDownSound, promoteSound } from '../../lib/sound.ts';
 import { GLARE, boxUV, loadRoom, noGlare, photo, pieceMaterial, roomLight, squareMaps, type Realism, type Room } from './realism.ts';
+import { createStill, type Still } from './still.ts';
 import { createFocus, type Focus } from './focus.ts';
 import { bankersLamp, books, candle, chessClock, coffeeCup, deskLamp, mug, notebook, phone, tumbler, type Kit } from './props.ts';
 import { DEFAULT_WORLD, WORLDS, chosenSet, type PieceSetId, type PropId, type WorldDef, type WorldId } from './looks.ts';
@@ -543,6 +547,9 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   let cinema = false;
   // the photograph's lens, made the first time the cinema view is asked for
   let lensFx: Focus | null = null;
+  /** the still table (still.ts): the picture, and whether it shows the scene as it stands */
+  let stillPic: Still | null = null;
+  let stillOk = false;
   const preset = () => (cinema ? (portrait ? CINEMA.upright : CINEMA.wide) : portrait ? ANGLES[angle].upright : ANGLES[angle].wide);
   const azimuthFor = () => (orientation === 'w' ? 0 : Math.PI) + preset().az;
   /** a phone straight from the seat or overhead: the playing field edge to edge, the frame's sides off screen */
@@ -1460,13 +1467,15 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   }
 
   // ---------------------------------------------------------------- travel
-  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  // a hand's move: it gathers speed and lays the piece down as gently, never darting through the middle (a sine ease
+  // peaks at half again the average speed; the cubic it replaced at three times)
+  const ease = (t: number) => (1 - Math.cos(Math.PI * t)) / 2;
   function fly(b: Body, to: Vector3, q1: Quaternion, opts: { arc?: number; dur?: number; delay?: number; spin?: number; end?: () => void } = {}) {
     // a fallen king stands up on the way; a promotion in progress completes
     unbend(b);
     const p0 = b.pos.clone();
     const dist = p0.distanceTo(to);
-    const arc = opts.arc ?? 0.45 + dist * 0.08;
+    const arc = opts.arc ?? 0.32 + dist * 0.07;
     const p1 = p0.clone().add(to).multiplyScalar(0.5);
     p1.y = Math.max(p0.y, to.y) + arc * 2;
     b.mode = 'flight';
@@ -1962,7 +1971,8 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
         end: () => {
           b.mode = 'rest';
           b.target.copy(dest);
-          b.vel.set(0, -1.3, 0);
+          // set down where it lands: the ease has already slowed it to rest (a push down sank it into the lacquer)
+          b.vel.set(0, 0, 0);
           if (kind) promote(b, kind);
         },
       });
@@ -2010,6 +2020,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       if (b.mode === 'off' || b.mode === 'stand') continue;
       if (b.fall) {
         if (b.fall.t < FALL_END) {
+          live.add(b);
           const was = b.fall.t;
           b.fall.t = Math.min(FALL_END, b.fall.t + dt);
           if (was < FALL_S && b.fall.t >= FALL_S) fallSound();
@@ -2020,10 +2031,12 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       }
       if (b.morph) {
         stepMorph(b, dt);
+        live.add(b);
         moving = true;
       }
       if (b.mode === 'flight' && b.flight) {
         const f = b.flight;
+        live.add(b);
         if (f.delay > 0) {
           f.delay -= dt;
           moving = true;
@@ -2069,7 +2082,10 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       }
       const still =
         Math.abs(dx) + Math.abs(dy) + Math.abs(dz) < 1e-4 && b.vel.lengthSq() < 1e-8 && Math.abs(b.tilt.x) + Math.abs(b.tilt.y) < 1e-4 && b.tiltV.lengthSq() < 1e-8;
-      if (!still) moving = true;
+      if (!still) {
+        moving = true;
+        live.add(b);
+      }
       b.group.position.copy(b.pos);
       b.group.rotation.set(b.tilt.x, 0, b.tilt.y);
     }
@@ -2269,6 +2285,8 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       sized = size;
       renderer.setSize(W, H, false);
       lensFx?.setSize(W, H);
+      stillPic?.setSize();
+      stillOk = false;
     }
     lens.snap = true;
     portrait = W / H < 0.85;
@@ -2285,12 +2303,15 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   };
   function applyLens() {
     if (!lens.at) return;
+    // a picture from another view is no picture of this one
+    stillOk = false;
     camera.fov = lens.at.fov;
     camera.aspect = W / H;
     camera.setViewOffset(W, H, lens.at.ox, lens.at.oy, W, H);
     camera.updateProjectionMatrix();
   }
   function placeCamera(refit: boolean) {
+    stillOk = false;
     const rig = rigFor(az, el, preset().dist);
     camera.position.set(...rig.camera);
     camera.lookAt(...rig.target);
@@ -2361,9 +2382,141 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
 
   const focusAt = new Vector3();
   /** switches for measuring what a frame costs (set from the development hook __board.exp; all off in use) */
-  const exp = { noShadows: false, noDof: false, noAdapt: false };
+  const exp = { noShadows: false, noDof: false, noAdapt: false, noStill: false };
+  // ---------------------------------------------------------------- the still table (still.ts)
+  /** the layer the moving pieces are drawn on, over the still picture */
+  const MOVING = 5;
+  /** what moved this frame (step fills it) */
+  const live = new Set<Body>();
+  /** left out of the still picture, and drawn over it every frame until all of them rest */
+  const out = new Set<Body>();
+  /** counts the cheap frames, to draw the moving shadow every other one */
+  let shadowBeat = 0;
+  /** set by tick when nothing but pieces moves this frame: the camera, the arrows and the case all hold still */
+  let calm = false;
+  /** the last frame was drawn the cheap way: the next still one is drawn whole */
+  let cheapLast = false;
+  /** something that stands still changed while pieces moved (the last move's squares): drawn when they land */
+  let stillStale = false;
+  // a moving piece's shadow, over the picture: while pieces move the lamp's shadow map holds only them, and two
+  // see-through catchers, the board's face and the table, take that shadow and nothing else (they live on the moving
+  // layer, so no full frame ever draws them)
+  const catchMat = own(new ShadowMaterial({ opacity: 0.42, depthWrite: false }));
+  const catchers = [
+    new Mesh(keep(new PlaneGeometry(2 * (BOARD.half + BOARD.frame), 2 * (BOARD.half + BOARD.frame)).rotateX(-Math.PI / 2)), catchMat),
+    new Mesh(keep(new PlaneGeometry(60, 60).rotateX(-Math.PI / 2)), catchMat),
+  ];
+  catchers[0].position.y = BOARD.top + 0.0012;
+  catchers[1].position.y = 0.0012;
+  for (const c of catchers) {
+    c.receiveShadow = true;
+    // soft (VSM) shadows draw every receiver into the map as well: not these, or they shadow themselves
+    c.onBeforeShadow = hideDraw;
+    c.onAfterShadow = showDraw;
+    c.renderOrder = 2;
+    c.layers.set(MOVING);
+    board.add(c);
+  }
+
+  function makeStill() {
+    stillPic = createStill(renderer);
+    stillPic.setSize();
+    // its programs and its buffers now, while nothing moves, not at the first move: the marks and the arrows too,
+    // hidden now but brought in by a move or a replay (one compiled during a move stalled it 130 ms)
+    const shown = [dots[0], lastTiles[0], overTile, checkGlow, cursorRing].map((m) => [m, m.visible] as const);
+    shown.forEach(([m]) => (m.visible = true));
+    const wash = new Mesh(tileGeo, dangerWash);
+    const ring = new Mesh(takeGeo, dangerMat);
+    board.add(wash, ring);
+    for (const c of catchers) c.layers.enable(0);
+    const hadArrows = arrows.length > 0;
+    if (!hadArrows) drawArrows([{ from: 'e2', to: 'e4', label: '1' }, { from: 'g1', to: 'f3' }]);
+    stillPic.compile(scene, camera);
+    if (!hadArrows) clearArrows();
+    board.remove(wash, ring);
+    shown.forEach(([m, v]) => (m.visible = v));
+    // and for the screen, where they are drawn
+    renderer.compile(scene, camera);
+    for (const c of catchers) c.layers.disable(0);
+    stillPic.draw(scene, camera);
+    // the move's hints are drawn over the picture, never in it: they go the moment a move is made
+    for (const ob of [...dots, cursorRing]) ob.layers.enable(MOVING);
+  }
+  /** the picture again, without these (what moves, or is about to) */
+  function drawStill(movers: Iterable<Body>) {
+    for (const b of out) for (const ob of [b.mesh, b.proxy, contacts.get(b), reflections.get(b)]) ob?.layers.disable(MOVING);
+    out.clear();
+    for (const b of movers) out.add(b);
+    stillStale = false;
+    const hidden: [Object3D, boolean][] = [];
+    for (const b of out) for (const ob of [b.group, contacts.get(b), reflections.get(b)]) if (ob) (hidden.push([ob, ob.visible]), (ob.visible = false));
+    for (const ob of [...dots, cursorRing]) (hidden.push([ob, ob.visible]), (ob.visible = false));
+    if (!exp.noShadows) renderer.shadowMap.needsUpdate = true;
+    stillPic!.draw(scene, camera);
+    for (const [ob, v] of hidden) ob.visible = v;
+    // the lights must reach the moving layer (a prop's light comes and goes with its room)
+    scene.traverse((ob) => {
+      if ((ob as Light).isLight) ob.layers.enable(MOVING);
+    });
+    for (const b of out) for (const ob of [b.mesh, contacts.get(b), reflections.get(b)]) ob?.layers.enable(MOVING);
+    stillOk = true;
+  }
+  function drawMoving() {
+    stillPic!.lay();
+    const bg = scene.background;
+    scene.background = null;
+    camera.layers.set(MOVING);
+    // the lamp's shadow map: only what moves, for the catchers and the moving pieces themselves; every other frame,
+    // which a soft shadow does not show and the frame budget does (the map and its blur cost as much as the rest)
+    if (!exp.noShadows && (shadowBeat++ & 1) === 0) {
+      for (const b of out) (b.proxy ?? b.mesh).layers.enable(MOVING);
+      key.shadow.camera.layers.set(MOVING);
+      renderer.shadowMap.needsUpdate = true;
+    }
+    renderer.autoClear = false;
+    renderer.render(scene, camera);
+    renderer.autoClear = true;
+    key.shadow.camera.layers.set(0);
+    camera.layers.set(0);
+    scene.background = bg;
+  }
+  /** Before a known move (the bot's, during its think): the picture without the pieces that will move, drawn now
+   *  while the table is quiet, so their flight starts on cheap frames. */
+  function prepare(sqs: Sq[]) {
+    if (!stillPic || cinema || !motionOn || !visible) return;
+    const bs = sqs.map((s) => bySq.get(s)).filter((b): b is Body => !!b);
+    if (!bs.length || (stillOk && !dirty && bs.every((b) => out.has(b)))) return;
+    ground();
+    drawStill(bs);
+    // the screen keeps its last full frame; the shadows go back to the full set at the next one
+    shadowsStale = true;
+  }
+
   function render() {
     ground();
+    if (calm && live.size && stillPic && !cinema && !exp.noStill) {
+      calm = false;
+      // a piece starting to move that the picture still holds: the picture again, without everything that moves (a
+      // piece picked up pays this as it lifts, so its flight finds the picture ready; the bot's is made in its think)
+      let fresh = !stillOk;
+      for (const b of live) if (!out.has(b)) fresh = true;
+      if (fresh) drawStill(live);
+      // otherwise what stands still changing while pieces move (the last move's squares) waits for them to land
+      else if (dirty) stillStale = true;
+      drawMoving();
+      cheapLast = true;
+      dirty = false;
+      return;
+    }
+    calm = false;
+    // the picture stays good for the next move of the same pieces, unless what stands still has changed
+    if (dirty || stillStale) stillOk = false;
+    if (cheapLast) {
+      cheapLast = false;
+      stillStale = false;
+      // the shadows held still with the picture: this frame draws them where the pieces now stand
+      shadowsStale = true;
+    }
     if ((shadowsStale || dirty) && !exp.noShadows) {
       renderer.shadowMap.needsUpdate = true;
       shadowsStale = false;
@@ -2482,6 +2635,8 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
   let orbitT = 0;
   let frames = 0;
   let slow = 0;
+  let quiet = 0;
+  let dprWanted = 0;
   function tick(seconds: number) {
     if (!visible) return;
     const dt = Math.min(seconds, 1 / 20);
@@ -2499,12 +2654,16 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
     if (down?.moved) o.host.style.cursor = 'grabbing';
 
     let moving = false;
+    live.clear();
     const n = Math.max(1, Math.ceil(dt / (1 / 120)));
     for (let i = 0; i < n; i++) moving = step(dt / n) || moving;
     if (moving) shadowsStale = true;
 
+    // anything but the pieces moving (the arrows, the camera, the case) draws the whole frame
+    let busyView = !!unboxing;
     // arrows draw on from the tail; the numbers land when the line is drawn
     if (arrows.length && arrowClock < 1) {
+      busyView = true;
       arrowClock = motionOn ? Math.min(1, arrowClock + dt / 0.32) : 1;
       const e = 1 - Math.pow(1 - arrowClock, 3);
       arrows.forEach((a, i) => {
@@ -2521,6 +2680,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       lens.at.oy += (lens.to.oy - lens.at.oy) * k;
       applyLens();
       moving = true;
+      busyView = true;
     }
     // a slow swing round the table on the home page; anywhere a game, lesson or puzzle is played the camera stays
     // put (Luca, 2026-10-14: "make the board to not move")
@@ -2529,22 +2689,34 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       az = azimuthFor() + Math.sin(orbitT) * 0.32;
       placeCamera(false);
       moving = true;
+      busyView = true;
     }
 
-    if (moving || dirty) {
+    calm = !busyView;
+    // the pieces have come to rest: one full frame puts them back in the room's light and shadows
+    const settle = !moving && cheapLast;
+    if (moving || dirty || settle) {
       render();
       frames++;
       if (seconds > 1 / 40) slow++;
       if (frames === 45) {
-        if (slow > 15 && dpr > 1 && !exp.noAdapt) {
-          dpr = Math.max(1, dpr - 0.5);
-          renderer.setPixelRatio(dpr);
-          fit();
-        }
+        // too slow: a lower resolution, but only once nothing moves (resizing the canvas stalls a frame)
+        if (slow > 15 && dpr > 1 && !exp.noAdapt) dprWanted = Math.max(1, dpr - 0.5);
         frames = 0;
         slow = 0;
       }
     }
+    if (!moving && dprWanted && dprWanted !== dpr) {
+      dpr = dprWanted;
+      renderer.setPixelRatio(dpr);
+      fit();
+      dirty = true;
+    }
+    // the still picture is made once the table has been quiet a moment (not for the home screen's lens, which draws
+    // every frame through its own target)
+    if (!stillPic && !cinema && !moving && !dirty && realism) {
+      if (++quiet > 30) makeStill();
+    } else quiet = 0;
   }
 
   function setMotion(on: boolean) {
@@ -2625,6 +2797,14 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       programs: () => (renderer.info.programs ?? []).map((p) => `${p.name} ${(p.cacheKey as string).slice(0, 60)}`),
       fits: () => `${fits} ${sized}`,
       exp: (o: Partial<typeof exp>) => Object.assign(exp, o),
+      // the pieces in motion this frame: where they are and how (development only, for measuring a move's path)
+      still: () => ({ made: !!stillPic, ok: stillOk, out: [...out].map((b) => b.sq) }),
+      // how dark a moving piece's shadow is over the picture (development only, for tuning the catchers)
+      catchers: (opacity: number) => (catchMat.opacity = opacity),
+      motion: () =>
+        bodies
+          .filter((b) => b.mode === 'flight' || b.mode === 'carry' || b.vel.lengthSq() > 1e-6)
+          .map((b) => ({ sq: b.sq, mode: b.mode, x: b.pos.x, y: b.pos.y - BOARD.top, z: b.pos.z })),
       // how bright a light in the room may look in the lacquer (development only, for tuning noGlare)
       glare: (cap: number) => {
         GLARE.uGlareCap.value = cap;
@@ -2707,6 +2887,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       shadowsStale = true;
       return ANGLES[angle].name;
     },
+    prepare,
     setPlate(text) {
       plate.hidden = !text;
       plate.textContent = text ?? '';
@@ -2753,6 +2934,7 @@ export function createBoard3d(o: BoardOptions, realism: Realism | null = null): 
       propParts.texs.forEach((t) => t.dispose());
       room.dispose();
       lensFx?.dispose();
+      stillPic?.dispose();
       numbers.forEach((t) => t.dispose());
       inlayMap?.dispose();
       ranksMap?.dispose();
